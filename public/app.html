@@ -1,0 +1,2437 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#05070f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NexaMarket Pro">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%236366f1'/><text y='.9em' font-size='80' text-anchor='middle' x='50'>N</text></svg>">
+<title>NexaMarket Pro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   DESIGN SYSTEM
+═══════════════════════════════════════════ */
+:root {
+  --bg:      #05070f;
+  --surface: #080d1a;
+  --card:    #0d1320;
+  --card2:   #111828;
+  --input:   #131c2e;
+  --border:  rgba(99,102,241,.1);
+  --border-a:rgba(99,102,241,.45);
+
+  --violet:  #6366f1;
+  --violet2: #818cf8;
+  --vg:      rgba(99,102,241,.18);
+  --teal:    #14b8a6;
+  --green:   #22c55e;
+  --amber:   #f59e0b;
+  --rose:    #f43f5e;
+  --sky:     #38bdf8;
+  --orange:  #f97316;
+
+  --t1: #eef0fc;
+  --t2: #6b7a99;
+  --t3: #2a3550;
+
+  --r-sm: 8px; --r-md: 12px; --r-lg: 18px; --r-xl: 24px;
+  --sw: 238px; --hh: 60px;
+  --sh: 0 8px 32px rgba(0,0,0,.5);
+  --tr: .2s cubic-bezier(.4,0,.2,1);
+  --fd: 'Syne', sans-serif;
+  --fb: 'DM Sans', sans-serif;
+}
+
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--fb);
+  background: var(--bg);
+  color: var(--t1);
+  min-height: 100vh;
+  font-size: 13.5px;
+  overflow-x: hidden;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse at 15% 15%, rgba(99,102,241,.07) 0, transparent 55%),
+    radial-gradient(ellipse at 85% 85%, rgba(20,184,166,.05) 0, transparent 55%);
+  pointer-events: none; z-index: 0;
+}
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-thumb { background: var(--t3); border-radius: 4px; }
+
+/* ═══════ SCREENS ═══════ */
+.screen { display: none; position: relative; z-index: 1; }
+.screen.active { display: flex; }
+
+/* ═══════ LOGIN SCREEN ═══════ */
+#screen-login {
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--card);
+  border: 1px solid rgba(99,102,241,.18);
+  border-radius: var(--r-xl);
+  padding: 36px;
+  box-shadow: 0 24px 80px rgba(0,0,0,.6);
+}
+.login-logo {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  margin-bottom: 28px;
+}
+.logo-mark {
+  width: 42px; height: 42px; border-radius: 11px;
+  background: linear-gradient(135deg, var(--violet), var(--violet2));
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--fd); font-weight: 800; font-size: 18px; color: #fff;
+  box-shadow: 0 6px 20px var(--vg);
+}
+.logo-text { font-family: var(--fd); font-weight: 800; font-size: 20px; }
+.logo-text span { color: var(--violet2); }
+.login-title { font-family: var(--fd); font-size: 24px; font-weight: 800; text-align: center; margin-bottom: 6px; letter-spacing: -.4px; }
+.login-sub { font-size: 13px; color: var(--t2); text-align: center; margin-bottom: 26px; }
+.login-demo-btn {
+  width: 100%; padding: 11px;
+  background: rgba(245,158,11,.1);
+  border: 1px solid rgba(245,158,11,.3);
+  border-radius: var(--r-md);
+  color: var(--amber);
+  font-family: var(--fb); font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all var(--tr);
+  margin-bottom: 10px;
+}
+.login-demo-btn:hover { background: rgba(245,158,11,.18); }
+.divider-or { display: flex; align-items: center; gap: 10px; margin: 14px 0; }
+.divider-or::before, .divider-or::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.divider-or span { font-size: 11px; color: var(--t3); }
+
+/* ═══════ INPUTS ═══════ */
+.fi {
+  width: 100%; background: var(--input);
+  border: 1px solid var(--border); border-radius: var(--r-sm);
+  padding: 10px 14px; color: var(--t1);
+  font-family: var(--fb); font-size: 13.5px;
+  outline: none; transition: border-color var(--tr);
+}
+.fi:focus { border-color: var(--border-a); }
+.fi::placeholder { color: var(--t3); }
+select.fi { cursor: pointer; }
+textarea.fi { resize: vertical; min-height: 72px; line-height: 1.6; }
+.fl { font-size: 12px; font-weight: 600; color: var(--t2); margin-bottom: 5px; display: block; }
+.fg { margin-bottom: 13px; }
+
+/* ═══════ BUTTONS ═══════ */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 18px; border-radius: var(--r-sm);
+  font-family: var(--fb); font-size: 13px; font-weight: 600;
+  cursor: pointer; border: none; transition: all var(--tr);
+  white-space: nowrap;
+}
+.btn-p { background: linear-gradient(135deg, var(--violet), var(--violet2)); color: #fff; box-shadow: 0 4px 16px var(--vg); }
+.btn-p:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(99,102,241,.35); }
+.btn-g { background: var(--input); color: var(--t2); border: 1px solid var(--border); }
+.btn-g:hover { background: var(--card2); color: var(--t1); }
+.btn-danger { background: rgba(244,63,94,.12); color: var(--rose); border: 1px solid rgba(244,63,94,.25); }
+.btn-danger:hover { background: rgba(244,63,94,.22); }
+.btn-success { background: rgba(34,197,94,.12); color: var(--green); border: 1px solid rgba(34,197,94,.25); }
+.btn-amber { background: rgba(245,158,11,.12); color: var(--amber); border: 1px solid rgba(245,158,11,.25); }
+.btn-sm { padding: 5px 11px; font-size: 12px; }
+.btn-full { width: 100%; justify-content: center; padding: 12px; }
+
+/* ═══════ ALERT ═══════ */
+.alert { padding: 10px 14px; border-radius: var(--r-sm); font-size: 13px; margin-bottom: 12px; }
+.alert-ok { background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.25); color: var(--green); }
+.alert-err { background: rgba(244,63,94,.1); border: 1px solid rgba(244,63,94,.25); color: var(--rose); }
+.alert:empty { display: none; }
+
+/* ═══════ TAGS ═══════ */
+.tag { display: inline-flex; align-items: center; gap: 3px; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+.tag-g { background: rgba(34,197,94,.12); color: var(--green); }
+.tag-r { background: rgba(244,63,94,.12); color: var(--rose); }
+.tag-a { background: rgba(245,158,11,.12); color: var(--amber); }
+.tag-v { background: rgba(99,102,241,.14); color: var(--violet2); }
+.tag-t { background: rgba(20,184,166,.12); color: var(--teal); }
+.tag-s { background: rgba(255,255,255,.06); color: var(--t2); }
+
+/* ═══════ MAIN APP LAYOUT ═══════ */
+#screen-app { flex-direction: row; min-height: 100vh; }
+
+/* SIDEBAR */
+.sidebar {
+  width: var(--sw); background: var(--surface);
+  border-right: 1px solid var(--border);
+  position: fixed; inset: 0 auto 0 0;
+  z-index: 100; display: flex; flex-direction: column;
+  overflow-y: auto;
+}
+.s-logo { padding: 18px 16px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+.s-mark { width: 33px; height: 33px; border-radius: 9px; background: linear-gradient(135deg, var(--violet), var(--violet2)); display: flex; align-items: center; justify-content: center; font-family: var(--fd); font-weight: 800; font-size: 14px; color: #fff; box-shadow: 0 4px 14px var(--vg); }
+.s-name { font-family: var(--fd); font-weight: 800; font-size: 15px; }
+.s-name em { color: var(--violet2); font-style: normal; }
+.s-sect { padding: 12px 10px 4px; }
+.s-lbl { font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--t3); padding: 0 6px; margin-bottom: 4px; }
+.ni { display: flex; align-items: center; gap: 9px; padding: 8px 8px; border-radius: var(--r-sm); cursor: pointer; color: var(--t2); font-size: 13px; transition: all var(--tr); margin-bottom: 1px; position: relative; }
+.ni:hover { background: var(--card); color: var(--t1); }
+.ni.on { background: rgba(99,102,241,.12); color: var(--violet2); font-weight: 600; }
+.ni.on::before { content: ''; position: absolute; left: 0; top: 20%; bottom: 20%; width: 2.5px; background: var(--violet); border-radius: 0 2px 2px 0; }
+.nb { margin-left: auto; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; background: rgba(244,63,94,.2); color: var(--rose); }
+.nb.g { background: rgba(34,197,94,.15); color: var(--green); }
+.nb.v { background: rgba(99,102,241,.2); color: var(--violet2); }
+.s-bot { margin-top: auto; padding: 14px 10px; border-top: 1px solid var(--border); }
+.u-row { display: flex; align-items: center; gap: 9px; padding: 8px; border-radius: var(--r-sm); cursor: pointer; transition: background var(--tr); }
+.u-row:hover { background: var(--card); }
+.u-av { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; color: #fff; flex-shrink: 0; background: linear-gradient(135deg, var(--violet), var(--teal)); }
+
+/* MAIN CONTENT */
+.main { margin-left: var(--sw); flex: 1; display: flex; flex-direction: column; }
+.hdr { height: var(--hh); background: rgba(8,13,26,.92); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 26px; gap: 14px; position: sticky; top: 0; z-index: 50; backdrop-filter: blur(10px); }
+.hdr-t { font-family: var(--fd); font-size: 17px; font-weight: 700; letter-spacing: -.3px; }
+.hdr-s { font-size: 11px; color: var(--t2); margin-top: 2px; }
+.hdr-sp { flex: 1; }
+.page { flex: 1; padding: 24px; display: flex; flex-direction: column; gap: 18px; }
+.page.hidden { display: none; }
+
+/* CARDS */
+.card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 22px; box-shadow: var(--sh); }
+.card-glow { border-color: rgba(99,102,241,.18); }
+.ct { font-family: var(--fd); font-size: 14.5px; font-weight: 700; letter-spacing: -.2px; }
+.cs { font-size: 11.5px; color: var(--t2); margin-top: 2px; }
+.ch { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; gap: 10px; }
+
+/* GRIDS */
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+.g4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+
+/* KPI */
+.kpi { background: var(--card); border: 1px solid var(--border); border-radius: var(--r-md); padding: 18px 20px; position: relative; overflow: hidden; transition: all var(--tr); }
+.kpi::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; border-radius: var(--r-md) var(--r-md) 0 0; }
+.kpi.v::after { background: linear-gradient(90deg, var(--violet), var(--violet2)); }
+.kpi.g::after { background: linear-gradient(90deg, var(--green), #84cc16); }
+.kpi.a::after { background: linear-gradient(90deg, var(--amber), var(--orange)); }
+.kpi.r::after { background: linear-gradient(90deg, var(--rose), #fb7185); }
+.kpi.t::after { background: linear-gradient(90deg, var(--teal), var(--sky)); }
+.kpi:hover { border-color: rgba(99,102,241,.2); transform: translateY(-1px); }
+.kpi-lbl { font-size: 11px; color: var(--t2); margin-bottom: 7px; }
+.kpi-val { font-family: var(--fd); font-size: 26px; font-weight: 800; letter-spacing: -1px; line-height: 1.05; }
+.kpi-sub { font-size: 11px; color: var(--t2); margin-top: 3px; }
+.up { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 700; color: var(--green); background: rgba(34,197,94,.1); padding: 2px 7px; border-radius: 10px; margin-top: 7px; }
+
+/* PLANS */
+.plans-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 16px; }
+.plan-opt { background: var(--input); border: 2px solid var(--border); border-radius: var(--r-md); padding: 14px; text-align: center; cursor: pointer; transition: all var(--tr); }
+.plan-opt:hover { border-color: rgba(99,102,241,.3); }
+.plan-opt.sel { border-color: var(--violet); background: rgba(99,102,241,.1); }
+.plan-name { font-weight: 700; font-size: 13px; margin-bottom: 4px; }
+.plan-price { font-family: var(--fd); font-size: 17px; font-weight: 800; color: var(--violet2); }
+.plan-dur { font-size: 11px; color: var(--t2); margin-top: 3px; }
+
+/* TABLE */
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--t3); padding: 0 0 10px; border-bottom: 1px solid var(--border); }
+td { padding: 11px 0; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,.04); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tbody tr { transition: background var(--tr); cursor: pointer; }
+tbody tr:hover td { background: rgba(99,102,241,.04); }
+
+/* TOGGLE */
+.tog { width: 38px; height: 22px; background: var(--t3); border-radius: 12px; position: relative; cursor: pointer; transition: background var(--tr); flex-shrink: 0; }
+.tog.on { background: var(--violet); }
+.tog::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform var(--tr); }
+.tog.on::after { transform: translateX(16px); }
+
+/* MODAL */
+.modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 500; display: none; align-items: center; justify-content: center; backdrop-filter: blur(6px); }
+.modal-bg.open { display: flex; }
+.modal { background: var(--card); border: 1px solid rgba(99,102,241,.2); border-radius: var(--r-xl); padding: 28px; width: 90%; max-width: 520px; max-height: 88vh; overflow-y: auto; animation: slide-up .25s ease; }
+@keyframes slide-up { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+.modal-title { font-family: var(--fd); font-size: 18px; font-weight: 800; margin-bottom: 20px; }
+.modal-footer { display: flex; gap: 10px; margin-top: 18px; }
+
+/* FORM GRID */
+.form-g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* LIVE DOT */
+.live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: pulse 1.6s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* WA CHAT */
+.wa-msgs { display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto; padding: 4px; }
+.wa-msg { max-width: 75%; display: flex; flex-direction: column; }
+.wa-msg.in { align-self: flex-start; }
+.wa-msg.out { align-self: flex-end; }
+.wa-bubble { padding: 10px 14px; border-radius: 16px; font-size: 13px; line-height: 1.55; }
+.wa-msg.in .wa-bubble { background: var(--card2); border: 1px solid var(--border); border-top-left-radius: 4px; }
+.wa-msg.out .wa-bubble { background: rgba(99,102,241,.2); border: 1px solid rgba(99,102,241,.3); border-bottom-right-radius: 4px; }
+.wa-msg.ai .wa-bubble { background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.2); border-top-left-radius: 4px; }
+.wa-time { font-size: 10px; color: var(--t3); margin-top: 3px; }
+.wa-ai-lbl { font-size: 10px; font-weight: 700; color: var(--green); margin-bottom: 2px; }
+
+/* SEP */
+.sep { height: 1px; background: var(--border); margin: 12px 0; }
+
+/* FUNNEL */
+.funnel-bar { height: 28px; background: var(--input); border-radius: 7px; overflow: hidden; position: relative; }
+.funnel-fill { height: 100%; border-radius: 7px; display: flex; align-items: center; padding: 0 12px; font-size: 12px; font-weight: 700; color: #fff; transition: width 1.4s cubic-bezier(.4,0,.2,1); }
+
+/* ANIM */
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+.page > * { animation: fadeIn .35s ease both; }
+
+/* MISC */
+.flex { display: flex; }
+.aic { align-items: center; }
+.jcsb { justify-content: space-between; }
+.gap6 { gap: 6px; } .gap8 { gap: 8px; } .gap10 { gap: 10px; } .gap12 { gap: 12px; }
+.mb8 { margin-bottom: 8px; } .mb12 { margin-bottom: 12px; } .mb16 { margin-bottom: 16px; }
+.mt8 { margin-top: 8px; } .mt12 { margin-top: 12px; }
+.fw6 { font-weight: 600; } .fw7 { font-weight: 700; }
+.fs11 { font-size: 11px; } .fs12 { font-size: 12px; } .fs13 { font-size: 13px; }
+.t2 { color: var(--t2); } .t3 { color: var(--t3); }
+.c-v { color: var(--violet2); } .c-g { color: var(--green); } .c-r { color: var(--rose); } .c-a { color: var(--amber); } .c-t { color: var(--teal); }
+.fd { font-family: var(--fd); }
+.w100 { width: 100%; }
+.ellipsis { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.prog { height: 5px; background: rgba(255,255,255,.06); border-radius: 3px; overflow: hidden; }
+.prog-f { height: 100%; border-radius: 3px; transition: width 1.5s cubic-bezier(.4,0,.2,1); }
+
+/* ═══════════════════════════════════════════
+   VISUELS IA
+═══════════════════════════════════════════ */
+.vis-plat {
+  background: var(--input); border: 2px solid var(--border);
+  border-radius: var(--r-md); padding: 10px 6px; text-align: center;
+  cursor: pointer; transition: all var(--tr);
+}
+.vis-plat:hover { border-color: rgba(99,102,241,.3); }
+.vis-plat.sel { border-color: var(--violet); background: rgba(99,102,241,.1); }
+.format-card { text-align: center; }
+.format-card img { width:100%; border-radius: var(--r-sm); object-fit:cover; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE — Mobile iOS/Android + Tablette
+═══════════════════════════════════════════ */
+
+/* Touch improvements */
+* { -webkit-tap-highlight-color: transparent; }
+input, select, textarea, button { font-size: 16px !important; } /* Prevent iOS zoom */
+button, .btn, .ni, .plan-opt, .kpi { cursor: pointer; -webkit-touch-callout: none; }
+
+/* iOS safe areas */
+body {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ── MOBILE (< 768px) ── */
+@media (max-width: 768px) {
+  :root { --sw: 0px; --hh: 56px; }
+
+  /* Sidebar → bottom nav on mobile */
+  .sidebar {
+    width: 100% !important;
+    height: auto !important;
+    inset: auto 0 0 0 !important;
+    flex-direction: row !important;
+    border-right: none !important;
+    border-top: 1px solid var(--border) !important;
+    z-index: 200 !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    padding: 0 !important;
+    background: var(--surface) !important;
+  }
+
+  .s-logo, .s-lbl, .s-bot { display: none !important; }
+
+  .s-sect {
+    display: flex !important;
+    flex-direction: row !important;
+    padding: 0 !important;
+    gap: 0 !important;
+  }
+
+  .ni {
+    flex-direction: column !important;
+    align-items: center !important;
+    padding: 8px 12px !important;
+    border-radius: 0 !important;
+    font-size: 10px !important;
+    gap: 3px !important;
+    min-width: 60px !important;
+    white-space: nowrap !important;
+    border-left: none !important;
+  }
+
+  .ni.on::before { display: none !important; }
+  .ni.on { border-top: 2px solid var(--violet) !important; background: rgba(99,102,241,.08) !important; }
+  .nb { display: none !important; }
+
+  /* Main content */
+  .main {
+    margin-left: 0 !important;
+    padding-bottom: 75px !important; /* space for bottom nav */
+  }
+
+  /* Header */
+  .hdr {
+    padding: 0 14px !important;
+    height: var(--hh) !important;
+  }
+  .hdr-t { font-size: 15px !important; }
+  .hdr-s { display: none !important; }
+  #plan-badge { display: none !important; }
+
+  /* Pages */
+  .page { padding: 14px !important; gap: 12px !important; }
+
+  /* Cards */
+  .card { padding: 16px !important; border-radius: 14px !important; }
+
+  /* Grids → single column on mobile */
+  .g2, .g3, .g4, .form-g2, .plans-grid { grid-template-columns: 1fr !important; gap: 10px !important; }
+
+  /* KPI grid → 2 columns */
+  #kpi-grid { grid-template-columns: 1fr 1fr !important; }
+  .kpi-val { font-size: 20px !important; }
+
+  /* Login card */
+  .login-card { padding: 24px 18px !important; border-radius: 18px !important; }
+  .login-title { font-size: 20px !important; }
+
+  /* Tables → scrollable */
+  .tbl-wrap { overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; }
+  table { min-width: 500px !important; }
+  td, th { padding: 9px 6px !important; font-size: 12px !important; }
+
+  /* Buttons */
+  .btn { padding: 10px 14px !important; font-size: 13px !important; }
+  .btn-sm { padding: 7px 11px !important; font-size: 12px !important; }
+
+  /* Modal */
+  .modal {
+    width: 95% !important;
+    max-height: 90vh !important;
+    margin: 0 auto !important;
+    border-radius: 18px !important;
+    padding: 20px 16px !important;
+  }
+
+  /* WhatsApp */
+  .wa-msgs { max-height: 300px !important; }
+
+  /* Finance grid */
+  #finance-kpis { grid-template-columns: 1fr !important; }
+
+  /* Admin plans */
+  #adm-plans, #modal-plans { grid-template-columns: 1fr 1fr !important; }
+
+  /* Input */
+  .fi { padding: 11px 13px !important; }
+
+  /* Funnel bars */
+  .funnel-bar { height: 32px !important; }
+  .funnel-fill { font-size: 11px !important; }
+}
+
+/* ── SMALL MOBILE (< 380px) ── */
+@media (max-width: 380px) {
+  .ni { min-width: 52px !important; padding: 7px 8px !important; font-size: 9px !important; }
+  #kpi-grid { grid-template-columns: 1fr 1fr !important; }
+  .kpi-val { font-size: 18px !important; }
+  .hdr-t { font-size: 14px !important; }
+}
+
+/* ── TABLETTE (768px - 1024px) ── */
+@media (min-width: 769px) and (max-width: 1024px) {
+  :root { --sw: 180px; }
+
+  .s-logo { padding: 14px 12px !important; }
+  .s-name { font-size: 13px !important; }
+  .ni { font-size: 12px !important; padding: 7px 6px !important; }
+
+  .page { padding: 16px !important; }
+  .g4 { grid-template-columns: 1fr 1fr !important; }
+  .g3 { grid-template-columns: 1fr 1fr !important; }
+  .kpi-val { font-size: 22px !important; }
+
+  .plans-grid { grid-template-columns: 1fr 1fr !important; }
+  #adm-plans { grid-template-columns: 1fr 1fr !important; }
+}
+
+/* ── PWA / Standalone mode ── */
+@media (display-mode: standalone) {
+  body { padding-top: env(safe-area-inset-top); }
+  .sidebar { padding-bottom: env(safe-area-inset-bottom); }
+}
+
+/* ── Touch feedback ── */
+.btn:active { transform: scale(0.97) !important; }
+.ni:active { opacity: 0.7 !important; }
+.kpi:active { transform: none !important; }
+.plan-opt:active { transform: scale(0.98) !important; }
+
+/* ── Smooth scrolling iOS ── */
+.page, .wa-msgs, .tbl-wrap, .modal {
+  -webkit-overflow-scrolling: touch !important;
+}
+
+/* ── Better tap targets ── */
+.btn, .ni, .tog { min-height: 40px !important; }
+
+/* ── iOS input fixes ── */
+input[type="password"], input[type="email"], input[type="text"] {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  border-radius: var(--r-sm) !important;
+}
+
+/* ── Dark mode support ── */
+@media (prefers-color-scheme: dark) {
+  /* Already dark by default — no changes needed */
+}
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     ÉCRAN 1 : LOGIN
+═══════════════════════════════════════════ -->
+<div class="screen active" id="screen-login">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-mark">N</div>
+      <div class="logo-text">Nexa<span>Market</span> Pro</div>
+    </div>
+    <div class="login-title">Bienvenue 👋</div>
+    <div class="login-sub">Connectez-vous à votre espace PME</div>
+
+    <button class="login-demo-btn" onclick="loginDemo()">
+      🎁 Essayer gratuitement 24h — Compte démo
+    </button>
+
+    <div class="divider-or"><span>ou connectez-vous</span></div>
+
+    <div id="login-alert" class="alert"></div>
+
+    <div class="fg">
+      <label class="fl">Email</label>
+      <input class="fi" type="email" id="l-email" placeholder="vous@boutique.ma" autocomplete="email">
+    </div>
+    <div class="fg">
+      <label class="fl">Mot de passe</label>
+      <input class="fi" type="password" id="l-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+
+    <button class="btn btn-p btn-full" onclick="doLogin()">Se connecter →</button>
+
+    <div style="text-align:center;margin-top:16px;font-size:12px;color:var(--t3)">
+      NexaMarket Pro · SaaS PME Maroc · v3.0
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     ÉCRAN 2 : APPLICATION PRINCIPALE
+═══════════════════════════════════════════ -->
+<div class="screen" id="screen-app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="s-logo">
+      <div class="s-mark">N</div>
+      <div class="s-name">Nexa<em>Market</em></div>
+    </div>
+
+    <div class="s-sect">
+      <div class="s-lbl">Vue générale</div>
+      <div class="ni on" onclick="showPage('dashboard',this)">📊 Dashboard</div>
+      <div class="ni" onclick="showPage('whatsapp',this)">💬 WhatsApp IA <span class="nb" id="nb-wa">0</span></div>
+    </div>
+
+    <div class="s-sect">
+      <div class="s-lbl">Marketing & Ventes</div>
+      <div class="ni" onclick="showPage('crm',this)">👥 CRM</div>
+      <div class="ni" onclick="showPage('ads',this)">📣 Ads IA</div>
+      <div class="ni" onclick="showPage('content',this)">✍️ Contenu IA</div>
+      <div class="ni" onclick="showPage('visuals',this)">🎨 Visuels IA</div>
+    </div>
+
+    <div class="s-sect">
+      <div class="s-lbl">E-commerce</div>
+      <div class="ni" onclick="showPage('products',this)">🛒 Produits</div>
+      <div class="ni" onclick="showPage('orders',this)">📦 Commandes <span class="nb g" id="nb-orders">0</span></div>
+      <div class="ni" onclick="showPage('billing',this)">🧾 Facturation</div>
+    </div>
+
+    <div class="s-sect">
+      <div class="s-lbl">Finance & IA</div>
+      <div class="ni" onclick="showPage('finance',this)">💰 IA Financière</div>
+      <div class="ni" id="ni-youcan" onclick="showPage('youcan',this)">🔗 YouCan <span class="nb g" id="nb-youcan" style="display:none">✓</span></div>
+    </div>
+
+    <!-- Super Admin only -->
+    <div class="s-sect" id="admin-section" style="display:none">
+      <div class="s-lbl">Administration</div>
+      <div class="ni" onclick="showPage('admin',this)">👑 Gestion comptes</div>
+    </div>
+
+    <div class="s-bot">
+      <div class="u-row" onclick="showPage('settings',this)">
+        <div class="u-av" id="user-av">YB</div>
+        <div style="flex:1;min-width:0">
+          <div class="fw6 fs13 ellipsis" id="user-name">Utilisateur</div>
+          <div class="fs11 t2" id="user-plan">—</div>
+        </div>
+      </div>
+      <button class="btn btn-danger" style="width:100%;justify-content:center;margin-top:8px;font-size:12px" onclick="doLogout()">
+        Déconnexion
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header class="hdr">
+      <div>
+        <div class="hdr-t" id="hdr-title">Dashboard</div>
+        <div class="hdr-s" id="hdr-sub">Bienvenue sur NexaMarket Pro</div>
+      </div>
+      <div class="hdr-sp"></div>
+      <div class="flex aic gap8">
+        <div class="flex aic gap6" style="background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);padding:6px 12px;border-radius:20px">
+          <div class="live-dot"></div>
+          <span class="fs12" style="color:var(--green)">Groq IA Connecté</span>
+        </div>
+        <div id="plan-badge" class="tag tag-v">Pro</div>
+      </div>
+    </header>
+
+    <!-- ── DASHBOARD ── -->
+    <div class="page" id="page-dashboard">
+      <div class="g4" id="kpi-grid">
+        <div class="kpi v"><div class="kpi-lbl">💰 Chiffre d'affaires</div><div class="kpi-val" id="k-revenue">0 MAD</div><div class="kpi-sub">Total commandes</div></div>
+        <div class="kpi g"><div class="kpi-lbl">📦 Commandes</div><div class="kpi-val" id="k-orders">0</div><div class="kpi-sub">Ce compte</div></div>
+        <div class="kpi a"><div class="kpi-lbl">👥 Contacts CRM</div><div class="kpi-val" id="k-contacts">0</div><div class="kpi-sub">Dans votre CRM</div></div>
+        <div class="kpi t"><div class="kpi-lbl">💬 WhatsApp</div><div class="kpi-val" id="k-wa">0</div><div class="kpi-sub">Messages reçus</div></div>
+      </div>
+
+      <div class="g2">
+        <div class="card card-glow">
+          <div class="ch"><div><div class="ct">🤖 Assistant IA — Groq</div><div class="cs">Posez vos questions business</div></div></div>
+          <div id="ai-messages" style="min-height:120px;max-height:250px;overflow-y:auto;margin-bottom:12px;display:flex;flex-direction:column;gap:8px">
+            <div style="background:var(--card2);border:1px solid var(--border);border-radius:12px;border-top-left-radius:3px;padding:12px;font-size:13px;line-height:1.6">
+              Bonjour ! Je suis votre assistant IA NexaMarket. Posez-moi n'importe quelle question sur votre business, vos ventes, votre marketing ou votre finance. 🚀
+            </div>
+          </div>
+          <div class="flex gap8">
+            <input class="fi" id="ai-inp" placeholder="Ex: Comment améliorer mon ROAS ?" onkeydown="if(event.key==='Enter')sendAI()" style="flex:1">
+            <button class="btn btn-p" onclick="sendAI()">→</button>
+          </div>
+          <div class="flex gap6 mt8" style="flex-wrap:wrap">
+            <button class="btn btn-g btn-sm" onclick="quickQ('Analyse ma situation financière')">💰 Analyse finance</button>
+            <button class="btn btn-g btn-sm" onclick="quickQ('Comment augmenter mes ventes sur WhatsApp en Darija?')">💬 Tips WhatsApp</button>
+            <button class="btn btn-g btn-sm" onclick="quickQ('Quelles sont les meilleures pratiques Meta Ads Maroc?')">📣 Tips Ads</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="ch"><div><div class="ct">📊 Entonnoir de vente</div><div class="cs">Votre pipeline</div></div></div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div><div class="flex jcsb fs12 mb8"><span class="t2">Contacts</span><span class="fw7 c-v" id="f-contacts">0</span></div><div class="funnel-bar"><div class="funnel-fill" id="ff-contacts" style="width:100%;background:linear-gradient(90deg,var(--violet),var(--violet2))">Tous</div></div></div>
+            <div><div class="flex jcsb fs12 mb8"><span class="t2">Leads chauds</span><span class="fw7 c-a" id="f-hot">0</span></div><div class="funnel-bar"><div class="funnel-fill" id="ff-hot" style="width:0%;background:linear-gradient(90deg,var(--amber),var(--orange))">Chauds</div></div></div>
+            <div><div class="flex jcsb fs12 mb8"><span class="t2">Commandes</span><span class="fw7 c-g" id="f-orders">0</span></div><div class="funnel-bar"><div class="funnel-fill" id="ff-orders" style="width:0%;background:linear-gradient(90deg,var(--green),var(--teal))">Clients</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CRM ── -->
+    <div class="page hidden" id="page-crm">
+      <div class="flex jcsb aic mb12">
+        <div><div class="ct">👥 CRM — Contacts</div><div class="cs" id="crm-count">0 contacts</div></div>
+        <button class="btn btn-p btn-sm" onclick="openModal('modal-contact')">+ Ajouter contact</button>
+      </div>
+      <div class="card">
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Contact</th><th>Téléphone</th><th>Source</th><th>Score IA</th><th>Valeur</th><th>Actions</th></tr></thead>
+            <tbody id="crm-tbody"><tr><td colspan="6" style="text-align:center;color:var(--t3);padding:24px">Aucun contact — Ajoutez votre premier contact</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PRODUITS ── -->
+    <div class="page hidden" id="page-products">
+      <div class="flex jcsb aic mb12">
+        <div><div class="ct">🛒 Catalogue Produits</div><div class="cs" id="prod-count">0 produits</div></div>
+        <button class="btn btn-p btn-sm" onclick="openModal('modal-product')">+ Ajouter produit</button>
+      </div>
+      <div class="card">
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Produit</th><th>SKU</th><th>Prix (MAD)</th><th>Stock</th><th>Catégorie</th><th>Actions</th></tr></thead>
+            <tbody id="prod-tbody"><tr><td colspan="6" style="text-align:center;color:var(--t3);padding:24px">Aucun produit — Ajoutez votre catalogue</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── COMMANDES ── -->
+    <div class="page hidden" id="page-orders">
+      <div class="flex jcsb aic mb12">
+        <div><div class="ct">📦 Commandes</div><div class="cs" id="orders-count">0 commandes</div></div>
+        <button class="btn btn-p btn-sm" onclick="openModal('modal-order')">+ Nouvelle commande</button>
+      </div>
+      <div class="card">
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>N°</th><th>Client</th><th>Total TTC</th><th>Paiement</th><th>Statut</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody id="orders-tbody"><tr><td colspan="7" style="text-align:center;color:var(--t3);padding:24px">Aucune commande</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── FACTURATION ── -->
+    <div class="page hidden" id="page-billing">
+      <div class="flex jcsb aic mb12">
+        <div><div class="ct">🧾 Facturation</div><div class="cs" id="billing-count">0 documents</div></div>
+        <div class="flex gap8">
+          <button class="btn btn-g btn-sm" onclick="openInvoiceModal('devis')">+ Devis</button>
+          <button class="btn btn-p btn-sm" onclick="openInvoiceModal('invoice')">+ Facture</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>N°</th><th>Type</th><th>Client</th><th>Total TTC</th><th>Statut</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody id="billing-tbody"><tr><td colspan="7" style="text-align:center;color:var(--t3);padding:24px">Aucune facture</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── WHATSAPP ── -->
+    <div class="page hidden" id="page-whatsapp">
+      <div class="g2">
+        <div class="card card-glow">
+          <div class="ch">
+            <div><div class="ct">💬 Messages WhatsApp</div><div class="cs" id="wa-stats-txt">0 messages</div></div>
+            <div class="flex aic gap8">
+              <div class="flex aic gap6"><div class="live-dot"></div><span class="fs12" style="color:var(--green)">Connecté</span></div>
+              <button class="btn btn-p btn-sm" onclick="openModal('modal-wa')">+ Message</button>
+            </div>
+          </div>
+          <div class="wa-msgs" id="wa-msgs-list">
+            <div style="text-align:center;color:var(--t3);padding:24px">Aucun message — Simulez une conversation</div>
+          </div>
+          <div class="sep"></div>
+          <div class="flex gap8 mt8">
+            <input class="fi" id="wa-quick-inp" placeholder="Message client (ex: Salam, wash 3ndkom hijab?)..." style="flex:1" onkeydown="if(event.key==='Enter')sendWaQuick()">
+            <select class="fi" id="wa-lang" style="width:100px">
+              <option value="dar">Darija</option>
+              <option value="fr">Français</option>
+              <option value="ar">Arabe</option>
+            </select>
+            <button class="btn btn-p" onclick="sendWaQuick()">🤖 IA</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ct mb12">📊 Statistiques</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div class="flex jcsb aic"><span class="t2">Messages reçus</span><span class="fw7" id="wa-s-total">0</span></div>
+            <div class="flex jcsb aic"><span class="t2">Réponses IA</span><span class="fw7 c-g" id="wa-s-ai">0</span></div>
+            <div class="flex jcsb aic"><span class="t2">Taux automatique</span><span class="fw7 c-v" id="wa-s-rate">0%</span></div>
+            <div class="sep"></div>
+            <div class="ct mb8 fs13">Réponse auto IA</div>
+            <div class="flex aic jcsb fs13"><span>Activer bot IA</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="flex aic jcsb fs13"><span>Langue auto-detect</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ADS ── -->
+    <div class="page hidden" id="page-ads">
+      <div class="flex jcsb aic mb12">
+        <div><div class="ct">📣 Campagnes Publicitaires</div><div class="cs">Meta · Google · TikTok</div></div>
+        <button class="btn btn-p btn-sm" onclick="openModal('modal-campaign')">+ Nouvelle campagne</button>
+      </div>
+      <div class="card">
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Campagne</th><th>Plateforme</th><th>Budget</th><th>Dépensé</th><th>ROAS</th><th>Statut</th></tr></thead>
+            <tbody id="ads-tbody"><tr><td colspan="6" style="text-align:center;color:var(--t3);padding:24px">Aucune campagne</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CONTENU IA ── -->
+    <div class="page hidden" id="page-content">
+      <div class="card card-glow">
+        <div class="ct mb16">✍️ Générateur de Contenu IA — Groq</div>
+        <div class="g2">
+          <div>
+            <div class="fg">
+              <label class="fl">Type de contenu</label>
+              <select class="fi" id="cont-type">
+                <option value="social">📱 Post Facebook/Instagram</option>
+                <option value="sms">💬 SMS Marketing</option>
+                <option value="email">📧 Email Marketing</option>
+                <option value="product">🛍 Fiche produit</option>
+                <option value="video">🎬 Script vidéo TikTok</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label class="fl">Produit / Sujet</label>
+              <input class="fi" id="cont-subject" placeholder="Ex: Hijab Premium Soie, Promo Ramadan...">
+            </div>
+            <div class="fg">
+              <label class="fl">Langue</label>
+              <select class="fi" id="cont-lang">
+                <option value="dar">🇲🇦 Darija</option>
+                <option value="fr">🇫🇷 Français</option>
+                <option value="ar">🇸🇦 Arabe</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label class="fl">Infos supplémentaires</label>
+              <textarea class="fi" id="cont-extra" placeholder="Prix, promotion, livraison gratuite..."></textarea>
+            </div>
+            <button class="btn btn-p w100" style="justify-content:center" onclick="generateContent()">
+              ⚡ Générer avec IA Groq
+            </button>
+          </div>
+          <div>
+            <label class="fl mb8">Résultat IA</label>
+            <div id="cont-output" style="background:var(--input);border:1px solid var(--border);border-radius:var(--r-md);padding:16px;min-height:260px;font-size:13px;line-height:1.75;white-space:pre-wrap;color:var(--t2)">
+              Le contenu généré apparaîtra ici...
+            </div>
+            <div class="flex gap8 mt8">
+              <button class="btn btn-g btn-sm" onclick="copyContent()">📋 Copier</button>
+              <button class="btn btn-g btn-sm" onclick="generateContent()">🔄 Régénérer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── FINANCE IA ── -->
+    <div class="page hidden" id="page-finance">
+      <div class="card card-glow">
+        <div class="ch">
+          <div><div class="ct">💰 Analyse Financière IA</div><div class="cs">Analyse en temps réel de vos données réelles</div></div>
+          <button class="btn btn-p btn-sm" onclick="loadFinanceAI()">🤖 Analyser maintenant</button>
+        </div>
+        <div id="finance-output" style="background:var(--input);border:1px solid var(--border);border-radius:var(--r-md);padding:18px;min-height:150px;font-size:13px;line-height:1.8;white-space:pre-wrap;color:var(--t2)">
+          Cliquez sur "Analyser maintenant" pour obtenir une analyse IA de votre situation financière réelle.
+        </div>
+      </div>
+      <div class="g3" id="finance-kpis">
+        <div class="kpi v"><div class="kpi-lbl">💰 Revenus</div><div class="kpi-val" id="fin-rev">0 MAD</div></div>
+        <div class="kpi r"><div class="kpi-lbl">📤 Dépenses</div><div class="kpi-val" id="fin-exp">0 MAD</div></div>
+        <div class="kpi g"><div class="kpi-lbl">📈 Bénéfice net</div><div class="kpi-val" id="fin-profit">0 MAD</div></div>
+      </div>
+      <div class="card">
+        <div class="ch"><div class="ct">📤 Ajouter une dépense</div></div>
+        <div class="form-g2 mb12">
+          <div class="fg"><label class="fl">Catégorie</label>
+            <select class="fi" id="exp-cat">
+              <option>Achats fournisseurs</option><option>Publicité</option><option>Logistique</option>
+              <option>Salaires</option><option>Loyer</option><option>Divers</option>
+            </select>
+          </div>
+          <div class="fg"><label class="fl">Montant (MAD)</label><input class="fi" type="number" id="exp-amt" placeholder="0"></div>
+          <div class="fg"><label class="fl">Description</label><input class="fi" id="exp-desc" placeholder="Description..."></div>
+          <div class="fg"><label class="fl">Date</label><input class="fi" type="date" id="exp-date"></div>
+        </div>
+        <button class="btn btn-p btn-sm" onclick="addExpense()">+ Ajouter dépense</button>
+      </div>
+    </div>
+
+    <!-- ── SETTINGS ── -->
+    <div class="page hidden" id="page-settings">
+      <div class="card card-glow">
+        <div class="ct mb16">⚙️ Paramètres du compte</div>
+        <div class="form-g2 mb12">
+          <div class="fg"><label class="fl">Nom complet</label><input class="fi" id="set-name" placeholder="Votre nom"></div>
+          <div class="fg"><label class="fl">Entreprise</label><input class="fi" id="set-company" placeholder="Nom boutique"></div>
+          <div class="fg"><label class="fl">Téléphone</label><input class="fi" id="set-phone" placeholder="+212..."></div>
+          <div class="fg"><label class="fl">Ville</label><input class="fi" id="set-city" placeholder="Casablanca"></div>
+          <div class="fg"><label class="fl">Secteur</label><input class="fi" id="set-sector" placeholder="Mode & Vêtements"></div>
+        </div>
+        <button class="btn btn-p btn-sm" onclick="saveSettings()">💾 Sauvegarder</button>
+        <div class="sep"></div>
+        <div class="ct mb12">🔑 Changer mot de passe</div>
+        <div class="form-g2">
+          <div class="fg"><label class="fl">Mot de passe actuel</label><input class="fi" type="password" id="pw-old" placeholder="••••••••"></div>
+          <div class="fg"><label class="fl">Nouveau mot de passe</label><input class="fi" type="password" id="pw-new" placeholder="••••••••"></div>
+        </div>
+        <button class="btn btn-g btn-sm" onclick="changePW()">Changer le mot de passe</button>
+        <div id="settings-alert" class="alert mt8"></div>
+      </div>
+    </div>
+
+    <!-- ── SUPER ADMIN PANEL ── -->
+    <div class="page hidden" id="page-admin">
+      <div class="g4" id="admin-stats">
+        <div class="kpi v"><div class="kpi-lbl">👥 Comptes total</div><div class="kpi-val" id="adm-total">0</div></div>
+        <div class="kpi g"><div class="kpi-lbl">✅ Actifs</div><div class="kpi-val" id="adm-actif">0</div></div>
+        <div class="kpi a"><div class="kpi-lbl">⏰ Expire bientôt</div><div class="kpi-val" id="adm-expire">0</div></div>
+        <div class="kpi r"><div class="kpi-lbl">⛔ Désactivés</div><div class="kpi-val" id="adm-inactif">0</div></div>
+      </div>
+
+      <!-- CREATE ACCOUNT -->
+      <div class="card card-glow">
+        <div class="ct mb16">➕ Créer un compte utilisateur</div>
+        <div id="adm-create-alert" class="alert"></div>
+        <div class="form-g2 mb12">
+          <div class="fg"><label class="fl">Nom complet *</label><input class="fi" id="adm-name" placeholder="Hassan Amrani"></div>
+          <div class="fg"><label class="fl">Email *</label><input class="fi" type="email" id="adm-email" placeholder="hassan@boutique.ma"></div>
+          <div class="fg"><label class="fl">Mot de passe *</label><input class="fi" type="password" id="adm-pass" placeholder="Min. 6 caractères"></div>
+          <div class="fg"><label class="fl">Téléphone</label><input class="fi" id="adm-phone" placeholder="+212 6XX XXX XXX"></div>
+          <div class="fg"><label class="fl">Entreprise</label><input class="fi" id="adm-company" placeholder="Boutique Mode Casa"></div>
+          <div class="fg"><label class="fl">Ville</label><input class="fi" id="adm-city" placeholder="Casablanca"></div>
+        </div>
+
+        <label class="fl mb8">Abonnement *</label>
+        <div class="plans-grid" id="adm-plans">
+          <div class="plan-opt" onclick="selPlan(this,'demo')" id="ap-demo"><div class="plan-name">🎁 Démo</div><div class="plan-price">Gratuit</div><div class="plan-dur">24 heures</div></div>
+          <div class="plan-opt sel" onclick="selPlan(this,'30j')" id="ap-30j"><div class="plan-name">📅 Mensuel</div><div class="plan-price">299 MAD</div><div class="plan-dur">30 jours</div></div>
+          <div class="plan-opt" onclick="selPlan(this,'1an')" id="ap-1an"><div class="plan-name">📆 Annuel</div><div class="plan-price">2 699 MAD</div><div class="plan-dur">365 jours</div></div>
+          <div class="plan-opt" onclick="selPlan(this,'avie')" id="ap-avie"><div class="plan-name">♾️ À vie</div><div class="plan-price">9 949 MAD</div><div class="plan-dur">Illimité</div></div>
+        </div>
+
+        <div class="fg" style="max-width:220px">
+          <label class="fl">Rôle</label>
+          <select class="fi" id="adm-role"><option value="user">Utilisateur</option><option value="admin">Admin</option></select>
+        </div>
+        <button class="btn btn-p" onclick="adminCreateUser()">✅ Créer le compte</button>
+      </div>
+
+      <!-- USERS LIST -->
+      <div class="card">
+        <div class="ch">
+          <div class="ct">📋 Tous les comptes</div>
+          <button class="btn btn-g btn-sm" onclick="loadAdminUsers()">🔄 Actualiser</button>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Utilisateur</th><th>Email</th><th>Abonnement</th><th>Expiration</th><th>Statut</th><th>Actions</th></tr></thead>
+            <tbody id="adm-tbody"><tr><td colspan="6" style="text-align:center;color:var(--t3);padding:24px">Chargement...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ── YOUCAN ── -->
+    <div class="page hidden" id="page-youcan">
+
+      <!-- STATUS CARD -->
+      <div class="card" id="yc-status-card" style="border-color:rgba(99,102,241,.15)">
+        <div class="ch">
+          <div>
+            <div class="ct">🔗 Intégration YouCan</div>
+            <div class="cs" id="yc-status-text">Vérification du statut...</div>
+          </div>
+          <div id="yc-status-badge" class="tag tag-s">Chargement...</div>
+        </div>
+
+        <!-- NOT CONNECTED -->
+        <div id="yc-not-connected">
+          <div style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:var(--r-md);padding:18px;margin-bottom:16px">
+            <div class="fw7 c-a mb8">📋 Comment connecter YouCan en 3 étapes</div>
+            <div class="fs13" style="line-height:2;color:var(--t2)">
+              <div><strong style="color:var(--t1)">1.</strong> Allez sur votre admin YouCan → <strong style="color:var(--violet2)">Paramètres → API</strong></div>
+              <div><strong style="color:var(--t1)">2.</strong> Copiez votre <strong style="color:var(--violet2)">clé API</strong> (commence par yk_...)</div>
+              <div><strong style="color:var(--t1)">3.</strong> Collez-la ci-dessous et cliquez Sauvegarder</div>
+            </div>
+          </div>
+          <div class="form-g2 mb12">
+            <div class="fg"><label class="fl">Clé API YouCan *</label><input class="fi" id="yc-apikey" placeholder="yk_live_xxxx..."></div>
+            <div class="fg"><label class="fl">URL boutique *</label><input class="fi" id="yc-store" placeholder="ma-boutique.youcan.shop"></div>
+            <div class="fg"><label class="fl">Webhook Secret (optionnel)</label><input class="fi" id="yc-secret" placeholder="Pour sécuriser les webhooks"></div>
+          </div>
+          <div id="yc-config-alert" class="alert"></div>
+          <div class="flex gap8">
+            <button class="btn btn-p" onclick="saveYouCanConfig()">💾 Sauvegarder et connecter</button>
+            <button class="btn btn-g" onclick="loadYouCanStatus()">🔄 Tester la connexion</button>
+          </div>
+          <div class="sep"></div>
+          <div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--r-md);padding:14px">
+            <div class="fw7 mb8 fs13">📌 Configurer le Webhook YouCan (pour sync temps réel)</div>
+            <div class="fs12 t2 mb8">Dans YouCan Admin → Paramètres → Webhooks → Ajouter cette URL :</div>
+            <div style="background:var(--input);border-radius:var(--r-sm);padding:10px 14px;font-family:monospace;font-size:12px;color:var(--violet2);word-break:break-all" id="yc-webhook-url">
+              Chargement...
+            </div>
+            <div class="fs11 t2 mt8">Événements à activer : <strong>order.created · order.confirmed · order.cancelled · product.updated</strong></div>
+          </div>
+        </div>
+
+        <!-- CONNECTED -->
+        <div id="yc-connected" style="display:none">
+          <div style="background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);border-radius:var(--r-md);padding:14px;margin-bottom:16px;display:flex;align-items:center;gap:12px">
+            <span style="font-size:28px">✅</span>
+            <div>
+              <div class="fw7 c-g">YouCan connecté et actif</div>
+              <div class="fs12 t2 mt4">Boutique : <span id="yc-store-name" class="c-v fw6">—</span></div>
+            </div>
+          </div>
+
+          <!-- SYNC BUTTONS -->
+          <div class="g3 mb16">
+            <div class="card" style="text-align:center;cursor:pointer;transition:all var(--tr)" onclick="syncOrders()" onmouseover="this.style.borderColor='rgba(99,102,241,.3)'" onmouseout="this.style.borderColor='var(--border)'">
+              <div style="font-size:28px;margin-bottom:8px">📦</div>
+              <div class="fw7 mb4">Sync Commandes</div>
+              <div class="fs12 t2 mb10">Importer toutes les commandes YouCan</div>
+              <button class="btn btn-p btn-sm w100" style="justify-content:center">🔄 Synchroniser</button>
+            </div>
+            <div class="card" style="text-align:center;cursor:pointer;transition:all var(--tr)" onclick="syncProducts()" onmouseover="this.style.borderColor='rgba(99,102,241,.3)'" onmouseout="this.style.borderColor='var(--border)'">
+              <div style="font-size:28px;margin-bottom:8px">🛒</div>
+              <div class="fw7 mb4">Sync Produits</div>
+              <div class="fs12 t2 mb10">Importer catalogue + stocks YouCan</div>
+              <button class="btn btn-p btn-sm w100" style="justify-content:center">🔄 Synchroniser</button>
+            </div>
+            <div class="card" style="text-align:center;cursor:pointer;transition:all var(--tr)" onclick="syncAll()" onmouseover="this.style.borderColor='rgba(34,197,94,.3)'" onmouseout="this.style.borderColor='var(--border)'">
+              <div style="font-size:28px;margin-bottom:8px">⚡</div>
+              <div class="fw7 mb4">Tout synchroniser</div>
+              <div class="fs12 t2 mb10">Commandes + Produits + Clients</div>
+              <button class="btn btn-success btn-sm w100" style="justify-content:center">⚡ Sync tout</button>
+            </div>
+          </div>
+
+          <div id="yc-sync-result" class="alert" style="margin-bottom:12px"></div>
+
+          <!-- YOUCAN ORDERS PREVIEW -->
+          <div class="ch mt8"><div class="ct fs13">📦 Dernières commandes YouCan</div><button class="btn btn-g btn-sm" onclick="loadYCOrders()">🔄 Actualiser</button></div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>N° Commande</th><th>Client</th><th>Total</th><th>Paiement</th><th>Statut</th><th>Date</th></tr></thead>
+              <tbody id="yc-orders-tbody"><tr><td colspan="6" style="text-align:center;color:var(--t3);padding:18px">Cliquez "Sync Commandes" pour charger</td></tr></tbody>
+            </table>
+          </div>
+
+          <div class="sep"></div>
+          <div class="fw7 mb8 fs13">⚙️ Reconfigurer</div>
+          <button class="btn btn-danger btn-sm" onclick="disconnectYouCan()">🔌 Déconnecter YouCan</button>
+        </div>
+      </div>
+
+      <!-- HOW IT WORKS -->
+      <div class="card">
+        <div class="ct mb16">🔄 Comment fonctionne la synchronisation</div>
+        <div class="g3">
+          <div style="text-align:center;padding:16px;background:var(--card2);border-radius:var(--r-md)">
+            <div style="font-size:32px;margin-bottom:10px">🛍</div>
+            <div class="fw7 mb6">Client commande sur YouCan</div>
+            <div class="fs12 t2">Un client passe commande sur votre boutique YouCan</div>
+          </div>
+          <div style="text-align:center;padding:16px;background:var(--card2);border-radius:var(--r-md)">
+            <div style="font-size:32px;margin-bottom:10px">⚡</div>
+            <div class="fw7 mb6">NexaMarket reçoit en temps réel</div>
+            <div class="fs12 t2">Via Webhook : commande + client ajoutés automatiquement</div>
+          </div>
+          <div style="text-align:center;padding:16px;background:var(--card2);border-radius:var(--r-md)">
+            <div style="font-size:32px;margin-bottom:10px">🤖</div>
+            <div class="fw7 mb6">Actions automatiques</div>
+            <div class="fs12 t2">Stock déduit · Contact CRM créé · Alerte notification</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- ── VISUELS IA ── -->
+    <div class="page hidden" id="page-visuals">
+
+      <!-- FORMATS -->
+      <div class="card card-glow">
+        <div class="ch">
+          <div><div class="ct">🎨 Générateur de Visuels Publicitaires IA</div><div class="cs">100% gratuit · Pollinations.ai + Groq · Formats officiels chaque plateforme</div></div>
+          <div class="flex aic gap6" style="background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);padding:6px 12px;border-radius:20px">
+            <div class="live-dot"></div><span class="fs12 c-g">Gratuit & Illimité</span>
+          </div>
+        </div>
+
+        <div class="g2">
+          <!-- LEFT: FORM -->
+          <div>
+            <div class="fg">
+              <label class="fl">Plateforme cible</label>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:4px" id="platform-grid">
+                <div class="vis-plat sel" onclick="selPlat(this,'facebook','1080x1080')" data-plat="facebook" data-size="1080x1080">
+                  <div style="font-size:20px">📘</div><div class="fw6 fs12">Facebook</div><div class="fs11 t2">1080×1080</div>
+                </div>
+                <div class="vis-plat" onclick="selPlat(this,'facebook_story','1080x1920')" data-plat="facebook_story" data-size="1080x1920">
+                  <div style="font-size:20px">📘</div><div class="fw6 fs12">FB Story</div><div class="fs11 t2">1080×1920</div>
+                </div>
+                <div class="vis-plat" onclick="selPlat(this,'instagram','1080x1080')" data-plat="instagram" data-size="1080x1080">
+                  <div style="font-size:20px">📸</div><div class="fw6 fs12">Instagram</div><div class="fs11 t2">1080×1080</div>
+                </div>
+                <div class="vis-plat" onclick="selPlat(this,'instagram_reel','1080x1920')" data-plat="instagram_reel" data-size="1080x1920">
+                  <div style="font-size:20px">📸</div><div class="fw6 fs12">IG Reel</div><div class="fs11 t2">1080×1920</div>
+                </div>
+                <div class="vis-plat" onclick="selPlat(this,'tiktok','1080x1920')" data-plat="tiktok" data-size="1080x1920">
+                  <div style="font-size:20px">🎵</div><div class="fw6 fs12">TikTok</div><div class="fs11 t2">1080×1920</div>
+                </div>
+                <div class="vis-plat" onclick="selPlat(this,'linkedin','1200x627')" data-plat="linkedin" data-size="1200x627">
+                  <div style="font-size:20px">💼</div><div class="fw6 fs12">LinkedIn</div><div class="fs11 t2">1200×627</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="fg">
+              <label class="fl">Produit / Sujet de la pub *</label>
+              <input class="fi" id="vis-product" placeholder="Ex: Hijab Premium Soie Bordeaux 185 MAD">
+            </div>
+
+            <div class="fg">
+              <label class="fl">Style visuel</label>
+              <select class="fi" id="vis-style">
+                <option value="professional product photo, white background, studio lighting">🏪 Studio produit (fond blanc)</option>
+                <option value="lifestyle photo, moroccan woman, natural light, warm colors">🌟 Lifestyle naturel</option>
+                <option value="bold promotional banner, sale discount, vibrant colors, arabic text overlay">🔥 Bannière promo</option>
+                <option value="minimalist elegant luxury fashion photo">✨ Minimaliste luxe</option>
+                <option value="flat lay product arrangement, colorful background, top view">📐 Flat lay vue dessus</option>
+                <option value="ramadan kareem islamic design, gold and purple, crescent moon">🌙 Spécial Ramadan</option>
+                <option value="eid mubarak celebration, festive colors, moroccan patterns">🎊 Aïd Moubarak</option>
+                <option value="summer sale beach vibes, bright colors, sunlight">☀️ Été & Soldes</option>
+              </select>
+            </div>
+
+            <div class="fg">
+              <label class="fl">Couleurs / Ambiance</label>
+              <input class="fi" id="vis-colors" placeholder="Ex: bordeaux et or, fond blanc, style élégant...">
+            </div>
+
+            <div class="fg">
+              <label class="fl">Texte à inclure dans l'image</label>
+              <input class="fi" id="vis-text" placeholder="Ex: -20% · Livraison gratuite · عرض خاص">
+            </div>
+
+            <div class="fg">
+              <label class="fl">Langue du texte IA (légende pub)</label>
+              <select class="fi" id="vis-lang">
+                <option value="dar">🇲🇦 Darija</option>
+                <option value="fr">🇫🇷 Français</option>
+                <option value="ar">🇸🇦 Arabe</option>
+              </select>
+            </div>
+
+            <div class="flex gap8">
+              <button class="btn btn-p w100" style="justify-content:center" onclick="generateVisual()">
+                🎨 Générer le visuel
+              </button>
+            </div>
+
+            <div id="vis-alert" class="alert mt8"></div>
+          </div>
+
+          <!-- RIGHT: PREVIEW -->
+          <div>
+            <label class="fl mb8">Aperçu du visuel</label>
+            <div id="vis-preview-wrap" style="background:var(--input);border:2px dashed var(--border);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;min-height:280px;position:relative;overflow:hidden;transition:all var(--tr)">
+              <div id="vis-placeholder" style="text-align:center;color:var(--t3);padding:24px">
+                <div style="font-size:48px;margin-bottom:12px">🎨</div>
+                <div class="fs13">Votre visuel apparaîtra ici</div>
+                <div class="fs12 t3 mt8">Remplissez le formulaire et cliquez Générer</div>
+              </div>
+              <img id="vis-img" style="display:none;width:100%;height:100%;object-fit:contain;border-radius:var(--r-md)" alt="Visuel généré">
+              <div id="vis-loading" style="display:none;position:absolute;inset:0;background:var(--input);display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px">
+                <div style="width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--violet);border-radius:50%;animation:spin 1s linear infinite"></div>
+                <div class="fs13 t2">Génération en cours...</div>
+                <div class="fs12 t3" id="vis-progress">Création du prompt IA...</div>
+              </div>
+            </div>
+
+            <!-- Image info -->
+            <div id="vis-info" style="display:none;margin-top:10px">
+              <div class="flex aic jcsb mb8">
+                <div>
+                  <div class="fw6 fs13" id="vis-plat-name">Facebook Feed</div>
+                  <div class="fs12 t2" id="vis-size-info">1080×1080px</div>
+                </div>
+                <div class="flex gap6">
+                  <button class="btn btn-p btn-sm" onclick="downloadVisual()">⬇️ Télécharger</button>
+                  <button class="btn btn-g btn-sm" onclick="generateVisual()">🔄 Régénérer</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Caption -->
+            <div id="vis-caption-wrap" style="display:none;margin-top:10px">
+              <label class="fl mb6">📝 Légende générée par Groq IA</label>
+              <div id="vis-caption" style="background:var(--input);border:1px solid var(--border);border-radius:var(--r-md);padding:14px;font-size:13px;line-height:1.7;white-space:pre-wrap;min-height:80px"></div>
+              <div class="flex gap6 mt8">
+                <button class="btn btn-g btn-sm" onclick="copyCaption()">📋 Copier la légende</button>
+                <button class="btn btn-g btn-sm" onclick="regenCaption()">🔄 Nouvelle légende</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ALL FORMATS -->
+      <div class="card">
+        <div class="ch">
+          <div><div class="ct">📐 Générer tous les formats en une fois</div><div class="cs">Obtenez les 6 formats officiels automatiquement</div></div>
+          <button class="btn btn-p btn-sm" id="btn-all-formats" onclick="generateAllFormats()">⚡ Générer tous les formats</button>
+        </div>
+        <div id="all-formats-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+          <div class="format-card" id="fmt-facebook">
+            <div class="format-preview" style="background:var(--input);border-radius:var(--r-sm);aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:28px;border:1px solid var(--border)">📘</div>
+            <div class="fw6 fs12 mt6">Facebook Feed</div><div class="fs11 t2">1080×1080</div>
+            <button class="btn btn-g btn-sm mt6 w100" style="justify-content:center;display:none" id="dl-facebook" onclick="downloadFormat('facebook')">⬇️ Télécharger</button>
+          </div>
+          <div class="format-card" id="fmt-facebook_story">
+            <div class="format-preview" style="background:var(--input);border-radius:var(--r-sm);aspect-ratio:9/16;display:flex;align-items:center;justify-content:center;font-size:28px;border:1px solid var(--border);max-height:120px">📘</div>
+            <div class="fw6 fs12 mt6">FB Story</div><div class="fs11 t2">1080×1920</div>
+            <button class="btn btn-g btn-sm mt6 w100" style="justify-content:center;display:none" id="dl-facebook_story" onclick="downloadFormat('facebook_story')">⬇️ Télécharger</button>
+          </div>
+          <div class="format-card" id="fmt-instagram">
+            <div class="format-preview" style="background:var(--input);border-radius:var(--r-sm);aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:28px;border:1px solid var(--border)">📸</div>
+            <div class="fw6 fs12 mt6">Instagram</div><div class="fs11 t2">1080×1080</div>
+            <button class="btn btn-g btn-sm mt6 w100" style="justify-content:center;display:none" id="dl-instagram" onclick="downloadFormat('instagram')">⬇️ Télécharger</button>
+          </div>
+          <div class="format-card" id="fmt-instagram_reel">
+            <div class="format-preview" style="background:var(--input);border-radius:var(--r-sm);aspect-ratio:9/16;display:flex;align-items:center;justify-content:center;font-size:28px;border:1px solid var(--border);max-height:120px">📸</div>
+            <div class="fw6 fs12 mt6">IG Reel</div><div class="fs11 t2">1080×1920</div>
+            <button class="btn btn-g btn-sm mt6 w100" style="justify-content:center;display:none" id="dl-instagram_reel" onclick="downloadFormat('instagram_reel')">⬇️ Télécharger</button>
+          </div>
+          <div class="format-card" id="fmt-tiktok">
+            <div class="format-preview" style="background:var(--input);border-radius:var(--r-sm);aspect-ratio:9/16;display:flex;align-items:center;justify-content:center;font-size:28px;border:1px solid var(--border);max-height:120px">🎵</div>
+            <div class="fw6 fs12 mt6">TikTok</div><div class="fs11 t2">1080×1920</div>
+            <button class="btn btn-g btn-sm mt6 w100" style="justify-content:center;display:none" id="dl-tiktok" onclick="downloadFormat('tiktok')">⬇️ Télécharger</button>
+          </div>
+          <div class="format-card" id="fmt-linkedin">
+            <div class="format-preview" style="background:var(--input);border-radius:var(--r-sm);aspect-ratio:1200/627;display:flex;align-items:center;justify-content:center;font-size:28px;border:1px solid var(--border)">💼</div>
+            <div class="fw6 fs12 mt6">LinkedIn</div><div class="fs11 t2">1200×627</div>
+            <button class="btn btn-g btn-sm mt6 w100" style="justify-content:center;display:none" id="dl-linkedin" onclick="downloadFormat('linkedin')">⬇️ Télécharger</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div><!-- end .main -->
+</div><!-- end #screen-app -->
+
+<!-- ═══════ MODALS ═══════ -->
+
+<!-- Contact -->
+<div class="modal-bg" id="modal-contact"><div class="modal" onclick="event.stopPropagation()">
+  <div class="modal-title">👤 Ajouter un contact</div>
+  <div class="form-g2">
+    <div class="fg"><label class="fl">Nom *</label><input class="fi" id="m-cname" placeholder="Hassan Amrani"></div>
+    <div class="fg"><label class="fl">Email</label><input class="fi" id="m-cemail" placeholder="hassan@..."></div>
+    <div class="fg"><label class="fl">Téléphone (WA)</label><input class="fi" id="m-cphone" placeholder="+212..."></div>
+    <div class="fg"><label class="fl">Entreprise</label><input class="fi" id="m-ccompany" placeholder="Boutique..."></div>
+    <div class="fg"><label class="fl">Ville</label><input class="fi" id="m-ccity" placeholder="Casablanca"></div>
+    <div class="fg"><label class="fl">Valeur estimée (MAD)</label><input class="fi" type="number" id="m-cvalue" placeholder="0"></div>
+    <div class="fg"><label class="fl">Source</label><select class="fi" id="m-csource"><option value="whatsapp">WhatsApp</option><option value="web">Site web</option><option value="referral">Référence</option><option value="ads">Publicité</option><option value="manual">Manuel</option></select></div>
+  </div>
+  <div class="fg"><label class="fl">Notes</label><textarea class="fi" id="m-cnotes" placeholder="Notes..."></textarea></div>
+  <div class="modal-footer">
+    <button class="btn btn-g" onclick="closeModal('modal-contact')">Annuler</button>
+    <button class="btn btn-p" onclick="saveContact()">✅ Ajouter</button>
+  </div>
+</div></div>
+
+<!-- Product -->
+<div class="modal-bg" id="modal-product"><div class="modal" onclick="event.stopPropagation()">
+  <div class="modal-title">🛒 Ajouter un produit</div>
+  <div class="form-g2">
+    <div class="fg"><label class="fl">Nom *</label><input class="fi" id="m-pname" placeholder="Hijab Premium Soie"></div>
+    <div class="fg"><label class="fl">SKU</label><input class="fi" id="m-psku" placeholder="HPS-001"></div>
+    <div class="fg"><label class="fl">Prix (MAD) *</label><input class="fi" type="number" id="m-pprice" placeholder="185"></div>
+    <div class="fg"><label class="fl">Stock initial</label><input class="fi" type="number" id="m-pstock" placeholder="50"></div>
+    <div class="fg"><label class="fl">Alerte stock</label><input class="fi" type="number" id="m-palert" placeholder="10"></div>
+    <div class="fg"><label class="fl">Catégorie</label><input class="fi" id="m-pcat" placeholder="Mode & Vêtements"></div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-g" onclick="closeModal('modal-product')">Annuler</button>
+    <button class="btn btn-p" onclick="saveProduct()">✅ Ajouter</button>
+  </div>
+</div></div>
+
+<!-- Order -->
+<div class="modal-bg" id="modal-order"><div class="modal" onclick="event.stopPropagation()">
+  <div class="modal-title">📦 Nouvelle commande</div>
+  <div class="form-g2">
+    <div class="fg"><label class="fl">Nom client *</label><input class="fi" id="m-oname" placeholder="Fatima Zahra"></div>
+    <div class="fg"><label class="fl">Paiement</label><select class="fi" id="m-opay"><option value="cash">Cash livraison</option><option value="cmi">CMI</option><option value="naps">NAPS</option><option value="virement">Virement</option></select></div>
+  </div>
+  <div class="fg"><label class="fl">Articles (format: Nom;Prix;Qté, un par ligne)</label><textarea class="fi" id="m-oitems" placeholder="Hijab Premium Soie;185;2&#10;Caftan Brodé;1200;1" rows="4"></textarea></div>
+  <div class="fg"><label class="fl">Adresse livraison</label><input class="fi" id="m-oaddr" placeholder="Boulevard Anfa, Casablanca"></div>
+  <div class="modal-footer">
+    <button class="btn btn-g" onclick="closeModal('modal-order')">Annuler</button>
+    <button class="btn btn-p" onclick="saveOrder()">✅ Créer commande</button>
+  </div>
+</div></div>
+
+<!-- Invoice -->
+<div class="modal-bg" id="modal-invoice"><div class="modal" onclick="event.stopPropagation()">
+  <div class="modal-title" id="inv-modal-title">🧾 Nouvelle facture</div>
+  <div class="form-g2">
+    <div class="fg"><label class="fl">Client *</label><input class="fi" id="m-iname" placeholder="Hassan Amrani"></div>
+    <div class="fg"><label class="fl">Remise (%)</label><input class="fi" type="number" id="m-idiscount" placeholder="0" min="0" max="100"></div>
+  </div>
+  <div class="fg"><label class="fl">Articles (Nom;Prix HT;Qté, un par ligne)</label><textarea class="fi" id="m-iitems" placeholder="Hijab Premium;154.17;3&#10;Livraison;0;1" rows="4"></textarea></div>
+  <div class="fg"><label class="fl">Notes</label><input class="fi" id="m-inotes" placeholder="Paiement sous 15 jours. Merci pour votre confiance."></div>
+  <div class="modal-footer">
+    <button class="btn btn-g" onclick="closeModal('modal-invoice')">Annuler</button>
+    <button class="btn btn-p" onclick="saveInvoice()">✅ Créer</button>
+  </div>
+</div></div>
+
+<!-- Campaign -->
+<div class="modal-bg" id="modal-campaign"><div class="modal" onclick="event.stopPropagation()">
+  <div class="modal-title">📣 Nouvelle campagne</div>
+  <div class="form-g2">
+    <div class="fg"><label class="fl">Nom *</label><input class="fi" id="m-adname" placeholder="Ramadan Collection 2025"></div>
+    <div class="fg"><label class="fl">Plateforme</label><select class="fi" id="m-adplat"><option value="meta">Meta Ads</option><option value="google">Google Ads</option><option value="tiktok">TikTok Ads</option></select></div>
+    <div class="fg"><label class="fl">Objectif</label><select class="fi" id="m-adobj"><option value="conversions">Conversions</option><option value="traffic">Trafic</option><option value="awareness">Notoriété</option></select></div>
+    <div class="fg"><label class="fl">Budget (MAD)</label><input class="fi" type="number" id="m-adbud" placeholder="5000"></div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-g" onclick="closeModal('modal-campaign')">Annuler</button>
+    <button class="btn btn-p" onclick="saveCampaign()">✅ Créer campagne</button>
+  </div>
+</div></div>
+
+<!-- WA message -->
+<div class="modal-bg" id="modal-wa"><div class="modal" onclick="event.stopPropagation()">
+  <div class="modal-title">💬 Enregistrer un message WhatsApp</div>
+  <div class="form-g2">
+    <div class="fg"><label class="fl">Nom contact</label><input class="fi" id="m-waname" placeholder="Fatima Zahra"></div>
+    <div class="fg"><label class="fl">Téléphone</label><input class="fi" id="m-waphone" placeholder="+212..."></div>
+  </div>
+  <div class="fg"><label class="fl">Message *</label><textarea class="fi" id="m-wabody" placeholder="Salam, wash 3ndkom hijab?..."></textarea></div>
+  <div class="fg"><label class="fl">Direction</label><select class="fi" id="m-wadir"><option value="in">Reçu (client → vous)</option><option value="out">Envoyé (vous → client)</option></select></div>
+  <div class="modal-footer">
+    <button class="btn btn-g" onclick="closeModal('modal-wa')">Annuler</button>
+    <button class="btn btn-p" onclick="saveWaMsg()">✅ Enregistrer</button>
+  </div>
+</div></div>
+
+<!-- Admin: Reset Password -->
+<div class="modal-bg" id="modal-reset"><div class="modal" onclick="event.stopPropagation()">
+  <div class="modal-title">🔑 Réinitialiser mot de passe</div>
+  <p class="fs13 t2 mb12">Nouveau MDP pour : <strong class="c-v" id="reset-uname">—</strong></p>
+  <div class="fg"><label class="fl">Nouveau mot de passe</label><input class="fi" type="password" id="reset-pass" placeholder="Min. 6 caractères"></div>
+  <div id="reset-alert" class="alert"></div>
+  <div class="modal-footer">
+    <button class="btn btn-g" onclick="closeModal('modal-reset')">Annuler</button>
+    <button class="btn btn-p" onclick="confirmReset()">💾 Enregistrer</button>
+  </div>
+</div></div>
+
+<!-- Admin: Change Plan -->
+<div class="modal-bg" id="modal-plan"><div class="modal" onclick="event.stopPropagation()">
+  <div class="modal-title">📅 Modifier l'abonnement</div>
+  <p class="fs13 t2 mb12">Client : <strong class="c-v" id="plan-uname">—</strong></p>
+  <div class="plans-grid" id="modal-plans">
+    <div class="plan-opt sel" onclick="selModalPlan(this,'demo')" id="mp-demo"><div class="plan-name">🎁 Démo</div><div class="plan-price">Gratuit</div><div class="plan-dur">24h</div></div>
+    <div class="plan-opt" onclick="selModalPlan(this,'30j')" id="mp-30j"><div class="plan-name">📅 Mensuel</div><div class="plan-price">299 MAD</div><div class="plan-dur">30 jours</div></div>
+    <div class="plan-opt" onclick="selModalPlan(this,'1an')" id="mp-1an"><div class="plan-name">📆 Annuel</div><div class="plan-price">2 699 MAD</div><div class="plan-dur">365 jours</div></div>
+    <div class="plan-opt" onclick="selModalPlan(this,'avie')" id="mp-avie"><div class="plan-name">♾️ À vie</div><div class="plan-price">9 949 MAD</div><div class="plan-dur">Illimité</div></div>
+  </div>
+  <div id="plan-alert" class="alert"></div>
+  <div class="modal-footer">
+    <button class="btn btn-g" onclick="closeModal('modal-plan')">Annuler</button>
+    <button class="btn btn-p" onclick="confirmPlan()">✅ Appliquer</button>
+  </div>
+</div></div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════ */
+let TOKEN   = localStorage.getItem('nx_token') || '';
+let ME      = null;
+let selAdmPlan = '30j';
+let selMdlPlan = 'demo';
+let resetUID   = null;
+let planUID    = null;
+let invType    = 'invoice';
+
+const API = async (method, path, body) => {
+  const opts = {
+    method,
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(path, opts);
+  return { ok: r.ok, status: r.status, data: await r.json() };
+};
+
+/* ═══════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════ */
+window.addEventListener('DOMContentLoaded', async () => {
+  if (TOKEN) {
+    const r = await API('GET', '/api/auth/me');
+    if (r.ok) { ME = r.data; enterApp(); }
+    else { TOKEN = ''; localStorage.removeItem('nx_token'); }
+  }
+
+  // Set today's date for expense
+  const today = new Date().toISOString().split('T')[0];
+  if (document.getElementById('exp-date')) document.getElementById('exp-date').value = today;
+});
+
+/* ═══════════════════════════════════════════════
+   AUTH
+═══════════════════════════════════════════════ */
+async function doLogin() {
+  const email = document.getElementById('l-email').value.trim();
+  const pass  = document.getElementById('l-pass').value;
+  const alert = document.getElementById('login-alert');
+  alert.className = 'alert'; alert.textContent = '';
+  if (!email || !pass) return setAlert('login-alert', 'Email et mot de passe requis', 'err');
+
+  const r = await API('POST', '/api/auth/login', { email, password: pass });
+  if (!r.ok) return setAlert('login-alert', r.data.error || 'Erreur connexion', 'err');
+
+  TOKEN = r.data.token;
+  ME    = r.data.user;
+  localStorage.setItem('nx_token', TOKEN);
+  enterApp();
+}
+
+async function loginDemo() {
+  // Register a demo account
+  const demoEmail = 'demo_' + Date.now() + '@nexamarket.ma';
+  const r = await API('POST', '/api/auth/register', {
+    name: 'Compte Démo', email: demoEmail, password: 'demo2026',
+    company: 'Démo NexaMarket', city: 'Casablanca'
+  });
+  if (!r.ok) {
+    // Try login with existing demo
+    setAlert('login-alert', 'Tentative avec compte démo existant...', 'ok');
+    document.getElementById('l-email').value = demoEmail;
+    document.getElementById('l-pass').value  = 'demo2026';
+    return;
+  }
+  TOKEN = r.data.token;
+  ME    = r.data.user;
+  localStorage.setItem('nx_token', TOKEN);
+  enterApp();
+}
+
+function doLogout() {
+  TOKEN = '';
+  ME    = null;
+  localStorage.removeItem('nx_token');
+  showScreen('screen-login');
+  document.getElementById('login-alert').textContent = '';
+}
+
+function enterApp() {
+  showScreen('screen-app');
+
+  // Update UI with user info
+  const initials = ME.name ? ME.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) : 'U';
+  document.getElementById('user-av').textContent   = initials;
+  document.getElementById('user-name').textContent = ME.name || 'Utilisateur';
+  document.getElementById('user-plan').textContent = planLabel(ME.plan);
+
+  const plans = { demo:'🎁 Démo', '30j':'📅 Mensuel', '1an':'📆 Annuel', avie:'♾️ À vie', starter:'Starter', pro:'Pro', enterprise:'Enterprise' };
+  document.getElementById('plan-badge').textContent = plans[ME.plan] || 'Actif';
+
+  // Show admin section
+  if (ME.role === 'superadmin') {
+    document.getElementById('admin-section').style.display = 'block';
+  }
+
+  // Load dashboard
+  showPage('dashboard');
+  loadDashboard();
+  // Check YouCan status silently
+  API('GET', '/api/youcan/status').then(r => {
+    if (r.ok && r.data.connected) {
+      const nb = document.getElementById('nb-youcan');
+      if (nb) nb.style.display = 'inline-flex';
+    }
+  });
+}
+
+/* ═══════════════════════════════════════════════
+   SCREENS & PAGES
+═══════════════════════════════════════════════ */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+const PAGE_META = {
+  dashboard: { t:'Dashboard', s:'Vue d\'ensemble de votre activité' },
+  crm:       { t:'CRM — Contacts', s:'Gérez vos prospects et clients' },
+  products:  { t:'Catalogue Produits', s:'Gérez votre stock et catalogue' },
+  orders:    { t:'Commandes', s:'Toutes vos commandes' },
+  billing:   { t:'Facturation', s:'Devis, factures et avoirs' },
+  whatsapp:  { t:'WhatsApp IA', s:'Conversations et bot automatique' },
+  ads:       { t:'Campagnes Publicitaires', s:'Meta · Google · TikTok Ads' },
+  content:   { t:'Générateur de Contenu IA', s:'Posts, SMS, emails en Darija / FR / AR' },
+  finance:   { t:'IA Financière', s:'Analyse et prévisions en temps réel' },
+  visuals:   { t:'🎨 Créateur de Visuels IA', s:'Générez des images pub pour Facebook · Instagram · TikTok · LinkedIn — 100% gratuit' },
+  settings:  { t:'Paramètres', s:'Votre compte et préférences' },
+  admin:     { t:'👑 Gestion des comptes', s:'Super Admin — Créer et gérer les utilisateurs' },
+};
+
+function showPage(id, navEl) {
+  document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+  const pg = document.getElementById('page-' + id);
+  if (pg) pg.classList.remove('hidden');
+
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('on'));
+  if (navEl) navEl.classList.add('on');
+
+  const m = PAGE_META[id] || {};
+  document.getElementById('hdr-title').textContent = m.t || id;
+  document.getElementById('hdr-s').textContent     = m.s || '';
+
+  // Load data for page
+  if (id === 'dashboard')  loadDashboard();
+  if (id === 'crm')        loadCRM();
+  if (id === 'products')   loadProducts();
+  if (id === 'orders')     loadOrders();
+  if (id === 'billing')    loadBilling();
+  if (id === 'whatsapp')   loadWA();
+  if (id === 'ads')        loadAds();
+  if (id === 'finance')    loadFinance();
+  if (id === 'visuals')    initVisuals();
+  if (id === 'admin')      loadAdminUsers();
+  if (id === 'settings')   loadSettings();
+  if (id === 'youcan')     loadYouCanStatus();
+}
+
+/* ═══════════════════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════════════════ */
+async function loadDashboard() {
+  const r = await API('GET', '/api/dashboard');
+  if (!r.ok) return;
+  const d = r.data;
+
+  document.getElementById('k-revenue').textContent  = fmt(d.revenue) + ' MAD';
+  document.getElementById('k-orders').textContent   = d.orders;
+  document.getElementById('k-contacts').textContent = d.contacts;
+  document.getElementById('k-wa').textContent       = d.waMessages;
+  document.getElementById('nb-orders').textContent  = d.orders;
+  document.getElementById('nb-wa').textContent      = d.waMessages;
+
+  // Funnel
+  document.getElementById('f-contacts').textContent = d.contacts;
+  document.getElementById('f-hot').textContent      = d.hotLeads;
+  document.getElementById('f-orders').textContent   = d.orders;
+  const pctHot    = d.contacts > 0 ? Math.min(100, Math.round(d.hotLeads / d.contacts * 100)) : 0;
+  const pctOrders = d.contacts > 0 ? Math.min(100, Math.round(d.orders   / d.contacts * 100)) : 0;
+  document.getElementById('ff-contacts').style.width = '100%';
+  document.getElementById('ff-hot').style.width      = pctHot + '%';
+  document.getElementById('ff-orders').style.width   = pctOrders + '%';
+}
+
+/* ═══════════════════════════════════════════════
+   AI CHAT
+═══════════════════════════════════════════════ */
+function quickQ(q) { document.getElementById('ai-inp').value = q; sendAI(); }
+
+async function sendAI() {
+  const inp = document.getElementById('ai-inp');
+  const msg = inp.value.trim();
+  if (!msg) return;
+  inp.value = '';
+
+  const container = document.getElementById('ai-messages');
+  // User bubble
+  container.innerHTML += `<div style="align-self:flex-end;background:rgba(99,102,241,.18);border:1px solid rgba(99,102,241,.25);border-radius:12px;border-bottom-right-radius:3px;padding:10px 14px;font-size:13px;max-width:80%">${esc(msg)}</div>`;
+  // Loading
+  const loadId = 'ai-load-' + Date.now();
+  container.innerHTML += `<div id="${loadId}" style="background:var(--card2);border:1px solid var(--border);border-radius:12px;border-top-left-radius:3px;padding:10px 14px;font-size:13px;color:var(--t2);max-width:80%">⏳ IA analyse en cours...</div>`;
+  container.scrollTop = container.scrollHeight;
+
+  const r = await API('POST', '/api/ai/chat', { message: msg });
+  const el = document.getElementById(loadId);
+  if (el) el.innerHTML = r.ok
+    ? r.data.reply.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    : '❌ Erreur: ' + (r.data?.error || 'IA non disponible');
+  container.scrollTop = container.scrollHeight;
+}
+
+/* ═══════════════════════════════════════════════
+   CRM
+═══════════════════════════════════════════════ */
+async function loadCRM() {
+  const r = await API('GET', '/api/crm/contacts');
+  if (!r.ok) return;
+  const contacts = r.data.contacts || [];
+  document.getElementById('crm-count').textContent = contacts.length + ' contacts';
+
+  if (!contacts.length) {
+    document.getElementById('crm-tbody').innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--t3);padding:24px">Aucun contact — Ajoutez votre premier contact</td></tr>';
+    return;
+  }
+  document.getElementById('crm-tbody').innerHTML = contacts.map(c => `
+    <tr>
+      <td><div class="fw6">${esc(c.name)}</div><div class="fs11 t2">${esc(c.company||'')}</div></td>
+      <td class="t2">${esc(c.phone||'—')}</td>
+      <td><span class="tag tag-s">${esc(c.source||'—')}</span></td>
+      <td><span style="font-weight:700;color:${scoreColor(c.aiScore)}">${c.aiScore||50}/100</span></td>
+      <td class="fw6">${fmt(c.value||0)} MAD</td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteContact('${c.id}')">🗑</button></td>
+    </tr>`).join('');
+}
+function scoreColor(s) { return s >= 75 ? 'var(--rose)' : s >= 50 ? 'var(--amber)' : 'var(--sky)'; }
+
+async function saveContact() {
+  const r = await API('POST', '/api/crm/contacts', {
+    name:    document.getElementById('m-cname').value,
+    email:   document.getElementById('m-cemail').value,
+    phone:   document.getElementById('m-cphone').value,
+    company: document.getElementById('m-ccompany').value,
+    city:    document.getElementById('m-ccity').value,
+    value:   parseFloat(document.getElementById('m-cvalue').value)||0,
+    source:  document.getElementById('m-csource').value,
+    notes:   document.getElementById('m-cnotes').value,
+  });
+  if (!r.ok) return alert(r.data.error || 'Erreur');
+  closeModal('modal-contact');
+  ['m-cname','m-cemail','m-cphone','m-ccompany','m-ccity','m-cvalue','m-cnotes'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  loadCRM();
+}
+async function deleteContact(id) {
+  if (!confirm('Supprimer ce contact ?')) return;
+  await API('DELETE', '/api/crm/contacts/' + id);
+  loadCRM();
+}
+
+/* ═══════════════════════════════════════════════
+   PRODUCTS
+═══════════════════════════════════════════════ */
+async function loadProducts() {
+  const r = await API('GET', '/api/ecom/products');
+  if (!r.ok) return;
+  const prods = r.data.products || [];
+  document.getElementById('prod-count').textContent = prods.length + ' produits';
+  if (!prods.length) { document.getElementById('prod-tbody').innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--t3);padding:24px">Aucun produit</td></tr>'; return; }
+  document.getElementById('prod-tbody').innerHTML = prods.map(p => `
+    <tr>
+      <td class="fw6">${esc(p.name)}</td>
+      <td class="t2 fs12">${esc(p.sku)}</td>
+      <td class="fw7 c-v">${fmt(p.price)} MAD</td>
+      <td><span style="color:${p.stock<=p.stockAlert?'var(--rose)':'var(--green)'}">📦 ${p.stock}</span></td>
+      <td class="t2">${esc(p.category)}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteProd('${p.id}')">🗑</button></td>
+    </tr>`).join('');
+}
+async function saveProduct() {
+  const r = await API('POST', '/api/ecom/products', {
+    name: document.getElementById('m-pname').value, sku: document.getElementById('m-psku').value,
+    price: parseFloat(document.getElementById('m-pprice').value),
+    stock: parseInt(document.getElementById('m-pstock').value)||0,
+    stockAlert: parseInt(document.getElementById('m-palert').value)||10,
+    category: document.getElementById('m-pcat').value,
+  });
+  if (!r.ok) return alert(r.data.error);
+  closeModal('modal-product');
+  loadProducts();
+}
+async function deleteProd(id) {
+  if (!confirm('Supprimer ce produit ?')) return;
+  await API('DELETE', '/api/ecom/products/' + id); loadProducts();
+}
+
+/* ═══════════════════════════════════════════════
+   ORDERS
+═══════════════════════════════════════════════ */
+async function loadOrders() {
+  const r = await API('GET', '/api/ecom/orders');
+  if (!r.ok) return;
+  const orders = r.data.orders || [];
+  document.getElementById('orders-count').textContent = orders.length + ' commandes';
+  if (!orders.length) { document.getElementById('orders-tbody').innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--t3);padding:24px">Aucune commande</td></tr>'; return; }
+  document.getElementById('orders-tbody').innerHTML = orders.map(o => `
+    <tr>
+      <td class="fw7 c-v">${esc(o.orderNumber)}</td>
+      <td class="fw6">${esc(o.contactName)}</td>
+      <td class="fw7">${fmt(o.total)} MAD</td>
+      <td class="t2">${esc(o.paymentMethod)}</td>
+      <td><span class="tag ${o.status==='delivered'?'tag-g':o.status==='cancelled'?'tag-r':'tag-a'}">${o.status}</span></td>
+      <td class="t2 fs12">${o.createdAt?.substring(0,10)}</td>
+      <td>
+        <select class="fi" style="font-size:11px;padding:4px 6px;width:110px" onchange="updateOrderStatus('${o.id}',this.value)">
+          <option ${o.status==='pending'?'selected':''} value="pending">En attente</option>
+          <option ${o.status==='confirmed'?'selected':''} value="confirmed">Confirmée</option>
+          <option ${o.status==='delivered'?'selected':''} value="delivered">Livrée</option>
+          <option ${o.status==='cancelled'?'selected':''} value="cancelled">Annulée</option>
+        </select>
+      </td>
+    </tr>`).join('');
+}
+async function saveOrder() {
+  const itemsRaw = document.getElementById('m-oitems').value.trim().split('\n').filter(l=>l);
+  const items = itemsRaw.map(line => {
+    const [name, price, qty] = line.split(';');
+    return { name: name?.trim(), price: parseFloat(price)||0, qty: parseInt(qty)||1 };
+  });
+  const r = await API('POST', '/api/ecom/orders', {
+    contactName: document.getElementById('m-oname').value,
+    paymentMethod: document.getElementById('m-opay').value,
+    address: document.getElementById('m-oaddr').value,
+    items
+  });
+  if (!r.ok) return alert(r.data.error);
+  closeModal('modal-order');
+  loadOrders(); loadDashboard();
+}
+async function updateOrderStatus(id, status) {
+  await API('PATCH', '/api/ecom/orders/' + id + '/status', { status });
+  loadOrders();
+}
+
+/* ═══════════════════════════════════════════════
+   BILLING
+═══════════════════════════════════════════════ */
+function openInvoiceModal(type) { invType = type; document.getElementById('inv-modal-title').textContent = type==='devis'?'📋 Nouveau devis':'🧾 Nouvelle facture'; openModal('modal-invoice'); }
+async function loadBilling() {
+  const r = await API('GET', '/api/billing/invoices');
+  if (!r.ok) return;
+  const invs = r.data.invoices || [];
+  document.getElementById('billing-count').textContent = invs.length + ' documents';
+  if (!invs.length) { document.getElementById('billing-tbody').innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--t3);padding:24px">Aucune facture</td></tr>'; return; }
+  document.getElementById('billing-tbody').innerHTML = invs.map(i => `
+    <tr>
+      <td class="fw7 c-v">${esc(i.invoiceNo)}</td>
+      <td><span class="tag ${i.type==='devis'?'tag-a':'tag-v'}">${i.type==='devis'?'Devis':'Facture'}</span></td>
+      <td class="fw6">${esc(i.contactName)}</td>
+      <td class="fw7">${fmt(i.totalTTC)} MAD</td>
+      <td><span class="tag ${i.status==='paid'?'tag-g':i.status==='overdue'?'tag-r':'tag-a'}">${i.status==='paid'?'✓ Payée':i.status==='overdue'?'⚠ Impayée':'⏳ En attente'}</span></td>
+      <td class="t2 fs12">${i.createdAt?.substring(0,10)}</td>
+      <td>
+        <select class="fi" style="font-size:11px;padding:4px 6px;width:110px" onchange="updateInvStatus('${i.id}',this.value)">
+          <option ${i.status==='pending'?'selected':''} value="pending">En attente</option>
+          <option ${i.status==='paid'?'selected':''} value="paid">Payée</option>
+          <option ${i.status==='overdue'?'selected':''} value="overdue">Impayée</option>
+        </select>
+      </td>
+    </tr>`).join('');
+}
+async function saveInvoice() {
+  const itemsRaw = document.getElementById('m-iitems').value.trim().split('\n').filter(l=>l);
+  const items = itemsRaw.map(line => {
+    const [name, price, qty] = line.split(';');
+    return { name: name?.trim(), price: parseFloat(price)||0, qty: parseInt(qty)||1 };
+  });
+  const r = await API('POST', '/api/billing/invoices', {
+    type: invType, contactName: document.getElementById('m-iname').value,
+    discount: parseFloat(document.getElementById('m-idiscount').value)||0,
+    notes: document.getElementById('m-inotes').value, items
+  });
+  if (!r.ok) return alert(r.data.error);
+  closeModal('modal-invoice'); loadBilling();
+}
+async function updateInvStatus(id, status) { await API('PATCH', '/api/billing/invoices/' + id + '/status', { status }); loadBilling(); }
+
+/* ═══════════════════════════════════════════════
+   WHATSAPP
+═══════════════════════════════════════════════ */
+async function loadWA() {
+  const [r1, r2] = await Promise.all([API('GET', '/api/wa/messages'), API('GET', '/api/wa/stats')]);
+  if (r2.ok) {
+    document.getElementById('wa-stats-txt').textContent  = r2.data.total + ' messages';
+    document.getElementById('wa-s-total').textContent    = r2.data.total;
+    document.getElementById('wa-s-ai').textContent       = r2.data.aiResponses;
+    document.getElementById('wa-s-rate').textContent     = r2.data.aiRate;
+  }
+  if (!r1.ok) return;
+  const msgs = r1.data.messages || [];
+  if (!msgs.length) { document.getElementById('wa-msgs-list').innerHTML = '<div style="text-align:center;color:var(--t3);padding:24px">Aucun message — Testez le bot IA ci-dessous</div>'; return; }
+  document.getElementById('wa-msgs-list').innerHTML = msgs.slice(-20).map(m => `
+    <div class="wa-msg ${m.direction==='out'?'out':m.aiResponse?'ai':'in'}">
+      ${m.aiResponse ? '<div class="wa-ai-lbl">🤖 IA NexaMarket</div>' : ''}
+      <div class="wa-bubble">${esc(m.body)}</div>
+      <div class="wa-time">${m.direction==='in'?esc(m.contactName)+' · ':''} ${m.createdAt?.substring(11,16)}</div>
+    </div>`).join('');
+  document.getElementById('wa-msgs-list').scrollTop = 99999;
+}
+async function sendWaQuick() {
+  const inp  = document.getElementById('wa-quick-inp');
+  const body = inp.value.trim();
+  const lang = document.getElementById('wa-lang').value;
+  if (!body) return;
+  inp.value = '';
+
+  // Save incoming message
+  await API('POST', '/api/wa/messages', { contactName: 'Client Test', body, direction: 'in' });
+
+  // Get AI reply
+  const r = await API('POST', '/api/ai/wa-reply', { message: body, contactName: 'Client Test', language: lang });
+  if (r.ok) {
+    await API('POST', '/api/wa/messages', { contactName: 'IA NexaMarket', body: r.data.reply, direction: 'out' });
+  }
+  loadWA();
+}
+async function saveWaMsg() {
+  await API('POST', '/api/wa/messages', {
+    contactName: document.getElementById('m-waname').value,
+    contactPhone: document.getElementById('m-waphone').value,
+    body: document.getElementById('m-wabody').value,
+    direction: document.getElementById('m-wadir').value
+  });
+  closeModal('modal-wa'); loadWA();
+}
+
+/* ═══════════════════════════════════════════════
+   ADS
+═══════════════════════════════════════════════ */
+async function loadAds() {
+  const r = await API('GET', '/api/ads/campaigns');
+  if (!r.ok) return;
+  const camps = r.data.campaigns || [];
+  if (!camps.length) { document.getElementById('ads-tbody').innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--t3);padding:24px">Aucune campagne</td></tr>'; return; }
+  document.getElementById('ads-tbody').innerHTML = camps.map(c => `
+    <tr>
+      <td class="fw6">${esc(c.name)}</td>
+      <td><span class="tag tag-v">${esc(c.platform)}</span></td>
+      <td>${fmt(c.budget)} MAD</td>
+      <td>${fmt(c.spent)} MAD</td>
+      <td class="fw7 ${c.roas>=3?'c-g':'c-a'}">${c.roas}×</td>
+      <td><span class="tag ${c.status==='active'?'tag-g':'tag-s'}">${c.status==='active'?'● Active':'Pausée'}</span></td>
+    </tr>`).join('');
+}
+async function saveCampaign() {
+  const r = await API('POST', '/api/ads/campaigns', {
+    name: document.getElementById('m-adname').value,
+    platform: document.getElementById('m-adplat').value,
+    objective: document.getElementById('m-adobj').value,
+    budget: parseFloat(document.getElementById('m-adbud').value)||0
+  });
+  if (!r.ok) return alert(r.data.error);
+  closeModal('modal-campaign'); loadAds();
+}
+
+/* ═══════════════════════════════════════════════
+   CONTENT IA
+═══════════════════════════════════════════════ */
+async function generateContent() {
+  const out = document.getElementById('cont-output');
+  out.textContent = '⏳ Génération en cours avec Groq IA...';
+  out.style.color = 'var(--t2)';
+  const r = await API('POST', '/api/ai/content', {
+    type:     document.getElementById('cont-type').value,
+    product:  document.getElementById('cont-subject').value || 'Produit de la boutique',
+    language: document.getElementById('cont-lang').value,
+    extras:   document.getElementById('cont-extra').value
+  });
+  if (r.ok) { out.textContent = r.data.content; out.style.color = 'var(--t1)'; }
+  else      { out.textContent = '❌ Erreur: ' + (r.data?.error || 'IA non disponible'); out.style.color = 'var(--rose)'; }
+}
+function copyContent() {
+  navigator.clipboard.writeText(document.getElementById('cont-output').textContent)
+    .then(() => alert('✅ Contenu copié!')).catch(() => {});
+}
+
+/* ═══════════════════════════════════════════════
+   FINANCE
+═══════════════════════════════════════════════ */
+async function loadFinance() {
+  const r = await API('GET', '/api/finance/dashboard');
+  if (!r.ok) return;
+  const d = r.data;
+  document.getElementById('fin-rev').textContent    = fmt(d.revenue) + ' MAD';
+  document.getElementById('fin-exp').textContent    = fmt(d.expenses) + ' MAD';
+  document.getElementById('fin-profit').textContent = fmt(d.profit) + ' MAD';
+}
+async function loadFinanceAI() {
+  const out = document.getElementById('finance-output');
+  out.textContent = '⏳ Analyse IA en cours...';
+  const r = await API('GET', '/api/ai/finance');
+  out.textContent = r.ok ? r.data.analysis : '❌ Erreur: ' + (r.data?.error || 'IA non disponible');
+}
+async function addExpense() {
+  const r = await API('POST', '/api/finance/expenses', {
+    category:    document.getElementById('exp-cat').value,
+    amount:      parseFloat(document.getElementById('exp-amt').value)||0,
+    description: document.getElementById('exp-desc').value,
+    date:        document.getElementById('exp-date').value
+  });
+  if (!r.ok) return alert(r.data.error);
+  document.getElementById('exp-amt').value = '';
+  document.getElementById('exp-desc').value = '';
+  loadFinance();
+  alert('✅ Dépense ajoutée');
+}
+
+/* ═══════════════════════════════════════════════
+   SETTINGS
+═══════════════════════════════════════════════ */
+function loadSettings() {
+  if (!ME) return;
+  document.getElementById('set-name').value    = ME.name    || '';
+  document.getElementById('set-company').value = ME.company || '';
+  document.getElementById('set-phone').value   = ME.phone   || '';
+  document.getElementById('set-city').value    = ME.city    || '';
+  document.getElementById('set-sector').value  = ME.sector  || '';
+}
+async function saveSettings() {
+  const r = await API('PUT', '/api/settings/profile', {
+    name:    document.getElementById('set-name').value,
+    company: document.getElementById('set-company').value,
+    phone:   document.getElementById('set-phone').value,
+    city:    document.getElementById('set-city').value,
+    sector:  document.getElementById('set-sector').value,
+  });
+  setAlert('settings-alert', r.ok ? '✅ Profil mis à jour' : (r.data.error || 'Erreur'), r.ok ? 'ok' : 'err');
+}
+async function changePW() {
+  const r = await API('PUT', '/api/auth/password', {
+    currentPassword: document.getElementById('pw-old').value,
+    newPassword:     document.getElementById('pw-new').value
+  });
+  setAlert('settings-alert', r.ok ? '✅ Mot de passe changé' : (r.data.error || 'Erreur'), r.ok ? 'ok' : 'err');
+  if (r.ok) { document.getElementById('pw-old').value=''; document.getElementById('pw-new').value=''; }
+}
+
+/* ═══════════════════════════════════════════════
+   SUPER ADMIN
+═══════════════════════════════════════════════ */
+function selPlan(el, plan) {
+  document.querySelectorAll('#adm-plans .plan-opt').forEach(p => p.classList.remove('sel'));
+  el.classList.add('sel'); selAdmPlan = plan;
+}
+function selModalPlan(el, plan) {
+  document.querySelectorAll('#modal-plans .plan-opt').forEach(p => p.classList.remove('sel'));
+  el.classList.add('sel'); selMdlPlan = plan;
+}
+
+async function adminCreateUser() {
+  const name  = document.getElementById('adm-name').value.trim();
+  const email = document.getElementById('adm-email').value.trim();
+  const pass  = document.getElementById('adm-pass').value;
+  if (!name || !email || !pass) return setAlert('adm-create-alert','Nom, email et mot de passe requis','err');
+  if (pass.length < 6)          return setAlert('adm-create-alert','Mot de passe min. 6 caractères','err');
+
+  const r = await API('POST', '/api/admin/users', {
+    name, email, password: pass,
+    phone:   document.getElementById('adm-phone').value,
+    company: document.getElementById('adm-company').value,
+    city:    document.getElementById('adm-city').value,
+    role:    document.getElementById('adm-role').value,
+    plan:    selAdmPlan
+  });
+  if (!r.ok) return setAlert('adm-create-alert', r.data.error || 'Erreur création', 'err');
+  setAlert('adm-create-alert', '✅ Compte créé — Email: ' + email, 'ok');
+  ['adm-name','adm-email','adm-pass','adm-phone','adm-company','adm-city'].forEach(id => document.getElementById(id).value='');
+  loadAdminUsers();
+}
+
+async function loadAdminUsers() {
+  const r = await API('GET', '/api/admin/users');
+  if (!r.ok) return;
+  const users = (r.data.users || []).filter(u => u.role !== 'superadmin');
+
+  const actifs   = users.filter(u =>  u.active).length;
+  const inactifs = users.filter(u => !u.active).length;
+  const expire   = users.filter(u => { if (!u.planExpiry || u.plan==='avie') return false; const d=Math.ceil((new Date(u.planExpiry)-new Date())/86400000); return d>=0&&d<=7; }).length;
+
+  document.getElementById('adm-total').textContent   = users.length;
+  document.getElementById('adm-actif').textContent   = actifs;
+  document.getElementById('adm-expire').textContent  = expire;
+  document.getElementById('adm-inactif').textContent = inactifs;
+
+  if (!users.length) {
+    document.getElementById('adm-tbody').innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--t3);padding:24px">Aucun utilisateur — Créez le premier compte ci-dessus</td></tr>';
+    return;
+  }
+  document.getElementById('adm-tbody').innerHTML = users.map(u => {
+    const pi = planInfo(u);
+    return `<tr>
+      <td><div class="fw6">${esc(u.name)}</div><div class="fs11 t2">${esc(u.company||'')}</div></td>
+      <td class="t2">${esc(u.email)}</td>
+      <td>${pi.badge}</td>
+      <td class="t2 fs12">${pi.expiry}</td>
+      <td><span class="tag ${u.active?'tag-g':'tag-r'}">${u.active?'● Actif':'⛔ Désactivé'}</span></td>
+      <td>
+        <div class="flex gap6" style="flex-wrap:wrap">
+          <button class="btn btn-amber btn-sm" onclick="openPlanModal('${u.id}','${esc(u.name)}')">📅 Plan</button>
+          <button class="btn btn-g btn-sm" onclick="openResetModal('${u.id}','${esc(u.name)}')">🔑 MDP</button>
+          ${u.active
+            ? `<button class="btn btn-danger btn-sm" onclick="toggleUser('${u.id}')">⛔ Désactiver</button>`
+            : `<button class="btn btn-success btn-sm" onclick="toggleUser('${u.id}')">✅ Activer</button>`}
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function planInfo(u) {
+  const names = { demo:'🎁 Démo 24h', '30j':'📅 Mensuel', '1an':'📆 Annuel', avie:'♾️ À vie', starter:'Starter', pro:'Pro', enterprise:'Enterprise' };
+  const name = names[u.plan] || u.plan || '—';
+  if (u.plan === 'avie') return { badge:`<span class="tag tag-t">♾️ À vie</span>`, expiry:'Illimité' };
+  if (!u.planExpiry)     return { badge:`<span class="tag tag-s">${name}</span>`, expiry:'—' };
+  const days = Math.ceil((new Date(u.planExpiry) - new Date()) / 86400000);
+  if (days < 0)  return { badge:`<span class="tag tag-r">❌ Expiré</span>`, expiry:'Expiré' };
+  if (days <= 3) return { badge:`<span class="tag tag-r">${name}</span>`, expiry:`⚠️ ${days}j restants` };
+  if (days <= 7) return { badge:`<span class="tag tag-a">${name}</span>`, expiry:`⏰ ${days}j restants` };
+  return { badge:`<span class="tag tag-g">${name}</span>`, expiry:`${days}j restants` };
+}
+
+function openResetModal(id, name) {
+  resetUID = id;
+  document.getElementById('reset-uname').textContent = name;
+  document.getElementById('reset-pass').value = '';
+  document.getElementById('reset-alert').textContent = '';
+  openModal('modal-reset');
+}
+async function confirmReset() {
+  const pass = document.getElementById('reset-pass').value;
+  if (!pass || pass.length < 6) return setAlert('reset-alert','Min. 6 caractères','err');
+  const r = await API('PATCH', '/api/admin/users/' + resetUID + '/reset-password', { newPassword: pass });
+  if (!r.ok) return setAlert('reset-alert', r.data.error || 'Erreur', 'err');
+  setAlert('reset-alert', '✅ Mot de passe mis à jour', 'ok');
+  setTimeout(() => closeModal('modal-reset'), 1400);
+}
+
+function openPlanModal(id, name) {
+  planUID = id;
+  document.getElementById('plan-uname').textContent = name;
+  document.getElementById('plan-alert').textContent = '';
+  selMdlPlan = 'demo';
+  document.querySelectorAll('#modal-plans .plan-opt').forEach(p => p.classList.remove('sel'));
+  document.getElementById('mp-demo').classList.add('sel');
+  openModal('modal-plan');
+}
+async function confirmPlan() {
+  const r = await API('PATCH', '/api/admin/users/' + planUID + '/plan', { plan: selMdlPlan });
+  if (!r.ok) return setAlert('plan-alert', r.data.error || 'Erreur', 'err');
+  setAlert('plan-alert', '✅ Abonnement mis à jour', 'ok');
+  loadAdminUsers();
+  setTimeout(() => closeModal('modal-plan'), 1400);
+}
+
+async function toggleUser(id) {
+  await API('PATCH', '/api/admin/users/' + id + '/toggle');
+  loadAdminUsers();
+}
+
+/* ═══════════════════════════════════════════════
+   MODALS
+═══════════════════════════════════════════════ */
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-bg').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.modal-bg.open').forEach(m => m.classList.remove('open'));
+});
+
+/* ═══════════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════════ */
+function fmt(n)    { return new Intl.NumberFormat('fr-MA').format(Math.round(n)||0); }
+function esc(s)    { return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function setAlert(id, msg, type) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.className = 'alert alert-' + type;
+}
+function planLabel(plan) {
+  const m = { demo:'Démo 24h', '30j':'Mensuel 30j', '1an':'Annuel', avie:'À vie', starter:'Starter', pro:'Pro', enterprise:'Enterprise' };
+  return m[plan] || plan || '—';
+}
+
+/* ═══════════════════════════════════════════════
+   YOUCAN INTEGRATION
+═══════════════════════════════════════════════ */
+async function loadYouCanStatus() {
+  // Set webhook URL display
+  const webhookEl = document.getElementById('yc-webhook-url');
+  if (webhookEl) webhookEl.textContent = window.location.origin + '/api/webhooks/youcan';
+
+  const r = await API('GET', '/api/youcan/status');
+  if (!r.ok) return;
+  const d = r.data;
+
+  const badge = document.getElementById('yc-status-badge');
+  const text  = document.getElementById('yc-status-text');
+  const nb    = document.getElementById('nb-youcan');
+
+  if (d.connected) {
+    badge.className = 'tag tag-g'; badge.textContent = '✅ Connecté';
+    text.textContent = 'YouCan actif — Synchronisation disponible';
+    document.getElementById('yc-not-connected').style.display = 'none';
+    document.getElementById('yc-connected').style.display     = 'block';
+    document.getElementById('yc-store-name').textContent      = d.store || 'Votre boutique';
+    if (nb) { nb.style.display = 'inline-flex'; }
+  } else {
+    badge.className = 'tag tag-s'; badge.textContent = '○ Non connecté';
+    text.textContent = 'YouCan non connecté — Optionnel, connectez si vous avez une boutique YouCan';
+    document.getElementById('yc-not-connected').style.display = 'block';
+    document.getElementById('yc-connected').style.display     = 'none';
+    if (nb) nb.style.display = 'none';
+  }
+}
+
+async function saveYouCanConfig() {
+  const apiKey = document.getElementById('yc-apikey').value.trim();
+  const store  = document.getElementById('yc-store').value.trim();
+  const secret = document.getElementById('yc-secret').value.trim();
+
+  if (!apiKey || !store) return setAlert('yc-config-alert','Clé API et URL boutique requis','err');
+
+  setAlert('yc-config-alert','⏳ Sauvegarde en cours...','ok');
+
+  const r = await API('POST', '/api/youcan/config', { apiKey, storeUrl: store, webhookSecret: secret });
+  if (!r.ok) return setAlert('yc-config-alert', r.data?.error || 'Erreur', 'err');
+
+  setAlert('yc-config-alert',
+    '✅ Configuration sauvegardée! Allez sur Railway → Variables et ajoutez:\n' +
+    'YOUCAN_API_KEY = ' + apiKey + '\n' +
+    'YOUCAN_STORE_URL = ' + store,
+    'ok'
+  );
+
+  // Show Railway instructions
+  setTimeout(() => {
+    alert(
+      '📋 Dernière étape — Ajoutez ces variables sur Railway:\n\n' +
+      'YOUCAN_API_KEY = ' + apiKey + '\n' +
+      'YOUCAN_STORE_URL = ' + store + (secret ? '\nYOUCAN_WEBHOOK_SECRET = ' + secret : '') + '\n\n' +
+      'Railway.app → nexamarket-pro → Variables → New Variable'
+    );
+  }, 500);
+}
+
+async function syncOrders() {
+  setAlert('yc-sync-result','⏳ Synchronisation commandes YouCan en cours...','ok');
+  const r = await API('POST', '/api/youcan/sync-orders');
+  if (r.ok) {
+    setAlert('yc-sync-result', '✅ ' + r.data.message, 'ok');
+    loadOrders(); loadDashboard();
+    loadYCOrders();
+  } else {
+    setAlert('yc-sync-result', '❌ ' + (r.data?.error || 'Erreur sync'), 'err');
+  }
+}
+
+async function syncProducts() {
+  setAlert('yc-sync-result','⏳ Synchronisation produits YouCan en cours...','ok');
+  const r = await API('POST', '/api/youcan/sync-products');
+  if (r.ok) {
+    setAlert('yc-sync-result', '✅ ' + r.data.message, 'ok');
+    loadProducts();
+  } else {
+    setAlert('yc-sync-result', '❌ ' + (r.data?.error || 'Erreur sync'), 'err');
+  }
+}
+
+async function syncAll() {
+  setAlert('yc-sync-result','⏳ Synchronisation complète en cours...','ok');
+  const [r1, r2] = await Promise.all([
+    API('POST', '/api/youcan/sync-orders'),
+    API('POST', '/api/youcan/sync-products')
+  ]);
+  const msg = [];
+  if (r1.ok) msg.push(r1.data.message);
+  if (r2.ok) msg.push(r2.data.message);
+  if (msg.length) {
+    setAlert('yc-sync-result', '✅ ' + msg.join(' | '), 'ok');
+    loadOrders(); loadProducts(); loadDashboard();
+    loadYCOrders();
+  } else {
+    setAlert('yc-sync-result', '❌ Erreur synchronisation — Vérifiez votre clé API', 'err');
+  }
+}
+
+async function loadYCOrders() {
+  const r = await API('GET', '/api/youcan/orders');
+  if (!r.ok || !r.data.connected) return;
+  const orders = r.data.orders || [];
+  const tbody  = document.getElementById('yc-orders-tbody');
+  if (!tbody) return;
+  if (!orders.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--t3);padding:18px">Aucune commande YouCan trouvée</td></tr>'; return; }
+  tbody.innerHTML = orders.slice(0, 20).map(o => {
+    const name = o.customer ? (o.customer.first_name + ' ' + (o.customer.last_name||'')) : (o.billing?.first_name || 'Client');
+    return `<tr>
+      <td class="fw7 c-v">#${o.number || o.id?.slice(-6)}</td>
+      <td class="fw6">${esc(name.trim())}</td>
+      <td class="fw7">${fmt(parseFloat(o.total||0))} MAD</td>
+      <td class="t2 fs12">${esc(o.payment_method||'—')}</td>
+      <td><span class="tag ${o.status==='confirmed'?'tag-g':o.status==='cancelled'?'tag-r':'tag-a'}">${esc(o.status||'—')}</span></td>
+      <td class="t2 fs12">${(o.created_at||'').substring(0,10)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function disconnectYouCan() {
+  if (!confirm('Déconnecter YouCan ? Les données déjà importées seront conservées.')) return;
+  document.getElementById('yc-connected').style.display    = 'none';
+  document.getElementById('yc-not-connected').style.display = 'block';
+  document.getElementById('yc-status-badge').className = 'tag tag-s';
+  document.getElementById('yc-status-badge').textContent = '○ Non connecté';
+  document.getElementById('nb-youcan').style.display = 'none';
+  alert('Pour déconnecter complètement:\nRailway → Variables → Supprimer YOUCAN_API_KEY');
+}
+
+// Load YouCan status when page opens
+const _origShowPage = showPage;
+
+/* ═══════════════════════════════════════════════
+   VISUELS IA — Pollinations.ai (100% gratuit)
+═══════════════════════════════════════════════ */
+
+let visCurrPlat  = 'facebook';
+let visCurrSize  = '1080x1080';
+let visGenerated = {};
+let visCurrImg   = '';
+
+const PLAT_NAMES = {
+  facebook:        'Facebook Feed',
+  facebook_story:  'Facebook Story',
+  instagram:       'Instagram Feed',
+  instagram_reel:  'Instagram Reel',
+  tiktok:          'TikTok',
+  linkedin:        'LinkedIn'
+};
+
+const PLAT_SIZES = {
+  facebook:        { w: 1080, h: 1080 },
+  facebook_story:  { w: 1080, h: 1920 },
+  instagram:       { w: 1080, h: 1080 },
+  instagram_reel:  { w: 1080, h: 1920 },
+  tiktok:          { w: 1080, h: 1920 },
+  linkedin:        { w: 1200, h: 627  }
+};
+
+function initVisuals() {
+  // Set default selection
+  const first = document.querySelector('.vis-plat.sel');
+  if (!first) selPlat(document.querySelector('.vis-plat'), 'facebook', '1080x1080');
+}
+
+function selPlat(el, plat, size) {
+  document.querySelectorAll('.vis-plat').forEach(p => p.classList.remove('sel'));
+  el.classList.add('sel');
+  visCurrPlat = plat;
+  visCurrSize = size;
+}
+
+function buildPrompt() {
+  const product = document.getElementById('vis-product').value || 'produit marocain';
+  const style   = document.getElementById('vis-style').value;
+  const colors  = document.getElementById('vis-colors').value;
+  const text    = document.getElementById('vis-text').value;
+
+  let prompt = `${style}, ${product}`;
+  if (colors) prompt += `, ${colors}`;
+  if (text)   prompt += `, text overlay saying "${text}"`;
+
+  // Platform-specific additions
+  const additions = {
+    facebook:        'square format, facebook ad optimized',
+    facebook_story:  'vertical portrait format, story optimized, mobile first',
+    instagram:       'square instagram post, high engagement visual',
+    instagram_reel:  'vertical video thumbnail, reel cover, mobile format',
+    tiktok:          'vertical tiktok format, gen-z aesthetic, trendy',
+    linkedin:        'professional linkedin post, wide format, business'
+  };
+  prompt += `, ${additions[visCurrPlat] || ''}`;
+  prompt += ', high quality, 4k, photorealistic, commercial photography';
+
+  return encodeURIComponent(prompt);
+}
+
+async function generateVisual() {
+  const product = document.getElementById('vis-product').value.trim();
+  if (!product) {
+    setAlert('vis-alert', 'Entrez le produit / sujet de la pub', 'err');
+    return;
+  }
+  document.getElementById('vis-alert').textContent = '';
+
+  // Show loading
+  const loading = document.getElementById('vis-loading');
+  const img     = document.getElementById('vis-img');
+  const placeholder = document.getElementById('vis-placeholder');
+
+  placeholder.style.display = 'none';
+  img.style.display = 'none';
+  loading.style.display = 'flex';
+  document.getElementById('vis-progress').textContent = "Construction du prompt...";
+
+  // Build prompt
+  const prompt = buildPrompt();
+  const { w, h } = PLAT_SIZES[visCurrPlat];
+
+  // Pollinations.ai URL (100% free, no API key)
+  const seed    = Math.floor(Math.random() * 999999);
+  const imgUrl  = `https://image.pollinations.ai/prompt/${prompt}?width=${w}&height=${h}&seed=${seed}&nologo=true&enhance=true`;
+
+  document.getElementById('vis-progress').textContent = "Génération en cours...";
+
+  // Load image
+  const newImg = new Image();
+  newImg.crossOrigin = 'anonymous';
+  newImg.onload = async () => {
+    loading.style.display = 'none';
+    img.src = imgUrl;
+    img.style.display = 'block';
+    visCurrImg = imgUrl;
+    visGenerated[visCurrPlat] = imgUrl;
+
+    // Update info
+    document.getElementById('vis-info').style.display = 'block';
+    document.getElementById('vis-plat-name').textContent = PLAT_NAMES[visCurrPlat];
+    document.getElementById('vis-size-info').textContent = `${w}×${h}px`;
+
+    // Update format card
+    updateFormatCard(visCurrPlat, imgUrl);
+
+    // Generate caption with Groq
+    await generateCaptionAI();
+  };
+  newImg.onerror = () => {
+    loading.style.display = 'none';
+    placeholder.style.display = 'block';
+    setAlert('vis-alert', '❌ Erreur génération — Vérifiez votre connexion internet', 'err');
+  };
+  newImg.src = imgUrl;
+}
+
+async function generateCaptionAI() {
+  const product  = document.getElementById('vis-product').value;
+  const lang     = document.getElementById('vis-lang').value;
+  const platform = PLAT_NAMES[visCurrPlat];
+
+  const langStr  = lang === 'dar' ? 'darija marocain' : lang === 'ar' ? 'arabe classique' : 'français';
+  const prompt   = `Crée une légende pub accrocheuse en ${langStr} pour ${platform} pour ce produit: "${product}". 
+Maximum 3 phrases. Inclure emojis et hashtags adaptés Maroc. Ton engageant et commercial.`;
+
+  const r = await API('POST', '/api/ai/chat', { message: prompt });
+  const captionWrap = document.getElementById('vis-caption-wrap');
+  const captionEl   = document.getElementById('vis-caption');
+
+  captionWrap.style.display = 'block';
+  captionEl.textContent     = r.ok ? r.data.reply : "Légende non disponible";
+}
+
+async function regenCaption() {
+  document.getElementById('vis-caption').textContent = '⏳ Génération...';
+  await generateCaptionAI();
+}
+
+function copyCaption() {
+  const text = document.getElementById('vis-caption').textContent;
+  navigator.clipboard.writeText(text).then(() => alert('✅ Légende copiée!')).catch(() => {});
+}
+
+function downloadVisual() {
+  if (!visCurrImg) return;
+  const a = document.createElement('a');
+  a.href = visCurrImg;
+  a.download = `nexamarket-${visCurrPlat}-${Date.now()}.jpg`;
+  a.target   = '_blank';
+  a.click();
+}
+
+function downloadFormat(plat) {
+  const url = visGenerated[plat];
+  if (!url) return;
+  const a = document.createElement('a');
+  a.href = url; a.download = `nexamarket-${plat}.jpg`; a.target = '_blank';
+  a.click();
+}
+
+function updateFormatCard(plat, imgUrl) {
+  const card = document.getElementById('fmt-' + plat);
+  if (!card) return;
+  const preview = card.querySelector('.format-preview');
+  preview.innerHTML = `<img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:var(--r-sm)" alt="${plat}">`;
+  const dlBtn = document.getElementById('dl-' + plat);
+  if (dlBtn) dlBtn.style.display = 'flex';
+}
+
+async function generateAllFormats() {
+  const product = document.getElementById('vis-product').value.trim();
+  if (!product) {
+    setAlert('vis-alert', "Entrez le produit avant de continuer", 'err');
+    return;
+  }
+
+  const btn = document.getElementById('btn-all-formats');
+  btn.textContent = '⏳ Génération en cours...';
+  btn.disabled    = true;
+
+  const platforms = Object.keys(PLAT_SIZES);
+  const style     = document.getElementById('vis-style').value;
+  const colors    = document.getElementById('vis-colors').value;
+  const text      = document.getElementById('vis-text').value;
+
+  for (const plat of platforms) {
+    const { w, h } = PLAT_SIZES[plat];
+    let p = `${style}, ${product}`;
+    if (colors) p += `, ${colors}`;
+    if (text)   p += `, text "${text}"`;
+
+    const adds = {
+      facebook:'square facebook ad', facebook_story:'vertical story',
+      instagram:'square instagram', instagram_reel:'vertical reel',
+      tiktok:'vertical tiktok', linkedin:'wide linkedin professional'
+    };
+    p += `, ${adds[plat]}, high quality commercial photo`;
+
+    const seed   = Math.floor(Math.random() * 999999);
+    const imgUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(p)}?width=${w}&height=${h}&seed=${seed}&nologo=true&enhance=true`;
+
+    // Update card with loading state
+    const card = document.getElementById('fmt-' + plat);
+    if (card) {
+      card.querySelector('.format-preview').innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:80px;color:var(--t3);font-size:12px">⏳ Génération...</div>`;
+    }
+
+    // Load async
+    const imgEl = new Image();
+    imgEl.crossOrigin = 'anonymous';
+    imgEl.onload = () => {
+      visGenerated[plat] = imgUrl;
+      updateFormatCard(plat, imgUrl);
+    };
+    imgEl.src = imgUrl;
+
+    // Small delay between requests
+    await new Promise(r => setTimeout(r, 800));
+  }
+
+  btn.textContent = '⚡ Régénérer tous les formats';
+  btn.disabled    = false;
+}
+</script>
+</body>
+</html>

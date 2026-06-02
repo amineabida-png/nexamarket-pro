@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexaMarket Pro — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   DESIGN SYSTEM — NexaMarket Pro
+   Aesthetic: Premium Dark SaaS / Arabian Modern
+   ============================================================ */
+:root {
+  --bg-base:       #07080f;
+  --bg-surface:    #0e1019;
+  --bg-card:       #131520;
+  --bg-card-hover: #181b2a;
+  --bg-input:      #1a1d2e;
+  --border:        rgba(255,255,255,0.07);
+  --border-active: rgba(139,92,246,0.5);
+
+  --accent:        #7c3aed;
+  --accent-2:      #a855f7;
+  --accent-glow:   rgba(124,58,237,0.25);
+  --teal:          #14b8a6;
+  --amber:         #f59e0b;
+  --rose:          #f43f5e;
+  --emerald:       #10b981;
+  --sky:           #38bdf8;
+
+  --text-primary:  #f0f1f8;
+  --text-secondary:#8b8fa8;
+  --text-muted:    #4a4e6a;
+
+  --sidebar-w:     240px;
+  --header-h:      64px;
+  --radius-sm:     8px;
+  --radius-md:     12px;
+  --radius-lg:     18px;
+  --radius-xl:     24px;
+
+  --shadow-card:   0 4px 24px rgba(0,0,0,0.4);
+  --shadow-glow:   0 0 40px rgba(124,58,237,0.15);
+
+  --font-display:  'Syne', sans-serif;
+  --font-body:     'DM Sans', sans-serif;
+
+  --transition:    0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+[data-theme="light"] {
+  --bg-base:       #f4f5fb;
+  --bg-surface:    #ffffff;
+  --bg-card:       #ffffff;
+  --bg-card-hover: #f8f9ff;
+  --bg-input:      #f1f2f9;
+  --border:        rgba(0,0,0,0.08);
+  --border-active: rgba(124,58,237,0.4);
+  --text-primary:  #0e0f1c;
+  --text-secondary:#5a5f80;
+  --text-muted:    #9ea3be;
+  --shadow-card:   0 2px 16px rgba(0,0,0,0.08);
+  --shadow-glow:   0 0 30px rgba(124,58,237,0.1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  display: flex;
+  min-height: 100vh;
+  overflow-x: hidden;
+  font-size: 14px;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 4px; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+  transition: transform var(--transition);
+  overflow-y: auto;
+}
+
+.sidebar-logo {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.logo-mark {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 16px;
+  color: #fff;
+  box-shadow: 0 4px 16px var(--accent-glow);
+  flex-shrink: 0;
+}
+.logo-text { font-family: var(--font-display); font-weight: 700; font-size: 17px; letter-spacing: -0.3px; }
+.logo-text span { color: var(--accent-2); }
+
+.sidebar-section { padding: 16px 12px 8px; }
+.sidebar-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 0 8px;
+  margin-bottom: 6px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition);
+  color: var(--text-secondary);
+  position: relative;
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 400;
+  margin-bottom: 2px;
+}
+.nav-item:hover { background: var(--bg-card); color: var(--text-primary); }
+.nav-item.active {
+  background: linear-gradient(90deg, rgba(124,58,237,0.18), rgba(124,58,237,0.05));
+  color: var(--accent-2);
+  font-weight: 500;
+}
+.nav-item.active::before {
+  content: '';
+  position: absolute; left: 0; top: 20%; bottom: 20%;
+  width: 3px;
+  background: var(--accent);
+  border-radius: 0 3px 3px 0;
+}
+.nav-icon {
+  width: 18px; height: 18px; flex-shrink: 0;
+  opacity: 0.7;
+}
+.nav-item.active .nav-icon { opacity: 1; }
+.nav-badge {
+  margin-left: auto;
+  background: var(--rose);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 20px;
+  min-width: 18px;
+  text-align: center;
+}
+.nav-badge.green { background: var(--emerald); }
+.nav-badge.amber { background: var(--amber); color: #000; }
+
+.sidebar-bottom {
+  margin-top: auto;
+  padding: 16px 12px;
+  border-top: 1px solid var(--border);
+}
+.user-pill {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--transition);
+}
+.user-pill:hover { background: var(--bg-card); }
+.user-avatar {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal), var(--sky));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 13px; color: #fff;
+  flex-shrink: 0;
+}
+.user-info { flex: 1; min-width: 0; }
+.user-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-role { font-size: 11px; color: var(--text-secondary); }
+
+/* ── MAIN LAYOUT ── */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ── HEADER ── */
+.header {
+  height: var(--header-h);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 28px;
+  gap: 16px;
+  position: sticky; top: 0;
+  z-index: 50;
+  backdrop-filter: blur(12px);
+}
+.header-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+.header-sub { font-size: 12px; color: var(--text-secondary); margin-top: 1px; }
+
+.header-spacer { flex: 1; }
+
+.search-box {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  width: 240px;
+  transition: border-color var(--transition);
+}
+.search-box:focus-within { border-color: var(--border-active); }
+.search-box input {
+  background: none; border: none; outline: none;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 13px;
+  width: 100%;
+}
+.search-box input::placeholder { color: var(--text-muted); }
+
+.header-actions { display: flex; align-items: center; gap: 8px; }
+.icon-btn {
+  width: 36px; height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition);
+  color: var(--text-secondary);
+  position: relative;
+}
+.icon-btn:hover { background: var(--bg-card-hover); color: var(--text-primary); border-color: var(--border-active); }
+.notif-dot {
+  position: absolute; top: 6px; right: 6px;
+  width: 7px; height: 7px;
+  background: var(--rose);
+  border-radius: 50%;
+  border: 1.5px solid var(--bg-surface);
+}
+
+.theme-toggle {
+  width: 36px; height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition);
+  color: var(--text-secondary);
+  font-size: 16px;
+}
+.theme-toggle:hover { background: var(--bg-card-hover); }
+
+.period-select {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 7px 12px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 13px;
+  cursor: pointer;
+  outline: none;
+}
+.btn-primary {
+  display: flex; align-items: center; gap: 6px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  box-shadow: 0 4px 16px var(--accent-glow);
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 24px var(--accent-glow); }
+
+/* ── PAGE CONTENT ── */
+.page-content {
+  flex: 1;
+  padding: 28px;
+  display: flex; flex-direction: column; gap: 24px;
+}
+
+/* ── KPI ROW ── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+  box-shadow: var(--shadow-card);
+  transition: all var(--transition);
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+}
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+.kpi-card.violet::before { background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+.kpi-card.teal::before   { background: linear-gradient(90deg, var(--teal), var(--sky)); }
+.kpi-card.amber::before  { background: linear-gradient(90deg, var(--amber), #f97316); }
+.kpi-card.rose::before   { background: linear-gradient(90deg, var(--rose), #fb7185); }
+
+.kpi-card:hover {
+  background: var(--bg-card-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+  border-color: var(--border-active);
+}
+.kpi-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+.kpi-label { font-size: 12px; font-weight: 500; color: var(--text-secondary); letter-spacing: 0.3px; }
+.kpi-icon {
+  width: 34px; height: 34px;
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+.kpi-icon.violet { background: rgba(124,58,237,0.15); }
+.kpi-icon.teal   { background: rgba(20,184,166,0.15); }
+.kpi-icon.amber  { background: rgba(245,158,11,0.15); }
+.kpi-icon.rose   { background: rgba(244,63,94,0.15); }
+
+.kpi-value {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.kpi-footer { display: flex; align-items: center; gap: 6px; }
+.kpi-delta {
+  display: flex; align-items: center; gap: 3px;
+  font-size: 12px; font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 20px;
+}
+.kpi-delta.up   { background: rgba(16,185,129,0.12); color: var(--emerald); }
+.kpi-delta.down { background: rgba(244,63,94,0.12);  color: var(--rose); }
+.kpi-period { font-size: 11px; color: var(--text-muted); }
+
+/* ── CHARTS ROW ── */
+.charts-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+}
+.chart-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-card);
+}
+.card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px;
+}
+.card-title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+.card-subtitle { font-size: 11.5px; color: var(--text-secondary); margin-top: 2px; }
+
+.legend { display: flex; gap: 16px; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+/* SVG CHARTS */
+.chart-wrap { position: relative; }
+
+/* Revenue Chart */
+.revenue-chart { width: 100%; height: 200px; }
+.chart-area { fill: none; }
+.chart-line { fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.chart-fill { fill-opacity: 0.12; }
+.chart-grid-line { stroke: var(--border); stroke-width: 1; }
+.chart-label { fill: var(--text-muted); font-size: 11px; font-family: var(--font-body); }
+
+/* Donut */
+.donut-chart { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+.donut-wrap { position: relative; width: 160px; height: 160px; }
+.donut-center {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.donut-center-val { font-family: var(--font-display); font-size: 26px; font-weight: 800; letter-spacing: -1px; }
+.donut-center-lbl { font-size: 11px; color: var(--text-secondary); }
+.donut-legend { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+.donut-row { display: flex; align-items: center; gap: 10px; }
+.donut-bar-bg { flex: 1; height: 4px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.donut-bar { height: 100%; border-radius: 4px; transition: width 1.2s cubic-bezier(0.4,0,0.2,1); }
+.donut-row-label { font-size: 12px; color: var(--text-secondary); min-width: 80px; }
+.donut-row-val { font-size: 12px; font-weight: 600; min-width: 38px; text-align: right; }
+
+/* ── BOTTOM ROW ── */
+.bottom-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+
+/* ── TABLE ── */
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  padding: 0 0 10px;
+  border-bottom: 1px solid var(--border);
+}
+.data-table td {
+  padding: 12px 0;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr { transition: background var(--transition); }
+.data-table tbody tr:hover td { background: var(--bg-card-hover); }
+
+.status-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.status-badge.delivered { background: rgba(16,185,129,0.12); color: var(--emerald); }
+.status-badge.pending   { background: rgba(245,158,11,0.12);  color: var(--amber); }
+.status-badge.cancelled { background: rgba(244,63,94,0.12);   color: var(--rose); }
+.status-badge.shipping  { background: rgba(56,189,248,0.12);  color: var(--sky); }
+
+/* ── ACTIVITY FEED ── */
+.activity-feed { display: flex; flex-direction: column; gap: 0; }
+.activity-item {
+  display: flex; gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  transition: background var(--transition);
+}
+.activity-item:last-child { border-bottom: none; }
+.activity-icon {
+  width: 32px; height: 32px; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+}
+.activity-text { flex: 1; }
+.activity-main { font-size: 13px; font-weight: 500; line-height: 1.4; }
+.activity-main b { color: var(--accent-2); font-weight: 600; }
+.activity-time { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+
+/* ── MINI STATS / WHATSAPP ── */
+.whatsapp-stats { display: flex; flex-direction: column; gap: 14px; }
+.wa-stat-row { display: flex; justify-content: space-between; align-items: center; }
+.wa-stat-label { font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; }
+.wa-stat-value { font-weight: 700; font-size: 15px; }
+.wa-bar-wrap { display: flex; gap: 2px; margin-top: 6px; }
+.wa-bar-seg {
+  height: 6px; border-radius: 3px; flex: 1;
+  transition: opacity var(--transition);
+}
+.wa-bar-seg.filled { background: #25D366; }
+.wa-bar-seg.empty  { background: var(--border); }
+
+/* ── AI PERFORMANCE ── */
+.ai-perf { display: flex; flex-direction: column; gap: 14px; }
+.perf-item { }
+.perf-top { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.perf-name { font-size: 12.5px; color: var(--text-secondary); }
+.perf-pct  { font-size: 12px; font-weight: 700; }
+.perf-track { height: 6px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.perf-fill  { height: 100%; border-radius: 4px; transition: width 1.4s cubic-bezier(0.4,0,0.2,1); }
+
+/* ── MODULE TABS ── */
+.module-tabs { display: flex; gap: 4px; }
+.module-tab {
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition);
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+}
+.module-tab:hover { background: var(--bg-input); color: var(--text-primary); }
+.module-tab.active { background: rgba(124,58,237,0.15); border-color: rgba(124,58,237,0.3); color: var(--accent-2); }
+
+/* ── AI INSIGHT BANNER ── */
+.ai-banner {
+  background: linear-gradient(135deg, rgba(124,58,237,0.12), rgba(168,85,247,0.06));
+  border: 1px solid rgba(124,58,237,0.25);
+  border-radius: var(--radius-lg);
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.ai-banner-icon {
+  width: 44px; height: 44px; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  box-shadow: 0 4px 16px var(--accent-glow);
+}
+.ai-banner-content { flex: 1; }
+.ai-banner-title { font-family: var(--font-display); font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+.ai-banner-text { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+.ai-banner-actions { display: flex; gap: 8px; }
+.btn-ghost {
+  padding: 7px 14px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.btn-ghost:hover { background: var(--bg-card); color: var(--text-primary); }
+
+/* ── FUNNEL BARS ── */
+.funnel { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.funnel-row { display: flex; align-items: center; gap: 10px; }
+.funnel-label { width: 70px; font-size: 12px; color: var(--text-secondary); }
+.funnel-bar-bg { flex: 1; height: 28px; background: var(--bg-input); border-radius: 6px; overflow: hidden; position: relative; }
+.funnel-bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  display: flex; align-items: center; padding: 0 10px;
+  font-size: 12px; font-weight: 700; color: #fff;
+  transition: width 1.3s cubic-bezier(0.4,0,0.2,1);
+}
+.funnel-count { font-size: 12px; font-weight: 700; min-width: 36px; text-align: right; }
+
+/* ── ANIMATION ── */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulse { 0%,100%{ opacity:1; } 50%{ opacity:0.5; } }
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.kpi-card    { animation: fadeIn 0.4s ease both; }
+.kpi-card:nth-child(1) { animation-delay: 0.05s; }
+.kpi-card:nth-child(2) { animation-delay: 0.10s; }
+.kpi-card:nth-child(3) { animation-delay: 0.15s; }
+.kpi-card:nth-child(4) { animation-delay: 0.20s; }
+
+.chart-card { animation: fadeIn 0.5s ease 0.25s both; }
+.ai-banner  { animation: fadeIn 0.4s ease 0.05s both; }
+
+/* ── LIVE DOT ── */
+.live-dot {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; color: var(--emerald);
+  font-weight: 600;
+}
+.live-dot::before {
+  content: '';
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--emerald);
+  animation: pulse 1.8s ease-in-out infinite;
+}
+
+/* ── SMALL CHART: BAR ── */
+.mini-bars { display: flex; align-items: flex-end; gap: 4px; height: 60px; margin-top: 8px; }
+.mini-bar {
+  flex: 1; border-radius: 4px 4px 0 0;
+  transition: height 1s ease;
+  cursor: pointer;
+}
+.mini-bar:hover { filter: brightness(1.2); }
+
+/* ── SCROLLABLE TABLE WRAP ── */
+.table-wrap { overflow-x: auto; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1200px) {
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .charts-row { grid-template-columns: 1fr; }
+  .bottom-row { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 820px) {
+  :root { --sidebar-w: 0px; }
+  .sidebar { transform: translateX(-240px); }
+  .bottom-row { grid-template-columns: 1fr; }
+}
+
+/* ── TOOLTIP ── */
+.tooltip-wrap { position: relative; }
+.tooltip-wrap:hover .tooltip { opacity: 1; pointer-events: auto; }
+.tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%; transform: translateX(-50%);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+  z-index: 200;
+  box-shadow: var(--shadow-card);
+}
+
+/* ── SPARKLINE ── */
+.sparkline { width: 80px; height: 30px; }
+
+/* ── FLAG ── */
+.flag { font-size: 15px; }
+
+/* ── EXTRA UTILS ── */
+.flex { display: flex; }
+.items-center { align-items: center; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.mt-1 { margin-top: 4px; }
+.mt-2 { margin-top: 8px; }
+.fw-700 { font-weight: 700; }
+.text-sm { font-size: 12px; }
+.text-muted { color: var(--text-muted); }
+.text-emerald { color: var(--emerald); }
+.text-rose { color: var(--rose); }
+.text-sky { color: var(--sky); }
+.text-amber { color: var(--amber); }
+.text-violet { color: var(--accent-2); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════
+     SIDEBAR
+════════════════════════════════════════════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">N</div>
+    <div>
+      <div class="logo-text">Nexa<span>Market</span></div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Vue générale</div>
+    <div class="nav-item active">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+      Analytique
+      <span class="nav-badge green">Nouveau</span>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Marketing & Ventes</div>
+    <div class="nav-item">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
+      IA Media Buyer
+      <span class="nav-badge amber">IA</span>
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      Contenu IA
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+      WhatsApp IA
+      <span class="nav-badge">14</span>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Clients & CRM</div>
+    <div class="nav-item">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      CRM
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+      Centre d'appels IA
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">E-commerce</div>
+    <div class="nav-item">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+      Catalogue
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+      Commandes
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+      Logistique
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Finance</div>
+    <div class="nav-item">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      Facturation
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      IA Financière
+    </div>
+  </div>
+
+  <div class="sidebar-bottom">
+    <div class="user-pill">
+      <div class="user-avatar">YB</div>
+      <div class="user-info">
+        <div class="user-name">Youssef Bennani</div>
+        <div class="user-role">Super Admin</div>
+      </div>
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color:var(--text-muted);flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══════════════════════════════════════════════════
+     MAIN
+════════════════════════════════════════════════════ -->
+<main class="main">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div>
+      <div class="header-title">Tableau de bord</div>
+      <div class="header-sub">Lundi, 2 Juin 2025 &nbsp;·&nbsp; <span class="live-dot">En direct</span></div>
+    </div>
+    <div class="header-spacer"></div>
+    <div class="search-box">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color:var(--text-muted);flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+      <input placeholder="Rechercher...">
+    </div>
+    <div class="header-actions">
+      <select class="period-select" id="periodSelect">
+        <option>Cette semaine</option>
+        <option>Ce mois</option>
+        <option>Dernier trimestre</option>
+        <option>Cette année</option>
+      </select>
+      <div class="icon-btn" onclick="exportDashboard()" title="Exporter">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+      </div>
+      <div class="icon-btn" title="Notifications">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+        <div class="notif-dot"></div>
+      </div>
+      <div class="theme-toggle" onclick="toggleTheme()" id="themeBtn" title="Changer le thème">🌙</div>
+      <button class="btn-primary" onclick="openCampaign()">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+        Nouvelle campagne
+      </button>
+    </div>
+  </header>
+
+  <!-- PAGE CONTENT -->
+  <div class="page-content">
+
+    <!-- AI INSIGHT BANNER -->
+    <div class="ai-banner">
+      <div class="ai-banner-icon">🤖</div>
+      <div class="ai-banner-content">
+        <div class="ai-banner-title">Recommandation IA — Opportunité détectée</div>
+        <div class="ai-banner-text">Votre ROI publicitaire sur Meta Ads a augmenté de <strong>34%</strong> cette semaine. L'IA recommande d'augmenter le budget de la campagne "Ramadan 2025" de 1 200 MAD pour maximiser les conversions avant la fin de la période.</div>
+      </div>
+      <div class="ai-banner-actions">
+        <button class="btn-ghost">Ignorer</button>
+        <button class="btn-primary" style="font-size:12.5px;padding:7px 14px;">Appliquer</button>
+      </div>
+    </div>
+
+    <!-- KPI CARDS -->
+    <div class="kpi-grid">
+
+      <div class="kpi-card violet">
+        <div class="kpi-header">
+          <div>
+            <div class="kpi-label">Chiffre d'affaires</div>
+          </div>
+          <div class="kpi-icon violet">💰</div>
+        </div>
+        <div class="kpi-value" id="caVal">284 750</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">MAD</div>
+        <div class="kpi-footer">
+          <div class="kpi-delta up">▲ +18.4%</div>
+          <div class="kpi-period">vs semaine précédente</div>
+        </div>
+        <div class="mini-bars" id="miniBar1" style="margin-top:16px;"></div>
+      </div>
+
+      <div class="kpi-card teal">
+        <div class="kpi-header">
+          <div><div class="kpi-label">Commandes</div></div>
+          <div class="kpi-icon teal">📦</div>
+        </div>
+        <div class="kpi-value">1 247</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">commandes totales</div>
+        <div class="kpi-footer">
+          <div class="kpi-delta up">▲ +9.2%</div>
+          <div class="kpi-period">vs semaine précédente</div>
+        </div>
+        <div class="mini-bars" id="miniBar2" style="margin-top:16px;"></div>
+      </div>
+
+      <div class="kpi-card amber">
+        <div class="kpi-header">
+          <div><div class="kpi-label">Leads générés</div></div>
+          <div class="kpi-icon amber">🎯</div>
+        </div>
+        <div class="kpi-value">3 892</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">prospects qualifiés</div>
+        <div class="kpi-footer">
+          <div class="kpi-delta up">▲ +24.1%</div>
+          <div class="kpi-period">vs semaine précédente</div>
+        </div>
+        <div class="mini-bars" id="miniBar3" style="margin-top:16px;"></div>
+      </div>
+
+      <div class="kpi-card rose">
+        <div class="kpi-header">
+          <div><div class="kpi-label">ROI Publicitaire</div></div>
+          <div class="kpi-icon rose">📈</div>
+        </div>
+        <div class="kpi-value">4.7×</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">retour sur dépenses</div>
+        <div class="kpi-footer">
+          <div class="kpi-delta up">▲ +34%</div>
+          <div class="kpi-period">vs semaine précédente</div>
+        </div>
+        <div class="mini-bars" id="miniBar4" style="margin-top:16px;"></div>
+      </div>
+
+    </div>
+
+    <!-- CHARTS ROW -->
+    <div class="charts-row">
+
+      <!-- Revenue Chart -->
+      <div class="chart-card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Évolution des revenus</div>
+            <div class="card-subtitle">12 dernières semaines · MAD</div>
+          </div>
+          <div class="flex gap-2">
+            <div class="legend">
+              <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>Revenus</div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div>Dépenses Pub</div>
+            </div>
+          </div>
+        </div>
+
+        <svg class="revenue-chart" viewBox="0 0 700 200" id="revenueSVG" preserveAspectRatio="none">
+          <!-- Grid -->
+          <line x1="0" y1="40" x2="700" y2="40" class="chart-grid-line" stroke-dasharray="4 4"/>
+          <line x1="0" y1="80" x2="700" y2="80" class="chart-grid-line" stroke-dasharray="4 4"/>
+          <line x1="0" y1="120" x2="700" y2="120" class="chart-grid-line" stroke-dasharray="4 4"/>
+          <line x1="0" y1="160" x2="700" y2="160" class="chart-grid-line" stroke-dasharray="4 4"/>
+
+          <!-- Revenue area -->
+          <defs>
+            <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.35"/>
+              <stop offset="100%" stop-color="#7c3aed" stop-opacity="0"/>
+            </linearGradient>
+            <linearGradient id="adGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#14b8a6" stop-opacity="0.25"/>
+              <stop offset="100%" stop-color="#14b8a6" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+
+          <path d="M30,155 C80,145 130,125 180,115 C230,105 280,120 330,95 C380,70 430,85 480,65 C530,45 570,55 620,40 L620,175 L30,175Z"
+                fill="url(#revGrad)"/>
+          <path d="M30,155 C80,145 130,125 180,115 C230,105 280,120 330,95 C380,70 430,85 480,65 C530,45 570,55 620,40"
+                class="chart-line" stroke="#7c3aed"/>
+
+          <!-- Ad spend area -->
+          <path d="M30,170 C80,165 130,160 180,155 C230,150 280,158 330,145 C380,132 430,140 480,130 C530,120 570,128 620,115 L620,175 L30,175Z"
+                fill="url(#adGrad)"/>
+          <path d="M30,170 C80,165 130,160 180,155 C230,150 280,158 330,145 C380,132 430,140 480,130 C530,120 570,128 620,115"
+                class="chart-line" stroke="#14b8a6" stroke-width="2"/>
+
+          <!-- X labels -->
+          <text x="30"  y="192" class="chart-label" text-anchor="middle">S1</text>
+          <text x="88"  y="192" class="chart-label" text-anchor="middle">S2</text>
+          <text x="146" y="192" class="chart-label" text-anchor="middle">S3</text>
+          <text x="204" y="192" class="chart-label" text-anchor="middle">S4</text>
+          <text x="262" y="192" class="chart-label" text-anchor="middle">S5</text>
+          <text x="320" y="192" class="chart-label" text-anchor="middle">S6</text>
+          <text x="378" y="192" class="chart-label" text-anchor="middle">S7</text>
+          <text x="436" y="192" class="chart-label" text-anchor="middle">S8</text>
+          <text x="494" y="192" class="chart-label" text-anchor="middle">S9</text>
+          <text x="552" y="192" class="chart-label" text-anchor="middle">S10</text>
+          <text x="620" y="192" class="chart-label" text-anchor="middle">S11</text>
+
+          <!-- Y labels -->
+          <text x="-4" y="44"  class="chart-label" text-anchor="end">300K</text>
+          <text x="-4" y="84"  class="chart-label" text-anchor="end">225K</text>
+          <text x="-4" y="124" class="chart-label" text-anchor="end">150K</text>
+          <text x="-4" y="164" class="chart-label" text-anchor="end">75K</text>
+
+          <!-- Highlight dot -->
+          <circle cx="620" cy="40" r="5" fill="#7c3aed" stroke="var(--bg-card)" stroke-width="2"/>
+          <circle cx="620" cy="115" r="5" fill="#14b8a6" stroke="var(--bg-card)" stroke-width="2"/>
+        </svg>
+
+        <!-- Second row of KPIs -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px;padding-top:20px;border-top:1px solid var(--border)">
+          <div>
+            <div style="font-size:11px;color:var(--text-secondary);margin-bottom:4px;">Taux de conversion</div>
+            <div style="font-family:var(--font-display);font-size:22px;font-weight:800;">3.8%</div>
+            <div class="kpi-delta up" style="margin-top:4px;font-size:11px;">▲ +0.6pts</div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--text-secondary);margin-bottom:4px;">Panier moyen</div>
+            <div style="font-family:var(--font-display);font-size:22px;font-weight:800;">228 MAD</div>
+            <div class="kpi-delta up" style="margin-top:4px;font-size:11px;">▲ +8.3%</div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--text-secondary);margin-bottom:4px;">Dépenses pub</div>
+            <div style="font-family:var(--font-display);font-size:22px;font-weight:800;">60 600 MAD</div>
+            <div class="kpi-delta down" style="margin-top:4px;font-size:11px;">▼ −3.1%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Donut Chart -->
+      <div class="chart-card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Canaux d'acquisition</div>
+            <div class="card-subtitle">Sources de trafic</div>
+          </div>
+        </div>
+
+        <div class="donut-chart">
+          <div class="donut-wrap">
+            <svg viewBox="0 0 120 120" style="width:100%;height:100%;transform:rotate(-90deg)">
+              <circle cx="60" cy="60" r="50" fill="none" stroke="var(--border)" stroke-width="14"/>
+              <circle cx="60" cy="60" r="50" fill="none" stroke="#7c3aed" stroke-width="14"
+                      stroke-dasharray="125.6 188.4" stroke-dashoffset="0" stroke-linecap="round"/>
+              <circle cx="60" cy="60" r="50" fill="none" stroke="#14b8a6" stroke-width="14"
+                      stroke-dasharray="75.36 238.6" stroke-dashoffset="-125.6" stroke-linecap="round"/>
+              <circle cx="60" cy="60" r="50" fill="none" stroke="#f59e0b" stroke-width="14"
+                      stroke-dasharray="56.52 257.5" stroke-dashoffset="-200.96" stroke-linecap="round"/>
+              <circle cx="60" cy="60" r="50" fill="none" stroke="#38bdf8" stroke-width="14"
+                      stroke-dasharray="56.52 257.5" stroke-dashoffset="-257.5" stroke-linecap="round"/>
+            </svg>
+            <div class="donut-center">
+              <div class="donut-center-val">3 892</div>
+              <div class="donut-center-lbl">leads</div>
+            </div>
+          </div>
+
+          <div class="donut-legend">
+            <div class="donut-row">
+              <div class="legend-dot" style="background:#7c3aed;flex-shrink:0;width:10px;height:10px;border-radius:3px;"></div>
+              <div class="donut-row-label">Meta Ads</div>
+              <div class="donut-bar-bg"><div class="donut-bar" style="width:40%;background:#7c3aed"></div></div>
+              <div class="donut-row-val text-violet">40%</div>
+            </div>
+            <div class="donut-row">
+              <div class="legend-dot" style="background:#14b8a6;flex-shrink:0;width:10px;height:10px;border-radius:3px;"></div>
+              <div class="donut-row-label">Google Ads</div>
+              <div class="donut-bar-bg"><div class="donut-bar" style="width:24%;background:#14b8a6"></div></div>
+              <div class="donut-row-val text-emerald">24%</div>
+            </div>
+            <div class="donut-row">
+              <div class="legend-dot" style="background:#f59e0b;flex-shrink:0;width:10px;height:10px;border-radius:3px;"></div>
+              <div class="donut-row-label">TikTok Ads</div>
+              <div class="donut-bar-bg"><div class="donut-bar" style="width:18%;background:#f59e0b"></div></div>
+              <div class="donut-row-val text-amber">18%</div>
+            </div>
+            <div class="donut-row">
+              <div class="legend-dot" style="background:#38bdf8;flex-shrink:0;width:10px;height:10px;border-radius:3px;"></div>
+              <div class="donut-row-label">WhatsApp</div>
+              <div class="donut-bar-bg"><div class="donut-bar" style="width:18%;background:#38bdf8"></div></div>
+              <div class="donut-row-val text-sky">18%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BOTTOM ROW -->
+    <div class="bottom-row">
+
+      <!-- Recent Orders -->
+      <div class="chart-card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Commandes récentes</div>
+            <div class="card-subtitle">Dernières 24h</div>
+          </div>
+          <div class="module-tabs">
+            <div class="module-tab active">Tout</div>
+            <div class="module-tab">En cours</div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Client</th>
+                <th>Produit</th>
+                <th>Montant</th>
+                <th>Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="color:var(--text-muted);font-size:12px;">#4821</td>
+                <td><div style="font-weight:500;">Fatima Z.</div><div style="font-size:11px;color:var(--text-muted);">Casablanca</div></td>
+                <td style="color:var(--text-secondary);">Hijab Premium ×3</td>
+                <td style="font-weight:700;">540 MAD</td>
+                <td><span class="status-badge delivered">✓ Livré</span></td>
+              </tr>
+              <tr>
+                <td style="color:var(--text-muted);font-size:12px;">#4820</td>
+                <td><div style="font-weight:500;">Ahmed K.</div><div style="font-size:11px;color:var(--text-muted);">Rabat</div></td>
+                <td style="color:var(--text-secondary);">Abaya Collection</td>
+                <td style="font-weight:700;">1 200 MAD</td>
+                <td><span class="status-badge shipping">→ Expédié</span></td>
+              </tr>
+              <tr>
+                <td style="color:var(--text-muted);font-size:12px;">#4819</td>
+                <td><div style="font-weight:500;">Nadia B.</div><div style="font-size:11px;color:var(--text-muted);">Marrakech</div></td>
+                <td style="color:var(--text-secondary);">Parfum Oud ×2</td>
+                <td style="font-weight:700;">890 MAD</td>
+                <td><span class="status-badge pending">⏳ En attente</span></td>
+              </tr>
+              <tr>
+                <td style="color:var(--text-muted);font-size:12px;">#4818</td>
+                <td><div style="font-weight:500;">Karim M.</div><div style="font-size:11px;color:var(--text-muted);">Fès</div></td>
+                <td style="color:var(--text-secondary);">Djellaba Homme</td>
+                <td style="font-weight:700;">750 MAD</td>
+                <td><span class="status-badge delivered">✓ Livré</span></td>
+              </tr>
+              <tr>
+                <td style="color:var(--text-muted);font-size:12px;">#4817</td>
+                <td><div style="font-weight:500;">Sara El A.</div><div style="font-size:11px;color:var(--text-muted);">Tanger</div></td>
+                <td style="color:var(--text-secondary);">Sac Artisanal</td>
+                <td style="font-weight:700;">320 MAD</td>
+                <td><span class="status-badge cancelled">✕ Annulé</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- WhatsApp + AI Performance -->
+      <div style="display:flex;flex-direction:column;gap:16px;">
+
+        <!-- WhatsApp IA -->
+        <div class="chart-card" style="flex:0">
+          <div class="card-header" style="margin-bottom:14px">
+            <div>
+              <div class="card-title">WhatsApp IA</div>
+              <div class="card-subtitle">Aujourd'hui</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#25D366;font-weight:600;">
+              <span style="width:8px;height:8px;background:#25D366;border-radius:50%;display:inline-block;animation:pulse 1.8s ease-in-out infinite"></span>
+              Connecté
+            </div>
+          </div>
+          <div class="whatsapp-stats">
+            <div class="wa-stat-row">
+              <div class="wa-stat-label">💬 Messages reçus</div>
+              <div class="wa-stat-value">247</div>
+            </div>
+            <div class="wa-stat-row">
+              <div class="wa-stat-label">🤖 Réponses IA</div>
+              <div class="wa-stat-value text-emerald">219</div>
+            </div>
+            <div class="wa-stat-row">
+              <div class="wa-stat-label">📋 Devis envoyés</div>
+              <div class="wa-stat-value text-violet">34</div>
+            </div>
+            <div class="wa-stat-row">
+              <div class="wa-stat-label">🎯 Leads qualifiés</div>
+              <div class="wa-stat-value text-amber">61</div>
+            </div>
+            <div style="margin-top:4px">
+              <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">Taux de réponse auto: 89%</div>
+              <div class="wa-bar-wrap">
+                <!-- 9 filled, 1 empty -->
+                <div class="wa-bar-seg filled"></div><div class="wa-bar-seg filled"></div><div class="wa-bar-seg filled"></div><div class="wa-bar-seg filled"></div><div class="wa-bar-seg filled"></div><div class="wa-bar-seg filled"></div><div class="wa-bar-seg filled"></div><div class="wa-bar-seg filled"></div><div class="wa-bar-seg filled"></div><div class="wa-bar-seg empty"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Funnel CRM -->
+        <div class="chart-card" style="flex:1">
+          <div class="card-header" style="margin-bottom:16px">
+            <div>
+              <div class="card-title">Entonnoir CRM</div>
+              <div class="card-subtitle">Pipeline de vente</div>
+            </div>
+          </div>
+          <div class="funnel">
+            <div class="funnel-row">
+              <div class="funnel-label">Visiteurs</div>
+              <div class="funnel-bar-bg">
+                <div class="funnel-bar-fill" style="width:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2))">102 400</div>
+              </div>
+            </div>
+            <div class="funnel-row">
+              <div class="funnel-label">Leads</div>
+              <div class="funnel-bar-bg">
+                <div class="funnel-bar-fill" style="width:76%;background:linear-gradient(90deg,var(--teal),var(--sky))">3 892</div>
+              </div>
+            </div>
+            <div class="funnel-row">
+              <div class="funnel-label">Prospects</div>
+              <div class="funnel-bar-bg">
+                <div class="funnel-bar-fill" style="width:48%;background:linear-gradient(90deg,var(--amber),#f97316)">1 870</div>
+              </div>
+            </div>
+            <div class="funnel-row">
+              <div class="funnel-label">Clients</div>
+              <div class="funnel-bar-bg">
+                <div class="funnel-bar-fill" style="width:24%;background:linear-gradient(90deg,var(--emerald),var(--teal))">1 247</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- AI Performance -->
+      <div class="chart-card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Performance IA</div>
+            <div class="card-subtitle">Modules actifs</div>
+          </div>
+        </div>
+        <div class="ai-perf">
+          <div class="perf-item">
+            <div class="perf-top">
+              <div class="perf-name">🎯 Ciblage Meta Ads</div>
+              <div class="perf-pct text-violet">94%</div>
+            </div>
+            <div class="perf-track"><div class="perf-fill" style="width:94%;background:var(--accent)"></div></div>
+          </div>
+          <div class="perf-item">
+            <div class="perf-top">
+              <div class="perf-name">💬 WhatsApp Bot</div>
+              <div class="perf-pct text-emerald">89%</div>
+            </div>
+            <div class="perf-track"><div class="perf-fill" style="width:89%;background:var(--emerald)"></div></div>
+          </div>
+          <div class="perf-item">
+            <div class="perf-top">
+              <div class="perf-name">📝 Contenu généré</div>
+              <div class="perf-pct text-sky">78%</div>
+            </div>
+            <div class="perf-track"><div class="perf-fill" style="width:78%;background:var(--sky)"></div></div>
+          </div>
+          <div class="perf-item">
+            <div class="perf-top">
+              <div class="perf-name">📊 Score CRM</div>
+              <div class="perf-pct text-amber">82%</div>
+            </div>
+            <div class="perf-track"><div class="perf-fill" style="width:82%;background:var(--amber)"></div></div>
+          </div>
+          <div class="perf-item">
+            <div class="perf-top">
+              <div class="perf-name">📞 Agent Vocal IA</div>
+              <div class="perf-pct text-rose">67%</div>
+            </div>
+            <div class="perf-track"><div class="perf-fill" style="width:67%;background:var(--rose)"></div></div>
+          </div>
+          <div class="perf-item">
+            <div class="perf-top">
+              <div class="perf-name">💰 Prévision IA</div>
+              <div class="perf-pct text-violet">91%</div>
+            </div>
+            <div class="perf-track"><div class="perf-fill" style="width:91%;background:var(--accent-2)"></div></div>
+          </div>
+        </div>
+
+        <!-- Platform integrations -->
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+          <div style="font-size:11px;color:var(--text-muted);margin-bottom:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase">Plateformes connectées</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <div style="display:flex;align-items:center;gap:5px;background:var(--bg-input);border:1px solid var(--border);border-radius:20px;padding:4px 10px;font-size:12px;">
+              <span style="width:6px;height:6px;background:var(--emerald);border-radius:50%;"></span> Meta Ads
+            </div>
+            <div style="display:flex;align-items:center;gap:5px;background:var(--bg-input);border:1px solid var(--border);border-radius:20px;padding:4px 10px;font-size:12px;">
+              <span style="width:6px;height:6px;background:var(--emerald);border-radius:50%;"></span> Google Ads
+            </div>
+            <div style="display:flex;align-items:center;gap:5px;background:var(--bg-input);border:1px solid var(--border);border-radius:20px;padding:4px 10px;font-size:12px;">
+              <span style="width:6px;height:6px;background:var(--emerald);border-radius:50%;"></span> TikTok Ads
+            </div>
+            <div style="display:flex;align-items:center;gap:5px;background:var(--bg-input);border:1px solid var(--border);border-radius:20px;padding:4px 10px;font-size:12px;">
+              <span style="width:6px;height:6px;background:var(--emerald);border-radius:50%;"></span> WhatsApp
+            </div>
+            <div style="display:flex;align-items:center;gap:5px;background:var(--bg-input);border:1px solid var(--border);border-radius:20px;padding:4px 10px;font-size:12px;">
+              <span style="width:6px;height:6px;background:var(--emerald);border-radius:50%;"></span> Amana
+            </div>
+            <div style="display:flex;align-items:center;gap:5px;background:var(--bg-input);border:1px solid var(--border);border-radius:20px;padding:4px 10px;font-size:12px;">
+              <span style="width:6px;height:6px;background:var(--amber);border-radius:50%;"></span> CMI
+            </div>
+          </div>
+        </div>
+
+        <!-- Financial Alert -->
+        <div style="margin-top:16px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start">
+          <span style="font-size:18px;flex-shrink:0;">🔔</span>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--emerald);margin-bottom:2px;">Alerte IA Financière</div>
+            <div style="font-size:12px;color:var(--text-secondary);line-height:1.5;">Prévision: +22% de revenus anticipés pour le prochain mois selon les tendances actuelles.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- ═══════════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════════════ -->
+<script>
+// ── THEME TOGGLE ──
+let isDark = true;
+function toggleTheme() {
+  isDark = !isDark;
+  document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+  document.getElementById('themeBtn').textContent = isDark ? '🌙' : '☀️';
+}
+
+// ── MINI BAR CHARTS ──
+function createMiniBars(id, data, color) {
+  const container = document.getElementById(id);
+  if (!container) return;
+  const max = Math.max(...data);
+  data.forEach((v, i) => {
+    const bar = document.createElement('div');
+    bar.className = 'mini-bar';
+    const pct = (v / max) * 100;
+    bar.style.cssText = `height:${pct}%;background:${i === data.length-1 ? color : color+'55'};`;
+    bar.title = v;
+    container.appendChild(bar);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  createMiniBars('miniBar1', [42,55,38,70,62,58,72,80,68,84,91,100], '#7c3aed');
+  createMiniBars('miniBar2', [55,60,48,72,65,70,74,80,72,85,90,95], '#14b8a6');
+  createMiniBars('miniBar3', [60,70,55,80,74,78,83,88,79,90,94,100], '#f59e0b');
+  createMiniBars('miniBar4', [50,55,60,65,58,68,72,78,74,82,88,100], '#f43f5e');
+});
+
+// ── PERIOD CHANGE ──
+document.getElementById('periodSelect').addEventListener('change', function() {
+  // Animate KPI values change
+  const kpiVal = document.getElementById('caVal');
+  kpiVal.style.opacity = '0.4';
+  kpiVal.style.transform = 'translateY(-4px)';
+  setTimeout(() => {
+    const values = {
+      'Cette semaine': '284 750',
+      'Ce mois': '1 142 300',
+      'Dernier trimestre': '3 890 200',
+      "Cette année": '14 720 000'
+    };
+    kpiVal.textContent = values[this.value] || '284 750';
+    kpiVal.style.opacity = '1';
+    kpiVal.style.transform = 'translateY(0)';
+    kpiVal.style.transition = 'all 0.3s ease';
+  }, 200);
+});
+
+// ── NAV ITEMS ──
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', function() {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+// ── MODULE TABS ──
+document.querySelectorAll('.module-tab').forEach(tab => {
+  tab.addEventListener('click', function() {
+    const parent = this.closest('.module-tabs');
+    parent.querySelectorAll('.module-tab').forEach(t => t.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+// ── EXPORT ──
+function exportDashboard() {
+  const btn = event.currentTarget;
+  const orig = btn.innerHTML;
+  btn.innerHTML = '⏳';
+  setTimeout(() => {
+    btn.innerHTML = '✓';
+    btn.style.color = 'var(--emerald)';
+    setTimeout(() => {
+      btn.innerHTML = orig;
+      btn.style.color = '';
+    }, 2000);
+  }, 1200);
+}
+
+// ── CAMPAIGN MODAL ──
+function openCampaign() {
+  alert('🚀 Module IA Media Buyer\n\nCréation de campagne automatique avec:\n• Génération d\'audiences IA\n• Création de visuels IA\n• Optimisation budget automatique\n\n→ Disponible dans la version complète NexaMarket Pro');
+}
+
+// ── LIVE COUNTER ──
+setInterval(() => {
+  // Simulate live WhatsApp messages
+  const waEl = document.querySelector('.wa-stat-value');
+  if (waEl && Math.random() > 0.7) {
+    const current = parseInt(waEl.textContent);
+    waEl.textContent = current + 1;
+    waEl.style.color = 'var(--emerald)';
+    setTimeout(() => waEl.style.color = '', 800);
+  }
+}, 5000);
+</script>
+
+</body>
+</html>

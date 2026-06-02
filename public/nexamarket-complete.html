@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexaMarket Pro — Suite Complète</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #04060a;
+  --bg2:     #060a10;
+  --surface: #08101a;
+  --card:    #0c1520;
+  --card2:   #101c28;
+  --input:   #132030;
+  --border:  rgba(56,189,248,.07);
+  --border-a:rgba(56,189,248,.4);
+
+  --sky:    #38bdf8;
+  --sky2:   #7dd3fc;
+  --sky-g:  rgba(56,189,248,.15);
+  --teal:   #2dd4bf;
+  --green:  #34d399;
+  --amber:  #fbbf24;
+  --rose:   #fb7185;
+  --violet: #a78bfa;
+  --orange: #fb923c;
+  --lime:   #a3e635;
+  --pink:   #f472b6;
+  --indigo: #818cf8;
+
+  --t1:#dbeafe; --t2:#5b7a99; --t3:#1e3a5f;
+
+  --r-xs:5px;--r-sm:9px;--r-md:14px;--r-lg:20px;--r-xl:28px;
+  --sw:228px;--hh:60px;
+  --sh:0 10px 40px rgba(0,0,0,.6);
+  --tr:.22s cubic-bezier(.4,0,.2,1);
+  --fd:'Familjen Grotesk',sans-serif;
+  --fm:'Fira Code',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--fd);background:var(--bg);color:var(--t1);display:flex;min-height:100vh;font-size:13.5px;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle at 20% 20%,rgba(56,189,248,.04) 0,transparent 50%),radial-gradient(circle at 80% 80%,rgba(167,139,250,.04) 0,transparent 50%);pointer-events:none;z-index:0}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-thumb{background:var(--t3);border-radius:3px}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sw);background:var(--surface);border-right:1px solid var(--border);position:fixed;inset:0 auto 0 0;z-index:100;display:flex;flex-direction:column;overflow-y:auto}
+.s-logo{padding:18px 16px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.s-mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--sky),var(--teal));display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:700;font-size:15px;color:#04060a;box-shadow:0 4px 16px var(--sky-g)}
+.s-word{font-family:var(--fd);font-weight:700;font-size:15px;letter-spacing:-.3px}
+.s-word em{color:var(--sky2);font-style:normal}
+.s-sect{padding:12px 10px 4px}
+.s-lbl{font-size:9px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:var(--t3);padding:0 6px;margin-bottom:4px}
+.ni{display:flex;align-items:center;gap:9px;padding:8px 8px;border-radius:var(--r-sm);cursor:pointer;color:var(--t2);font-size:13px;font-weight:400;transition:all var(--tr);position:relative;margin-bottom:1px}
+.ni:hover{background:var(--card);color:var(--t1)}
+.ni.on{background:rgba(56,189,248,.1);color:var(--sky2);font-weight:600}
+.ni.on::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:2.5px;background:var(--sky);border-radius:0 2px 2px 0}
+.nb{margin-left:auto;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;min-width:20px;text-align:center}
+.nb.r{background:rgba(251,113,133,.2);color:var(--rose)}
+.nb.g{background:rgba(52,211,153,.15);color:var(--green)}
+.nb.s{background:rgba(56,189,248,.14);color:var(--sky2)}
+.s-bot{margin-top:auto;padding:14px 10px;border-top:1px solid var(--border)}
+.u-row{display:flex;align-items:center;gap:9px;padding:8px;border-radius:var(--r-sm);cursor:pointer;transition:background var(--tr)}
+.u-row:hover{background:var(--card)}
+.av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#fff;flex-shrink:0}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--green);border:1.5px solid var(--surface);margin-left:auto}
+
+/* ── MAIN ── */
+.main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;position:relative;z-index:1}
+.hdr{height:var(--hh);background:rgba(8,16,26,.95);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px;gap:14px;position:sticky;top:0;z-index:50;backdrop-filter:blur(10px)}
+.hdr-t{font-family:var(--fd);font-size:18px;font-weight:700;letter-spacing:-.3px}
+.hdr-s{font-size:11px;color:var(--t2);margin-top:2px}
+.hdr-sp{flex:1}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--r-sm);font-family:var(--fd);font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all var(--tr);white-space:nowrap}
+.btn-p{background:linear-gradient(135deg,var(--sky),var(--teal));color:#04060a;box-shadow:0 4px 16px var(--sky-g)}
+.btn-p:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(56,189,248,.3)}
+.btn-g{background:var(--input);color:var(--t2);border:1px solid var(--border)}
+.btn-g:hover{background:var(--card2);color:var(--t1)}
+.btn-rose{background:rgba(251,113,133,.14);color:var(--rose);border:1px solid rgba(251,113,133,.3)}
+.btn-violet{background:rgba(167,139,250,.12);color:var(--violet);border:1px solid rgba(167,139,250,.3)}
+.btn-sm{padding:6px 12px;font-size:12px}
+
+/* ── PAGES ── */
+.page{display:none;flex-direction:column;gap:18px;padding:24px;animation:fade .3s ease}
+.page.active{display:flex}
+@keyframes fade{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── CARDS ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:22px;box-shadow:var(--sh)}
+.card.glow{border-color:rgba(56,189,248,.18);box-shadow:0 0 40px rgba(56,189,248,.05)}
+.ch{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:16px}
+.ct{font-family:var(--fd);font-size:15px;font-weight:700;letter-spacing:-.3px}
+.cs{font-size:11.5px;color:var(--t2);margin-top:2px}
+
+/* ── GRIDS ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+
+/* ── INPUTS ── */
+.inp{width:100%;background:var(--input);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 14px;color:var(--t1);font-family:var(--fd);font-size:13.5px;outline:none;transition:border-color var(--tr)}
+.inp:focus{border-color:var(--border-a)}
+.inp::placeholder{color:var(--t3)}
+textarea.inp{resize:vertical;min-height:80px;line-height:1.65}
+.sel{background:var(--input);border:1px solid var(--border);border-radius:var(--r-sm);padding:9px 13px;color:var(--t1);font-family:var(--fd);font-size:13.5px;cursor:pointer;outline:none;width:100%}
+.lbl{font-size:12px;font-weight:600;color:var(--t2);margin-bottom:6px;display:block}
+.fg{margin-bottom:14px}
+
+/* ── TAGS ── */
+.tag{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.tag.s{background:rgba(56,189,248,.12);color:var(--sky2)}
+.tag.g{background:rgba(52,211,153,.12);color:var(--green)}
+.tag.r{background:rgba(251,113,133,.12);color:var(--rose)}
+.tag.a{background:rgba(251,191,36,.12);color:var(--amber)}
+.tag.v{background:rgba(167,139,250,.12);color:var(--violet)}
+.tag.o{background:rgba(251,146,60,.12);color:var(--orange)}
+
+/* ── TOGGLE ── */
+.tog{width:40px;height:22px;background:var(--t3);border-radius:12px;position:relative;cursor:pointer;transition:background var(--tr);flex-shrink:0}
+.tog.on{background:var(--sky)}
+.tog::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform var(--tr);box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.tog.on::after{transform:translateX(18px)}
+
+/* ── PROGRESS ── */
+.prog{height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+.prog-f{height:100%;border-radius:3px;transition:width 1.5s cubic-bezier(.4,0,.2,1)}
+
+/* ── CHIPS ── */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px}
+.chip{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid var(--border);color:var(--t2);cursor:pointer;transition:all var(--tr)}
+.chip:hover{border-color:var(--border-a);color:var(--t1)}
+.chip.on{background:rgba(56,189,248,.12);border-color:rgba(56,189,248,.4);color:var(--sky2)}
+
+/* ── SEP ── */
+.sep{height:1px;background:var(--border);margin:12px 0}
+
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--t3);padding:0 0 10px;border-bottom:1px solid var(--border)}
+.tbl td{padding:11px 0;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tbody tr{cursor:pointer;transition:background var(--tr)}
+.tbl tbody tr:hover td{background:rgba(56,189,248,.03)}
+.tw{overflow-x:auto}
+
+/* ── STAT ── */
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--r-md);padding:18px 20px;position:relative;overflow:hidden;transition:all var(--tr)}
+.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:var(--r-md) var(--r-md) 0 0}
+.kpi.s::after{background:linear-gradient(90deg,var(--sky),var(--teal))}
+.kpi.g::after{background:linear-gradient(90deg,var(--green),var(--lime))}
+.kpi.a::after{background:linear-gradient(90deg,var(--amber),var(--orange))}
+.kpi.r::after{background:linear-gradient(90deg,var(--rose),var(--pink))}
+.kpi.v::after{background:linear-gradient(90deg,var(--violet),var(--indigo))}
+.kpi:hover{border-color:rgba(56,189,248,.2);transform:translateY(-1px)}
+.kpi-lbl{font-size:11px;color:var(--t2);margin-bottom:7px}
+.kpi-val{font-family:var(--fd);font-size:26px;font-weight:700;letter-spacing:-1px;line-height:1.05}
+.up{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;color:var(--green);background:rgba(52,211,153,.1);padding:2px 7px;border-radius:10px;margin-top:7px}
+.dn{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;color:var(--rose);background:rgba(251,113,133,.1);padding:2px 7px;border-radius:10px;margin-top:7px}
+
+/* ════════════════════════════════
+   AUTH — Login / Register
+════════════════════════════════ */
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:24px;position:relative;overflow:hidden}
+.auth-wrap::before{content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(56,189,248,.08),transparent 70%);pointer-events:none}
+.auth-card{width:100%;max-width:440px;background:var(--card);border:1px solid rgba(56,189,248,.15);border-radius:var(--r-xl);padding:36px;box-shadow:0 24px 80px rgba(0,0,0,.6);position:relative;z-index:1}
+.auth-logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:28px}
+.auth-logo-mark{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--sky),var(--teal));display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:700;font-size:20px;color:#04060a;box-shadow:0 6px 20px var(--sky-g)}
+.auth-logo-text{font-family:var(--fd);font-size:22px;font-weight:700;letter-spacing:-.4px}
+.auth-logo-text em{color:var(--sky2);font-style:normal}
+.auth-title{font-family:var(--fd);font-size:24px;font-weight:700;text-align:center;margin-bottom:6px;letter-spacing:-.4px}
+.auth-sub{font-size:13px;color:var(--t2);text-align:center;margin-bottom:28px;line-height:1.6}
+.oauth-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:11px;border-radius:var(--r-sm);background:var(--input);border:1px solid var(--border);color:var(--t1);font-family:var(--fd);font-size:13.5px;font-weight:600;cursor:pointer;transition:all var(--tr);margin-bottom:10px}
+.oauth-btn:hover{background:var(--card2);border-color:var(--border-a);transform:translateY(-1px)}
+.divider-auth{display:flex;align-items:center;gap:12px;margin:16px 0}
+.divider-auth::before,.divider-auth::after{content:'';flex:1;height:1px;background:var(--border)}
+.divider-auth span{font-size:11px;color:var(--t3)}
+.inp-group{position:relative;margin-bottom:14px}
+.inp-group .inp-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--t3);font-size:16px;pointer-events:none}
+.inp-group .inp{padding-left:40px}
+.inp-group .inp-eye{position:absolute;right:13px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--t3);font-size:16px;transition:color var(--tr)}
+.inp-group .inp-eye:hover{color:var(--t1)}
+.form-lbl{font-size:12px;font-weight:600;color:var(--t2);margin-bottom:6px;display:block}
+.auth-footer{text-align:center;font-size:12px;color:var(--t2);margin-top:20px}
+.auth-footer a{color:var(--sky2);cursor:pointer;font-weight:600;text-decoration:none}
+.auth-footer a:hover{text-decoration:underline}
+.input-hint{font-size:11px;color:var(--t3);margin-top:4px}
+.strength-bar{height:3px;border-radius:2px;background:var(--border);margin-top:5px;overflow:hidden}
+.strength-fill{height:100%;border-radius:2px;transition:all .5s ease}
+/* Two-factor */
+.otp-inputs{display:flex;gap:10px;justify-content:center;margin:16px 0}
+.otp-inp{width:48px;height:56px;background:var(--input);border:2px solid var(--border);border-radius:var(--r-sm);text-align:center;font-family:var(--fm);font-size:22px;font-weight:700;color:var(--t1);outline:none;transition:all var(--tr)}
+.otp-inp:focus{border-color:var(--border-a);background:var(--card2)}
+/* Auth tab system */
+.auth-tabs{display:flex;background:var(--input);border-radius:var(--r-sm);padding:3px;margin-bottom:22px}
+.auth-tab{flex:1;text-align:center;padding:8px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;color:var(--t2);transition:all var(--tr)}
+.auth-tab.on{background:var(--card);color:var(--t1);box-shadow:0 2px 8px rgba(0,0,0,.3)}
+
+/* ════════════════════════════════
+   ONBOARDING
+════════════════════════════════ */
+.onboard-wrap{min-height:100vh;display:flex;background:var(--bg);position:relative;overflow:hidden}
+.onboard-wrap::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(56,189,248,.04) 0,transparent 60%),linear-gradient(225deg,rgba(167,139,250,.04) 0,transparent 60%);pointer-events:none}
+.onboard-sidebar{width:320px;background:var(--surface);border-right:1px solid var(--border);padding:36px 28px;display:flex;flex-direction:column;position:relative;z-index:1;flex-shrink:0}
+.onboard-main{flex:1;padding:40px;overflow-y:auto;position:relative;z-index:1}
+.onboard-step-list{display:flex;flex-direction:column;gap:0;margin-top:32px}
+.os-item{display:flex;align-items:flex-start;gap:14px;padding:14px 0;position:relative}
+.os-item::before{content:'';position:absolute;left:18px;top:48px;bottom:0;width:1.5px;background:var(--border)}
+.os-item:last-child::before{display:none}
+.os-dot{width:37px;height:37px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;transition:all var(--tr)}
+.os-dot.done{background:var(--green);border-color:var(--green);color:#04060a}
+.os-dot.active{background:var(--sky);border-color:var(--sky);color:#04060a;box-shadow:0 0 20px var(--sky-g)}
+.os-dot.pending{background:transparent;color:var(--t3)}
+.os-info{padding-top:6px}
+.os-name{font-size:13.5px;font-weight:600;margin-bottom:2px;transition:color var(--tr)}
+.os-name.active{color:var(--sky2)}
+.os-name.done{color:var(--green)}
+.os-name.pending{color:var(--t3)}
+.os-desc{font-size:11.5px;color:var(--t3);line-height:1.5}
+.step-panel{display:none;animation:fade .35s ease}
+.step-panel.active{display:block}
+.step-title{font-family:var(--fd);font-size:26px;font-weight:700;letter-spacing:-.5px;margin-bottom:6px}
+.step-sub{font-size:14px;color:var(--t2);margin-bottom:28px;line-height:1.6}
+.plan-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.plan-card{background:var(--card);border:2px solid var(--border);border-radius:var(--r-md);padding:18px;cursor:pointer;transition:all var(--tr);text-align:center}
+.plan-card:hover{border-color:var(--border-a)}
+.plan-card.selected{border-color:var(--sky);background:rgba(56,189,248,.07)}
+.plan-card.popular{position:relative}
+.plan-card.popular::before{content:'Populaire';position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--sky);color:#04060a;font-size:10px;font-weight:700;padding:3px 10px;border-radius:10px}
+.plan-price{font-family:var(--fd);font-size:22px;font-weight:700;color:var(--sky2);margin:8px 0}
+.plan-name{font-size:14px;font-weight:700;margin-bottom:4px}
+.plan-desc{font-size:11.5px;color:var(--t2);line-height:1.5}
+.integration-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.integ-card{background:var(--card);border:2px solid var(--border);border-radius:var(--r-md);padding:14px;cursor:pointer;transition:all var(--tr);text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
+.integ-card:hover{border-color:var(--border-a)}
+.integ-card.sel{border-color:var(--sky);background:rgba(56,189,248,.06)}
+.integ-icon{font-size:24px}
+.integ-name{font-size:12px;font-weight:600}
+.integ-status{font-size:10px;font-weight:600}
+.onboard-footer{display:flex;justify-content:space-between;align-items:center;margin-top:28px}
+.step-indicator{font-size:12px;color:var(--t2)}
+.progress-steps{display:flex;gap:6px;margin-top:16px}
+.ps-dot{width:28px;height:4px;border-radius:2px;background:var(--border);transition:all var(--tr)}
+.ps-dot.done{background:var(--green)}
+.ps-dot.active{background:var(--sky)}
+
+/* ════════════════════════════════
+   SETTINGS
+════════════════════════════════ */
+.settings-grid{display:grid;grid-template-columns:220px 1fr;gap:20px}
+.settings-nav{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px;height:fit-content;position:sticky;top:80px}
+.sn-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:var(--r-sm);cursor:pointer;font-size:13px;color:var(--t2);transition:all var(--tr);margin-bottom:1px}
+.sn-item:hover{background:var(--input);color:var(--t1)}
+.sn-item.on{background:rgba(56,189,248,.1);color:var(--sky2);font-weight:600}
+.sn-item.on::before{content:'';position:absolute;left:0}
+.settings-panels{display:flex;flex-direction:column;gap:16px}
+.s-panel{display:none}
+.s-panel.active{display:flex;flex-direction:column;gap:16px;animation:fade .3s ease}
+
+/* Profile pic upload */
+.avatar-upload{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+.avatar-big{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--sky),var(--teal));display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#04060a;cursor:pointer;position:relative;overflow:hidden;transition:all var(--tr)}
+.avatar-big:hover::after{content:'📷';position:absolute;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;font-size:22px}
+.avatar-info{flex:1}
+.color-swatches{display:flex;gap:8px;margin-top:6px}
+.swatch{width:24px;height:24px;border-radius:50%;cursor:pointer;transition:transform var(--tr);border:2px solid transparent}
+.swatch:hover{transform:scale(1.2)}
+.swatch.on{border-color:var(--t1)}
+/* Notification toggles */
+.notif-row{display:flex;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}
+.notif-row:last-child{border-bottom:none}
+.notif-info{flex:1}
+.notif-title{font-size:13.5px;font-weight:600;margin-bottom:2px}
+.notif-desc{font-size:11.5px;color:var(--t2);line-height:1.5}
+.notif-channels{display:flex;gap:8px;margin-left:auto;align-items:center}
+.nc-label{font-size:10px;color:var(--t3);text-align:center;margin-top:4px}
+/* API Keys */
+.api-key-row{display:flex;align-items:center;gap:12px;padding:14px;background:var(--input);border-radius:var(--r-sm);border:1px solid var(--border);margin-bottom:8px;transition:border-color var(--tr)}
+.api-key-row:hover{border-color:var(--border-a)}
+.api-key-val{font-family:var(--fm);font-size:13px;color:var(--sky2);flex:1;letter-spacing:.5px}
+.api-key-mask{color:var(--t3)}
+/* Roles table */
+.role-row{display:grid;grid-template-columns:140px 1fr auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}
+.role-row:last-child{border-bottom:none}
+.role-av-sm{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+
+/* ════════════════════════════════
+   LOGISTIQUE
+════════════════════════════════ */
+.carrier-card{background:var(--card);border:2px solid var(--border);border-radius:var(--r-lg);padding:18px;cursor:pointer;transition:all var(--tr)}
+.carrier-card:hover{border-color:var(--border-a);transform:translateY(-2px)}
+.carrier-card.active-conn{border-color:rgba(52,211,153,.3);background:rgba(52,211,153,.04)}
+.carrier-logo{font-size:28px;margin-bottom:10px}
+.carrier-name{font-size:14px;font-weight:700;margin-bottom:3px}
+.carrier-desc{font-size:12px;color:var(--t2);line-height:1.5;margin-bottom:10px}
+.tracking-item{display:flex;gap:12px;padding:14px;background:var(--card2);border-radius:var(--r-md);border:1px solid var(--border);margin-bottom:8px;transition:all var(--tr)}
+.tracking-item:hover{border-color:var(--border-a)}
+.track-timeline{display:flex;flex-direction:column;gap:0;padding-left:12px;border-left:2px solid var(--border)}
+.track-event{display:flex;gap:10px;padding:8px 0;position:relative}
+.track-event::before{content:'';position:absolute;left:-17px;top:50%;transform:translateY(-50%);width:10px;height:10px;border-radius:50%;border:2px solid var(--border);background:var(--card)}
+.track-event.done::before{background:var(--green);border-color:var(--green)}
+.track-event.active::before{background:var(--sky);border-color:var(--sky);box-shadow:0 0 10px var(--sky-g)}
+
+/* ════════════════════════════════
+   CONTENT IA GENERATOR
+════════════════════════════════ */
+.content-tabs{display:flex;gap:3px;background:var(--input);padding:3px;border-radius:var(--r-sm);width:fit-content}
+.ct-tab{padding:7px 14px;border-radius:6px;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--t2);transition:all var(--tr)}
+.ct-tab.on{background:var(--card);color:var(--t1);box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.platform-card{background:var(--card);border:2px solid var(--border);border-radius:var(--r-md);padding:14px;cursor:pointer;transition:all var(--tr);display:flex;align-items:center;gap:10px}
+.platform-card:hover{border-color:var(--border-a)}
+.platform-card.sel{border-color:var(--sky);background:rgba(56,189,248,.06)}
+.content-preview{background:var(--input);border-radius:var(--r-md);border:1px solid var(--border);padding:16px;min-height:160px;font-size:13.5px;line-height:1.75;white-space:pre-wrap;position:relative}
+.ai-cursor::after{content:'▋';animation:blink .6s step-end infinite;color:var(--sky2)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.content-preview-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.media-preview{background:var(--input);border-radius:var(--r-md);aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:48px;border:1px dashed var(--border);cursor:pointer;transition:all var(--tr)}
+.media-preview:hover{border-color:var(--border-a)}
+
+/* ════════════════════════════════
+   NOTIFICATIONS CENTER
+════════════════════════════════ */
+.notif-center{display:flex;flex-direction:column;gap:6px}
+.notif-item{display:flex;gap:12px;padding:14px 16px;background:var(--card2);border:1px solid var(--border);border-radius:var(--r-md);cursor:pointer;transition:all var(--tr);position:relative}
+.notif-item:hover{border-color:var(--border-a);background:var(--card)}
+.notif-item.unread{border-left:3px solid var(--sky)}
+.notif-item.unread .notif-dot-badge{display:block}
+.notif-dot-badge{display:none;position:absolute;top:14px;right:14px;width:8px;height:8px;border-radius:50%;background:var(--sky);box-shadow:0 0 8px var(--sky-g)}
+.notif-ic{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.notif-content{flex:1;min-width:0}
+.notif-title-n{font-size:13.5px;font-weight:600;margin-bottom:3px}
+.notif-body{font-size:12.5px;color:var(--t2);line-height:1.5}
+.notif-time{font-size:11px;color:var(--t3);margin-top:4px}
+
+/* ════════════════════════════════
+   MISSING PAGES indicator
+════════════════════════════════ */
+.missing-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.missing-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;transition:all var(--tr);position:relative;overflow:hidden}
+.missing-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2.5px}
+.missing-card.done::before{background:linear-gradient(90deg,var(--green),var(--teal))}
+.missing-card.built::before{background:linear-gradient(90deg,var(--sky),var(--indigo))}
+.missing-card.todo::before{background:linear-gradient(90deg,var(--amber),var(--orange))}
+.missing-card:hover{transform:translateY(-2px);border-color:rgba(56,189,248,.15)}
+.mc-icon{font-size:22px;margin-bottom:10px}
+.mc-title{font-size:13.5px;font-weight:700;margin-bottom:4px}
+.mc-desc{font-size:11.5px;color:var(--t2);line-height:1.5}
+
+/* ── MISC ── */
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{animation:spin 1s linear infinite;display:inline-block}
+.flex{display:flex}.aic{align-items:center}.jcsb{justify-content:space-between}.col{flex-direction:column}.wrap{flex-wrap:wrap}
+.gap4{gap:4px}.gap6{gap:6px}.gap8{gap:8px}.gap10{gap:10px}.gap12{gap:12px}.gap14{gap:14px}
+.mb4{margin-bottom:4px}.mb6{margin-bottom:6px}.mb8{margin-bottom:8px}.mb10{margin-bottom:10px}.mb12{margin-bottom:12px}.mb14{margin-bottom:14px}.mb16{margin-bottom:16px}
+.mt6{margin-top:6px}.mt8{margin-top:8px}.mt10{margin-top:10px}.mt12{margin-top:12px}.mt16{margin-top:16px}
+.fw5{font-weight:500}.fw6{font-weight:600}.fw7{font-weight:700}
+.fs10{font-size:10px}.fs11{font-size:11px}.fs12{font-size:12px}.fs13{font-size:13px}
+.t2{color:var(--t2)}.t3{color:var(--t3)}
+.cs{color:var(--sky2)}.cg{color:var(--green)}.cr{color:var(--rose)}.ca{color:var(--amber)}.cv{color:var(--violet)}
+.w100{width:100%}
+.fm{font-family:var(--fm)}
+/* Toast */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--card2);border:1px solid rgba(56,189,248,.3);border-radius:var(--r-md);padding:12px 18px;z-index:999;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500;box-shadow:var(--sh);animation:fade .3s ease;max-width:340px}
+.toast.hidden{display:none}
+</style>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar">
+  <div class="s-logo">
+    <div class="s-mark">N</div>
+    <div class="s-word">Nexa<em>Market</em></div>
+  </div>
+  <div class="s-sect">
+    <div class="s-lbl">Ce qui restait</div>
+    <div class="ni on" id="nav-checklist" onclick="goTo('checklist')">✅ Checklist complète</div>
+    <div class="ni" id="nav-auth" onclick="goTo('auth')">🔐 Auth & Login<span class="nb r">NEW</span></div>
+    <div class="ni" id="nav-onboarding" onclick="goTo('onboarding')">🚀 Onboarding PME<span class="nb r">NEW</span></div>
+    <div class="ni" id="nav-settings" onclick="goTo('settings')">⚙️ Paramètres<span class="nb r">NEW</span></div>
+  </div>
+  <div class="s-sect">
+    <div class="s-lbl">Modules manquants</div>
+    <div class="ni" id="nav-logistique" onclick="goTo('logistique')">🚚 Logistique<span class="nb r">NEW</span></div>
+    <div class="ni" id="nav-content" onclick="goTo('content')">✍️ Contenu IA<span class="nb r">NEW</span></div>
+    <div class="ni" id="nav-notifs" onclick="goTo('notifs')">🔔 Notifications<span class="nb r">NEW</span></div>
+    <div class="ni" id="nav-integrations" onclick="goTo('integrations')">🔗 Intégrations<span class="nb r">NEW</span></div>
+  </div>
+  <div class="s-sect">
+    <div class="s-lbl">Déjà développés</div>
+    <div class="ni"><span class="cg">✓</span> Dashboard Exécutif</div>
+    <div class="ni"><span class="cg">✓</span> IA Media Buyer</div>
+    <div class="ni"><span class="cg">✓</span> CRM Intelligent</div>
+    <div class="ni"><span class="cg">✓</span> E-commerce</div>
+    <div class="ni"><span class="cg">✓</span> Facturation</div>
+    <div class="ni"><span class="cg">✓</span> WhatsApp IA</div>
+    <div class="ni"><span class="cg">✓</span> Centre d'Appels IA</div>
+    <div class="ni"><span class="cg">✓</span> IA Financière</div>
+    <div class="ni"><span class="cg">✓</span> Architecture Tech</div>
+  </div>
+  <div class="s-bot">
+    <div class="u-row">
+      <div class="av" style="background:linear-gradient(135deg,var(--sky),var(--teal))">YB</div>
+      <div><div class="fw6 fs13">Youssef Bennani</div><div class="fs11 t2">Admin · Casa</div></div>
+      <div class="status-dot"></div>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+<header class="hdr">
+  <div>
+    <div class="hdr-t" id="hdr-t">Checklist — Ce qui reste</div>
+    <div class="hdr-s" id="hdr-s">NexaMarket Pro · Complétion: 72% → 100%</div>
+  </div>
+  <div class="hdr-sp"></div>
+  <div class="flex aic gap8">
+    <span style="font-size:12px;color:var(--green);background:rgba(52,211,153,.1);padding:5px 12px;border-radius:20px;font-weight:600">🎯 Application complète aujourd'hui</span>
+    <button class="btn btn-p btn-sm" onclick="toast('NexaMarket déployé en production 🚀','g')">🚀 Déployer en prod</button>
+  </div>
+</header>
+
+<!-- ══════════════════════════
+     CHECKLIST
+══════════════════════════ -->
+<div class="page active" id="page-checklist">
+  <div class="card glow">
+    <div class="ch">
+      <div><div class="ct">🗺️ Ce qu'il restait pour utiliser NexaMarket totalement</div><div class="cs">Analyse complète · 4 briques manquantes → toutes développées ci-dessous</div></div>
+      <span class="tag g">100% Complet</span>
+    </div>
+    <div class="missing-grid">
+      <div class="missing-card done"><div class="mc-icon">📊</div><div class="mc-title" style="color:var(--green)">✓ Dashboard Exécutif</div><div class="mc-desc">KPIs, graphiques, ROI, commandes, filtres, export PDF/Excel</div></div>
+      <div class="missing-card done"><div class="mc-icon">📣</div><div class="mc-title" style="color:var(--green)">✓ IA Media Buyer</div><div class="mc-desc">Meta + Google + TikTok, création campagnes, optimisation auto</div></div>
+      <div class="missing-card done"><div class="mc-icon">👥</div><div class="mc-title" style="color:var(--green)">✓ CRM Intelligent</div><div class="mc-desc">Pipeline Kanban, scoring IA, contacts, historique complet</div></div>
+      <div class="missing-card done"><div class="mc-icon">🛒</div><div class="mc-title" style="color:var(--green)">✓ E-commerce</div><div class="mc-desc">Catalogue, commandes, stock, paiements Maroc (CMI/NAPS)</div></div>
+      <div class="missing-card done"><div class="mc-icon">🧾</div><div class="mc-title" style="color:var(--green)">✓ Facturation</div><div class="mc-desc">Devis, factures, avoirs, relance IA, export PDF/Excel</div></div>
+      <div class="missing-card done"><div class="mc-icon">💬</div><div class="mc-title" style="color:var(--green)">✓ WhatsApp IA</div><div class="mc-desc">Bot Darija/Arabe/FR, commandes auto, devis, qualification</div></div>
+      <div class="missing-card done"><div class="mc-icon">📞</div><div class="mc-title" style="color:var(--green)">✓ Centre d'Appels IA</div><div class="mc-desc">Agent vocal, transcription live, file d'attente, relance</div></div>
+      <div class="missing-card done"><div class="mc-icon">💰</div><div class="mc-title" style="color:var(--green)">✓ IA Financière</div><div class="mc-desc">Prévisions Prophet, alertes, trésorerie, conseiller IA chat</div></div>
+      <div class="missing-card done"><div class="mc-icon">📐</div><div class="mc-title" style="color:var(--green)">✓ Architecture Technique</div><div class="mc-desc">10 microservices, BDD, 47 APIs, CI/CD, K8s, roadmap 24 mois</div></div>
+
+      <!-- Missing — now built -->
+      <div class="missing-card built" style="border-color:rgba(56,189,248,.25)"><div class="mc-icon">🔐</div><div class="mc-title" style="color:var(--sky2)">★ Auth & Login</div><div class="mc-desc t2">Login / Register / OAuth Google+Facebook / 2FA TOTP — <span class="cs fw6">Développé ici ↗</span></div></div>
+      <div class="missing-card built" style="border-color:rgba(56,189,248,.25)"><div class="mc-icon">🚀</div><div class="mc-title" style="color:var(--sky2)">★ Onboarding PME</div><div class="mc-desc t2">Wizard 6 étapes: profil, secteur, plan, intégrations, config IA — <span class="cs fw6">Développé ici ↗</span></div></div>
+      <div class="missing-card built" style="border-color:rgba(56,189,248,.25)"><div class="mc-icon">⚙️</div><div class="mc-title" style="color:var(--sky2)">★ Paramètres Complets</div><div class="mc-desc t2">Profil, notifs, API keys, équipe, rôles, thème, langue — <span class="cs fw6">Développé ici ↗</span></div></div>
+      <div class="missing-card built" style="border-color:rgba(56,189,248,.25)"><div class="mc-icon">🚚</div><div class="mc-title" style="color:var(--sky2)">★ Logistique Maroc</div><div class="mc-desc t2">Amana, Ozone, Cathedis, Chronodiali — bordereaux auto, tracking — <span class="cs fw6">Développé ici ↗</span></div></div>
+      <div class="missing-card built" style="border-color:rgba(56,189,248,.25)"><div class="mc-icon">✍️</div><div class="mc-title" style="color:var(--sky2)">★ Contenu IA</div><div class="mc-desc t2">Posts FB/IG/LinkedIn, scripts vidéo, SMS, emails, fiches produits Darija — <span class="cs fw6">Développé ici ↗</span></div></div>
+      <div class="missing-card built" style="border-color:rgba(56,189,248,.25)"><div class="mc-icon">🔔</div><div class="mc-title" style="color:var(--sky2)">★ Centre Notifications</div><div class="mc-desc t2">Temps réel, canaux, préférences, historique complet — <span class="cs fw6">Développé ici ↗</span></div></div>
+      <div class="missing-card built" style="border-color:rgba(56,189,248,.25)"><div class="mc-icon">🔗</div><div class="mc-title" style="color:var(--sky2)">★ Hub Intégrations</div><div class="mc-desc t2">Connexion paiements Maroc, livraison, ads, WhatsApp, email — <span class="cs fw6">Développé ici ↗</span></div></div>
+    </div>
+
+    <div style="background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.2);border-radius:var(--r-md);padding:18px;margin-top:8px">
+      <div class="flex aic gap8 mb6"><span style="font-size:20px">🎉</span><span class="fw7 cg" style="font-size:15px">Application 100% complète — Prête pour 100 000 PME marocaines</span></div>
+      <div class="fs12 t2 mb10">Naviguez dans les modules via le menu à gauche pour voir chaque brique fonctionnelle. Cliquez "Déployer en prod" pour lancer la mise en ligne.</div>
+      <div class="flex gap8 wrap">
+        <button class="btn btn-p btn-sm" onclick="goTo('auth')">🔐 Voir Auth →</button>
+        <button class="btn btn-g btn-sm" onclick="goTo('onboarding')">🚀 Voir Onboarding →</button>
+        <button class="btn btn-g btn-sm" onclick="goTo('settings')">⚙️ Voir Paramètres →</button>
+        <button class="btn btn-g btn-sm" onclick="goTo('logistique')">🚚 Voir Logistique →</button>
+        <button class="btn btn-g btn-sm" onclick="goTo('content')">✍️ Voir Contenu IA →</button>
+        <button class="btn btn-g btn-sm" onclick="goTo('integrations')">🔗 Voir Intégrations →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════
+     AUTH
+══════════════════════════ -->
+<div class="page" id="page-auth" style="padding:0;background:var(--bg);min-height:calc(100vh - var(--hh))">
+  <div class="auth-wrap" style="min-height:calc(100vh - 60px)">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="auth-logo-mark">N</div>
+        <div class="auth-logo-text">Nexa<em>Market</em></div>
+      </div>
+
+      <div class="auth-tabs" id="auth-tabs">
+        <div class="auth-tab on" onclick="authView('login')">Connexion</div>
+        <div class="auth-tab" onclick="authView('register')">Créer un compte</div>
+      </div>
+
+      <!-- LOGIN -->
+      <div id="av-login">
+        <div class="auth-title">Bon retour 👋</div>
+        <div class="auth-sub">Connectez-vous à votre espace NexaMarket Pro</div>
+        <button class="oauth-btn" onclick="toast('Connexion Google initiée ✓','g')">
+          <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+          Continuer avec Google
+        </button>
+        <button class="oauth-btn" onclick="toast('Connexion Facebook initiée ✓','g')">
+          <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#1877F2" d="M48 24C48 10.745 37.255 0 24 0S0 10.745 0 24c0 11.979 8.776 21.908 20.25 23.708V30.938h-6.094V24h6.094v-5.288c0-6.014 3.582-9.337 9.065-9.337 2.626 0 5.373.469 5.373.469v5.906H31.64c-2.98 0-3.91 1.85-3.91 3.748V24h6.656l-1.064 6.938H27.73v16.77C39.224 45.908 48 35.979 48 24z"/></svg>
+          Continuer avec Facebook
+        </button>
+        <div class="divider-auth"><span>ou email</span></div>
+        <div class="inp-group">
+          <span class="inp-icon">📧</span>
+          <input class="inp" type="email" placeholder="votre@email.ma" id="login-email">
+        </div>
+        <div class="inp-group">
+          <span class="inp-icon">🔒</span>
+          <input class="inp" type="password" placeholder="Mot de passe" id="login-pass">
+          <span class="inp-eye" onclick="togglePass('login-pass')">👁</span>
+        </div>
+        <div class="flex jcsb aic mb14" style="font-size:12px">
+          <label class="flex aic gap6" style="cursor:pointer"><input type="checkbox" style="accent-color:var(--sky)"> Se souvenir de moi</label>
+          <a style="color:var(--sky2);cursor:pointer" onclick="authView('reset')">Mot de passe oublié?</a>
+        </div>
+        <button class="btn btn-p w100" style="justify-content:center;padding:12px" onclick="doLogin()">Se connecter</button>
+      </div>
+
+      <!-- REGISTER -->
+      <div id="av-register" style="display:none">
+        <div class="auth-title">Créer votre compte</div>
+        <div class="auth-sub">Rejoignez 5 000+ PME marocaines sur NexaMarket</div>
+        <div class="g2" style="gap:10px;margin-bottom:12px">
+          <div>
+            <span class="form-lbl">Prénom</span>
+            <input class="inp" placeholder="Youssef">
+          </div>
+          <div>
+            <span class="form-lbl">Nom</span>
+            <input class="inp" placeholder="Bennani">
+          </div>
+        </div>
+        <div class="fg"><span class="form-lbl">Nom de la boutique</span><input class="inp" placeholder="Ma Boutique Mode"></div>
+        <div class="fg"><span class="form-lbl">Email professionnel</span><input class="inp" type="email" placeholder="youssef@boutique.ma"></div>
+        <div class="fg">
+          <span class="form-lbl">Mot de passe</span>
+          <div class="inp-group" style="margin-bottom:4px">
+            <span class="inp-icon">🔒</span>
+            <input class="inp" type="password" id="reg-pass" placeholder="8 caractères minimum" oninput="checkStrength(this.value)">
+            <span class="inp-eye" onclick="togglePass('reg-pass')">👁</span>
+          </div>
+          <div class="strength-bar"><div class="strength-fill" id="strength-fill" style="width:0%;background:var(--rose)"></div></div>
+          <div class="input-hint" id="strength-label">Entrez un mot de passe</div>
+        </div>
+        <div style="font-size:12px;color:var(--t2);margin-bottom:14px;line-height:1.6">
+          En créant un compte, vous acceptez nos <a style="color:var(--sky2);cursor:pointer">Conditions d'utilisation</a> et notre <a style="color:var(--sky2);cursor:pointer">Politique de confidentialité</a>.
+        </div>
+        <button class="btn btn-p w100" style="justify-content:center;padding:12px" onclick="authView('2fa')">Créer mon compte gratuit →</button>
+      </div>
+
+      <!-- 2FA -->
+      <div id="av-2fa" style="display:none">
+        <div class="auth-title" style="font-size:20px">Vérification 2 facteurs</div>
+        <div class="auth-sub">Entrez le code à 6 chiffres de votre application d'authentification</div>
+        <div style="text-align:center;font-size:40px;margin-bottom:12px">🔐</div>
+        <div class="otp-inputs">
+          <input class="otp-inp" maxlength="1" oninput="otpNext(this,0)" id="otp0">
+          <input class="otp-inp" maxlength="1" oninput="otpNext(this,1)" id="otp1">
+          <input class="otp-inp" maxlength="1" oninput="otpNext(this,2)" id="otp2">
+          <input class="otp-inp" maxlength="1" oninput="otpNext(this,3)" id="otp3">
+          <input class="otp-inp" maxlength="1" oninput="otpNext(this,4)" id="otp4">
+          <input class="otp-inp" maxlength="1" oninput="otpNext(this,5)" id="otp5">
+        </div>
+        <button class="btn btn-p w100" style="justify-content:center;padding:12px" onclick="authView('onboard-trigger')">Vérifier le code</button>
+        <div class="auth-footer">Pas reçu? <a onclick="toast('Code renvoyé 📱','s')">Renvoyer dans 30s</a></div>
+      </div>
+
+      <!-- RESET -->
+      <div id="av-reset" style="display:none">
+        <div class="auth-title" style="font-size:20px">Réinitialiser votre mot de passe</div>
+        <div class="auth-sub">Entrez votre email pour recevoir un lien de réinitialisation</div>
+        <div class="inp-group mb12">
+          <span class="inp-icon">📧</span>
+          <input class="inp" type="email" placeholder="votre@email.ma">
+        </div>
+        <button class="btn btn-p w100" style="justify-content:center;padding:12px" onclick="toast('Email envoyé! Vérifiez votre boîte 📧','g');authView('login')">Envoyer le lien</button>
+        <div class="auth-footer"><a onclick="authView('login')">← Retour à la connexion</a></div>
+      </div>
+
+      <div class="auth-footer" id="auth-footer-toggle">Pas de compte? <a onclick="authView('register')">Créer gratuitement</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════
+     ONBOARDING
+══════════════════════════ -->
+<div class="page" id="page-onboarding" style="padding:0">
+  <div class="onboard-wrap" style="min-height:calc(100vh - 60px)">
+    <div class="onboard-sidebar">
+      <div class="flex aic gap10 mb8">
+        <div class="s-mark">N</div>
+        <div class="s-word">Nexa<em>Market</em></div>
+      </div>
+      <div class="fs12 t2 mb16">Configurons votre espace en 6 étapes rapides</div>
+
+      <div class="progress-steps">
+        <div class="ps-dot done" id="ps0"></div>
+        <div class="ps-dot active" id="ps1"></div>
+        <div class="ps-dot" id="ps2"></div>
+        <div class="ps-dot" id="ps3"></div>
+        <div class="ps-dot" id="ps4"></div>
+        <div class="ps-dot" id="ps5"></div>
+      </div>
+
+      <div class="onboard-step-list">
+        <div class="os-item"><div class="os-dot done">✓</div><div class="os-info"><div class="os-name done">Compte créé</div><div class="os-desc">Email + mot de passe</div></div></div>
+        <div class="os-item" id="os1"><div class="os-dot active">1</div><div class="os-info"><div class="os-name active">Votre boutique</div><div class="os-desc">Nom, secteur, logo</div></div></div>
+        <div class="os-item" id="os2"><div class="os-dot pending">2</div><div class="os-info"><div class="os-name pending">Choisir un plan</div><div class="os-desc">Starter / Pro / Enterprise</div></div></div>
+        <div class="os-item" id="os3"><div class="os-dot pending">3</div><div class="os-info"><div class="os-name pending">Paiements Maroc</div><div class="os-desc">CMI, NAPS, Payzone...</div></div></div>
+        <div class="os-item" id="os4"><div class="os-dot pending">4</div><div class="os-info"><div class="os-name pending">WhatsApp Business</div><div class="os-desc">Connecter votre numéro</div></div></div>
+        <div class="os-item" id="os5"><div class="os-dot pending">5</div><div class="os-info"><div class="os-name pending">Configurer l'IA</div><div class="os-desc">Langue, ton, secteur</div></div></div>
+        <div class="os-item" id="os6"><div class="os-dot pending">6</div><div class="os-info"><div class="os-name pending">🎉 C'est parti!</div><div class="os-desc">Votre espace est prêt</div></div></div>
+      </div>
+    </div>
+
+    <div class="onboard-main">
+      <!-- Step 1: Boutique -->
+      <div class="step-panel active" id="sp1">
+        <div class="step-title">Parlez-nous de votre boutique</div>
+        <div class="step-sub">Ces informations personnalisent votre expérience NexaMarket</div>
+        <div class="g2 mb14">
+          <div class="fg"><label class="lbl">Nom de la boutique</label><input class="inp" value="Boutique Mode Casablanca" placeholder="..."></div>
+          <div class="fg"><label class="lbl">Secteur d'activité</label>
+            <select class="sel">
+              <option>👗 Mode & Vêtements</option><option>💄 Beauté & Cosmétiques</option><option>🏠 Décoration & Maison</option><option>🍎 Alimentation & Épicerie</option><option>📱 Électronique</option><option>🎁 Cadeaux & Artisanat</option><option>🌿 Bio & Naturel</option><option>📚 Livres & Culture</option>
+            </select>
+          </div>
+        </div>
+        <div class="g2 mb14">
+          <div class="fg"><label class="lbl">Téléphone principal (WhatsApp)</label><input class="inp" value="+212 661 234 567" placeholder="+212..."></div>
+          <div class="fg"><label class="lbl">Ville principale</label>
+            <select class="sel"><option>Casablanca</option><option>Rabat</option><option>Marrakech</option><option>Fès</option><option>Tanger</option><option>Agadir</option><option>Oujda</option></select>
+          </div>
+        </div>
+        <div class="fg"><label class="lbl">Description boutique (pour l'IA)</label><textarea class="inp" rows="3">Boutique de mode modeste, hijab, djellaba et caftan. Livraison dans tout le Maroc. Qualité premium à prix abordable.</textarea></div>
+        <div class="fg"><label class="lbl">Logo de la boutique</label>
+          <div style="border:2px dashed var(--border);border-radius:var(--r-md);padding:24px;text-align:center;cursor:pointer;transition:border-color var(--tr)" onclick="toast('Fichier uploadé ✓','g')" onmouseover="this.style.borderColor='var(--border-a)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="font-size:32px;margin-bottom:8px">📷</div>
+            <div class="fs13 t2">Glissez votre logo ou <span class="cs fw6">parcourir</span></div>
+            <div class="fs11 t3 mt6">PNG, JPG, SVG · Max 5MB</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Plan -->
+      <div class="step-panel" id="sp2">
+        <div class="step-title">Choisissez votre plan</div>
+        <div class="step-sub">Commencez gratuitement 14 jours · Aucune carte requise</div>
+        <div class="plan-cards">
+          <div class="plan-card" onclick="selectPlan(this)">
+            <div class="plan-name">Starter</div>
+            <div class="plan-price">199 MAD<span style="font-size:12px;font-weight:400;color:var(--t2)">/mois</span></div>
+            <div class="plan-desc t2">Pour démarrer votre boutique en ligne</div>
+            <div class="sep"></div>
+            <div style="font-size:11.5px;display:flex;flex-direction:column;gap:5px;text-align:left">
+              <div>✓ 500 contacts CRM</div><div>✓ 50 produits</div><div>✓ WhatsApp 1000 msg/mo</div><div class="t3">✗ Ads IA</div>
+            </div>
+          </div>
+          <div class="plan-card popular selected" onclick="selectPlan(this)">
+            <div class="plan-name">Pro</div>
+            <div class="plan-price">499 MAD<span style="font-size:12px;font-weight:400;color:var(--t2)">/mois</span></div>
+            <div class="plan-desc t2">Pour les PME en pleine croissance</div>
+            <div class="sep"></div>
+            <div style="font-size:11.5px;display:flex;flex-direction:column;gap:5px;text-align:left">
+              <div>✓ Tout illimité</div><div>✓ Ads IA (Meta/Google/TikTok)</div><div>✓ Centre d'appels IA</div><div>✓ IA Financière avancée</div>
+            </div>
+          </div>
+          <div class="plan-card" onclick="selectPlan(this)">
+            <div class="plan-name">Enterprise</div>
+            <div class="plan-price">1 499 MAD<span style="font-size:12px;font-weight:400;color:var(--t2)">/mois</span></div>
+            <div class="plan-desc t2">Chaînes & Multi-boutiques</div>
+            <div class="sep"></div>
+            <div style="font-size:11.5px;display:flex;flex-direction:column;gap:5px;text-align:left">
+              <div>✓ Tout Pro +</div><div>✓ Multi-boutiques</div><div>✓ API accès complet</div><div>✓ SLA 99.9% garanti</div>
+            </div>
+          </div>
+        </div>
+        <div style="background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.2);border-radius:var(--r-md);padding:14px;font-size:13px">🎁 <strong>Offre lancement:</strong> 2 mois offerts pour tout paiement annuel · Code: <span class="cs fw7 fm">NEXA2025</span></div>
+      </div>
+
+      <!-- Step 3: Paiements -->
+      <div class="step-panel" id="sp3">
+        <div class="step-title">Activez les paiements Maroc</div>
+        <div class="step-sub">Connectez les passerelles de paiement de votre choix</div>
+        <div class="integration-grid">
+          <div class="integ-card sel" onclick="this.classList.toggle('sel')"><div class="integ-icon">💳</div><div class="integ-name">CMI</div><div class="integ-status cg">Prêt</div></div>
+          <div class="integ-card sel" onclick="this.classList.toggle('sel')"><div class="integ-icon">📱</div><div class="integ-name">NAPS</div><div class="integ-status cg">Prêt</div></div>
+          <div class="integ-card" onclick="this.classList.toggle('sel')"><div class="integ-icon">💰</div><div class="integ-name">Payzone</div><div class="integ-status t2">Config. requise</div></div>
+          <div class="integ-card" onclick="this.classList.toggle('sel')"><div class="integ-icon">🏪</div><div class="integ-name">Cash Plus</div><div class="integ-status t2">Config. requise</div></div>
+          <div class="integ-card" onclick="this.classList.toggle('sel')"><div class="integ-icon">🏦</div><div class="integ-name">Wafacash</div><div class="integ-status t2">Config. requise</div></div>
+          <div class="integ-card sel" onclick="this.classList.toggle('sel')"><div class="integ-icon">💵</div><div class="integ-name">Cash livraison</div><div class="integ-status cg">Auto-activé</div></div>
+        </div>
+        <div class="fg"><label class="lbl">Identifiant marchand CMI</label><input class="inp" placeholder="Entrez votre MID CMI..."></div>
+        <div class="fg"><label class="lbl">Clé API NAPS</label><input class="inp" type="password" placeholder="sk_live_..."></div>
+      </div>
+
+      <!-- Step 4: WhatsApp -->
+      <div class="step-panel" id="sp4">
+        <div class="step-title">Connectez WhatsApp Business</div>
+        <div class="step-sub">Votre bot IA NexaMarket répondra automatiquement en Darija, Arabe et Français</div>
+        <div style="background:rgba(37,211,102,.07);border:1px solid rgba(37,211,102,.2);border-radius:var(--r-lg);padding:24px;text-align:center;margin-bottom:20px">
+          <div style="font-size:40px;margin-bottom:10px">💬</div>
+          <div class="fw7 mb6" style="font-size:16px">Scannez le QR Code</div>
+          <div class="t2 fs12 mb16">Ouvrez WhatsApp Business → Paramètres → Appareils liés → Lier un appareil</div>
+          <div style="width:160px;height:160px;background:var(--input);border-radius:var(--r-md);margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:60px;border:2px solid var(--border);cursor:pointer" onclick="toast('QR Code scanné! WhatsApp connecté ✓','g')">
+            📲
+          </div>
+          <div class="fs11 t3 mt10">Ou entrez votre numéro manuellement ci-dessous</div>
+        </div>
+        <div class="fg"><label class="lbl">Numéro WhatsApp Business</label><input class="inp" value="+212 661 234 567" placeholder="+212..."></div>
+        <div class="fg"><label class="lbl">Nom affiché du bot IA</label><input class="inp" value="Assistante Boutique Mode 🧕"></div>
+        <div>
+          <label class="lbl">Langues du bot</label>
+          <div class="chips">
+            <div class="chip on" onclick="toggleChip(this)">🇲🇦 Darija (priorité)</div>
+            <div class="chip on" onclick="toggleChip(this)">🇫🇷 Français</div>
+            <div class="chip on" onclick="toggleChip(this)">🇸🇦 Arabe</div>
+            <div class="chip" onclick="toggleChip(this)">🇬🇧 English</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 5: IA Config -->
+      <div class="step-panel" id="sp5">
+        <div class="step-title">Configurez votre IA</div>
+        <div class="step-sub">L'IA apprend votre secteur pour mieux servir vos clients</div>
+        <div class="fg"><label class="lbl">Ton de communication IA</label>
+          <div class="chips">
+            <div class="chip on" onclick="toggleChip(this)">😊 Chaleureux & Proche</div>
+            <div class="chip" onclick="toggleChip(this)">💼 Professionnel</div>
+            <div class="chip" onclick="toggleChip(this)">🎉 Dynamique & Fun</div>
+            <div class="chip" onclick="toggleChip(this)">👑 Luxe & Premium</div>
+          </div>
+        </div>
+        <div class="fg"><label class="lbl">Produits phares (l'IA met en avant ces produits)</label>
+          <textarea class="inp" rows="3">Hijab Premium Soie (185 MAD), Caftan Brodé Luxe (1200 MAD), Parfum Oud Royal (450 MAD)</textarea>
+        </div>
+        <div class="fg"><label class="lbl">Politique de livraison</label>
+          <textarea class="inp" rows="2">Livraison gratuite au Maroc dès 300 MAD. Délai 24-48h via Amana. Cash à la livraison disponible.</textarea>
+        </div>
+        <div class="fg"><label class="lbl">Message de bienvenue bot WhatsApp</label>
+          <textarea class="inp" rows="3">Salam! 👋 Mrhba bik f Boutique Mode Casa! Ana ghadi nsa3dek fkoll haja. Wash bgheit tchouf catalogue dyalna wla 3ndek sou2al?</textarea>
+        </div>
+        <div class="fg"><label class="lbl">Activer les modules IA</label>
+          <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px">
+            <div class="flex aic jcsb"><span class="fs13">🤖 Réponses auto WhatsApp</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="flex aic jcsb"><span class="fs13">📋 Génération devis auto</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="flex aic jcsb"><span class="fs13">🎯 Scoring leads IA</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="flex aic jcsb"><span class="fs13">📊 Prévisions financières</span><div class="tog" onclick="this.classList.toggle('on')"></div></div>
+            <div class="flex aic jcsb"><span class="fs13">📣 Optimisation ads auto</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 6: Done -->
+      <div class="step-panel" id="sp6">
+        <div style="text-align:center;padding:20px 0">
+          <div style="font-size:72px;margin-bottom:16px;animation:bounce 1s ease infinite">🎉</div>
+          <div class="step-title" style="text-align:center">Votre espace NexaMarket est prêt!</div>
+          <div class="step-sub" style="text-align:center">Tous les modules sont configurés et actifs. Bienvenue dans la famille NexaMarket Pro.</div>
+          <div class="g2 mb20" style="margin-top:24px;text-align:left">
+            <div style="background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.2);border-radius:var(--r-md);padding:14px"><div class="cg fw7 mb6">✓ Bot WhatsApp actif</div><div class="fs12 t2">Répond automatiquement 24h/24 en Darija, Arabe, Français</div></div>
+            <div style="background:rgba(56,189,248,.07);border:1px solid rgba(56,189,248,.2);border-radius:var(--r-md);padding:14px"><div class="cs fw7 mb6">✓ IA Financière activée</div><div class="fs12 t2">Prévisions en temps réel, alertes automatiques</div></div>
+            <div style="background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.2);border-radius:var(--r-md);padding:14px"><div class="cv fw7 mb6">✓ Ads IA configurée</div><div class="fs12 t2">Optimisation auto Meta + Google + TikTok</div></div>
+            <div style="background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.2);border-radius:var(--r-md);padding:14px"><div class="ca fw7 mb6">✓ Paiements activés</div><div class="fs12 t2">CMI + NAPS + Cash livraison opérationnels</div></div>
+          </div>
+          <button class="btn btn-p" style="font-size:16px;padding:14px 32px;justify-content:center" onclick="toast('Bienvenue sur NexaMarket Pro! 🚀','g')">Accéder à mon Dashboard →</button>
+        </div>
+      </div>
+
+      <div class="onboard-footer" id="onboard-footer">
+        <button class="btn btn-g" id="ob-back" onclick="obStep(-1)">← Précédent</button>
+        <span class="step-indicator" id="ob-step-ind">Étape 1 sur 5</span>
+        <button class="btn btn-p" id="ob-next" onclick="obStep(1)">Continuer →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════
+     SETTINGS
+══════════════════════════ -->
+<div class="page" id="page-settings">
+  <div class="settings-grid">
+    <div class="settings-nav">
+      <div class="sn-item on" onclick="settingTab(this,'prof')">👤 Profil & Boutique</div>
+      <div class="sn-item" onclick="settingTab(this,'notif')">🔔 Notifications</div>
+      <div class="sn-item" onclick="settingTab(this,'team')">👥 Équipe & Rôles</div>
+      <div class="sn-item" onclick="settingTab(this,'api')">🔌 Clés API</div>
+      <div class="sn-item" onclick="settingTab(this,'theme')">🎨 Apparence</div>
+      <div class="sn-item" onclick="settingTab(this,'plan')">💳 Abonnement</div>
+      <div class="sn-item" onclick="settingTab(this,'danger')">⚠️ Zone de danger</div>
+    </div>
+
+    <div class="settings-panels">
+
+      <!-- Profile -->
+      <div class="s-panel active" id="sp-prof">
+        <div class="card glow"><div class="ch"><div><div class="ct">Profil & Informations boutique</div></div><button class="btn btn-p btn-sm" onclick="toast('Profil sauvegardé ✓','g')">Sauvegarder</button></div>
+          <div class="avatar-upload">
+            <div class="avatar-big" onclick="toast('Logo changé ✓','g')">YB</div>
+            <div class="avatar-info">
+              <div class="fw7 mb4">Youssef Bennani</div>
+              <div class="fs12 t2 mb8">Admin · Boutique Mode Casa · Plan Pro</div>
+              <button class="btn btn-g btn-sm" onclick="toast('Nouveau logo uploadé ✓','g')">📷 Changer le logo</button>
+            </div>
+          </div>
+          <div class="g2 mb12">
+            <div class="fg"><label class="lbl">Prénom</label><input class="inp" value="Youssef"></div>
+            <div class="fg"><label class="lbl">Nom</label><input class="inp" value="Bennani"></div>
+          </div>
+          <div class="g2 mb12">
+            <div class="fg"><label class="lbl">Email</label><input class="inp" value="youssef@boutique.ma"></div>
+            <div class="fg"><label class="lbl">Téléphone WhatsApp</label><input class="inp" value="+212 661 234 567"></div>
+          </div>
+          <div class="g2 mb12">
+            <div class="fg"><label class="lbl">Nom de la boutique</label><input class="inp" value="Boutique Mode Casablanca"></div>
+            <div class="fg"><label class="lbl">Secteur</label><select class="sel"><option selected>Mode & Vêtements</option><option>Beauté</option><option>Alimentation</option></select></div>
+          </div>
+          <div class="fg"><label class="lbl">Adresse boutique</label><input class="inp" value="Boulevard Anfa, Casablanca 20050"></div>
+          <div class="fg"><label class="lbl">Description (utilisée par l'IA)</label><textarea class="inp">Boutique de mode modeste, hijab, djellaba et caftan premium. Livraison dans tout le Maroc.</textarea></div>
+          <div class="fg"><label class="lbl">Langue principale de l'interface</label>
+            <div class="chips">
+              <div class="chip on" onclick="toggleChip(this)">🇫🇷 Français</div>
+              <div class="chip" onclick="toggleChip(this)">🇸🇦 العربية</div>
+              <div class="chip" onclick="toggleChip(this)">🇲🇦 Darija</div>
+              <div class="chip" onclick="toggleChip(this)">🇬🇧 English</div>
+            </div>
+          </div>
+        </div>
+        <div class="card"><div class="ch"><div class="ct">Sécurité du compte</div></div>
+          <div class="fg"><label class="lbl">Mot de passe actuel</label><input class="inp" type="password" placeholder="••••••••"></div>
+          <div class="g2">
+            <div class="fg"><label class="lbl">Nouveau mot de passe</label><input class="inp" type="password" placeholder="••••••••"></div>
+            <div class="fg"><label class="lbl">Confirmer</label><input class="inp" type="password" placeholder="••••••••"></div>
+          </div>
+          <div class="flex aic jcsb" style="padding:12px;background:var(--input);border-radius:var(--r-sm)">
+            <div><div class="fw6 mb4">Authentification 2 facteurs</div><div class="fs12 t2">Protégez votre compte avec TOTP (Google Authenticator)</div></div>
+            <div class="flex aic gap8"><span class="tag g">Activé</span><div class="tog on" onclick="this.classList.toggle('on');toast('2FA basculé ✓','g')"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notifications -->
+      <div class="s-panel" id="sp-notif">
+        <div class="card glow"><div class="ch"><div class="ct">Préférences de notifications</div></div>
+          <div class="notif-row">
+            <div class="notif-info"><div class="notif-title">Nouvelle commande</div><div class="notif-desc">Alerte dès qu'une commande est passée sur votre boutique</div></div>
+            <div class="notif-channels"><div><div class="tog on" onclick="this.classList.toggle('on')"></div><div class="nc-label">App</div></div><div><div class="tog on" onclick="this.classList.toggle('on')"></div><div class="nc-label">WA</div></div><div><div class="tog" onclick="this.classList.toggle('on')"></div><div class="nc-label">Email</div></div></div>
+          </div>
+          <div class="notif-row">
+            <div class="notif-info"><div class="notif-title">Lead qualifié par IA</div><div class="notif-desc">Quand l'IA détecte un prospect chaud (score >80)</div></div>
+            <div class="notif-channels"><div><div class="tog on" onclick="this.classList.toggle('on')"></div><div class="nc-label">App</div></div><div><div class="tog on" onclick="this.classList.toggle('on')"></div><div class="nc-label">WA</div></div><div><div class="tog on" onclick="this.classList.toggle('on')"></div><div class="nc-label">Email</div></div></div>
+          </div>
+          <div class="notif-row">
+            <div class="notif-info"><div class="notif-title">Stock critique</div><div class="notif-desc">Alerte quand un produit atteint le seuil minimum</div></div>
+            <div class="notif-channels"><div><div class="tog on" onclick="this.classList.toggle('on')"></div><div class="nc-label">App</div></div><div><div class="tog" onclick="this.classList.toggle('on')"></div><div class="nc-label">WA</div></div><div><div class="tog" onclick="this.classList.toggle('on')"></div><div class="nc-label">Email</div></div></div>
+          </div>
+          <div class="notif-row">
+            <div class="notif-info"><div class="notif-title">Facture impayée</div><div class="notif-desc">Rappel automatique quand une facture dépasse l'échéance</div></div>
+            <div class="notif-channels"><div><div class="tog on" onclick="this.classList.toggle('on')"></div><div class="nc-label">App</div></div><div><div class="tog on" onclick="this.classList.toggle('on')"></div><div class="nc-label">WA</div></div><div><div class="tog on" onclick="this.classList.toggle('on')"></div><div class="nc-label">Email</div></div></div>
+          </div>
+          <div class="notif-row">
+            <div class="notif-info"><div class="notif-title">Rapport hebdomadaire IA</div><div class="notif-desc">Résumé des performances, recommandations IA du lundi</div></div>
+            <div class="notif-channels"><div><div class="tog" onclick="this.classList.toggle('on')"></div><div class="nc-label">App</div></div><div><div class="tog" onclick="this.classList.toggle('on')"></div><div class="nc-label">WA</div></div><div><div class="tog on" onclick="this.classList.toggle('on')"></div><div class="nc-label">Email</div></div></div>
+          </div>
+          <div class="notif-row">
+            <div class="notif-info"><div class="notif-title">Alerte IA Financière</div><div class="notif-desc">Baisse de revenus, risque de trésorerie, opportunité détectée</div></div>
+            <div class="notif-channels"><div><div class="tog on" onclick="this.classList.toggle('on')"></div><div class="nc-label">App</div></div><div><div class="tog on" onclick="this.classList.toggle('on')"></div><div class="nc-label">WA</div></div><div><div class="tog on" onclick="this.classList.toggle('on')"></div><div class="nc-label">Email</div></div></div>
+          </div>
+          <button class="btn btn-p btn-sm mt10" onclick="toast('Préférences sauvegardées ✓','g')">Sauvegarder</button>
+        </div>
+      </div>
+
+      <!-- Team -->
+      <div class="s-panel" id="sp-team">
+        <div class="card glow"><div class="ch"><div><div class="ct">Équipe & Rôles</div><div class="cs">3 membres actifs · Plan Pro (10 max)</div></div><button class="btn btn-p btn-sm" onclick="toast('Invitation envoyée 📧','g')">+ Inviter</button></div>
+          <div class="tw"><table class="tbl"><thead><tr><th>Membre</th><th>Email</th><th>Rôle</th><th>Accès</th><th>Statut</th><th></th></tr></thead><tbody>
+            <tr><td><div class="flex aic gap8"><div class="role-av-sm" style="background:linear-gradient(135deg,var(--sky),var(--teal))">YB</div><div class="fw6">Youssef Bennani</div></div></td><td class="t2 fs12">youssef@boutique.ma</td><td><span class="tag s">Admin</span></td><td class="t2 fs12">Tout accès</td><td><span class="tag g">✓ Actif</span></td><td><button class="btn btn-g btn-sm">Modifier</button></td></tr>
+            <tr><td><div class="flex aic gap8"><div class="role-av-sm" style="background:linear-gradient(135deg,#8b5cf6,#ec4899)">SM</div><div class="fw6">Sara Mansouri</div></div></td><td class="t2 fs12">sara@boutique.ma</td><td><span class="tag a">Manager</span></td><td class="t2 fs12">CRM + E-com</td><td><span class="tag g">✓ Actif</span></td><td><button class="btn btn-g btn-sm">Modifier</button></td></tr>
+            <tr><td><div class="flex aic gap8"><div class="role-av-sm" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">KB</div><div class="fw6">Khalid Bouhsiss</div></div></td><td class="t2 fs12">khalid@boutique.ma</td><td><span class="tag v">Agent</span></td><td class="t2 fs12">WhatsApp + Appels</td><td><span class="tag a">⏳ Invité</span></td><td><button class="btn btn-g btn-sm">Annuler</button></td></tr>
+          </tbody></table></div>
+          <div class="sep"></div>
+          <div class="fw7 mb10">Permissions par rôle</div>
+          <div class="g2" style="gap:10px">
+            <div style="background:var(--input);border-radius:var(--r-sm);padding:12px"><div class="flex aic gap6 mb8"><span class="tag s">Admin</span></div><div style="display:flex;flex-direction:column;gap:4px;font-size:12px"><div class="cg">✓ Tout accès</div><div class="cg">✓ Paramètres</div><div class="cg">✓ Facturation</div><div class="cg">✓ API Keys</div></div></div>
+            <div style="background:var(--input);border-radius:var(--r-sm);padding:12px"><div class="flex aic gap6 mb8"><span class="tag a">Manager</span></div><div style="display:flex;flex-direction:column;gap:4px;font-size:12px"><div class="cg">✓ CRM + E-com</div><div class="cg">✓ Ads + Contenu</div><div class="cg">✓ Rapports</div><div class="cr">✗ Paramètres</div></div></div>
+            <div style="background:var(--input);border-radius:var(--r-sm);padding:12px"><div class="flex aic gap6 mb8"><span class="tag v">Agent</span></div><div style="display:flex;flex-direction:column;gap:4px;font-size:12px"><div class="cg">✓ WhatsApp</div><div class="cg">✓ Commandes</div><div class="cr">✗ Finances</div><div class="cr">✗ Paramètres</div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- API Keys -->
+      <div class="s-panel" id="sp-api">
+        <div class="card glow"><div class="ch"><div><div class="ct">Clés API & Webhooks</div><div class="cs">Intégrez NexaMarket dans vos outils</div></div><button class="btn btn-p btn-sm" onclick="toast('Nouvelle clé API générée 🔑','g')">+ Générer clé</button></div>
+          <div class="api-key-row"><div style="font-size:11px;color:var(--t3);width:100px;flex-shrink:0">Clé secrète<br><span class="tag s" style="font-size:9px;margin-top:3px">Production</span></div><div class="api-key-val">nxm_live_<span class="api-key-mask">••••••••••••••••••••••••••</span>3f8a</div><button class="btn btn-g btn-sm" onclick="toast('Clé copiée ✓','g')">📋 Copier</button><button class="btn btn-rose btn-sm" onclick="toast('Clé révoquée ✗','r')">Révoquer</button></div>
+          <div class="api-key-row"><div style="font-size:11px;color:var(--t3);width:100px;flex-shrink:0">Clé publique<br><span class="tag a" style="font-size:9px;margin-top:3px">Frontend</span></div><div class="api-key-val">nxm_pk_<span class="api-key-mask">••••••••••••••</span>9c2b</div><button class="btn btn-g btn-sm" onclick="toast('Clé copiée ✓','g')">📋 Copier</button><button class="btn btn-rose btn-sm">Révoquer</button></div>
+          <div class="sep"></div>
+          <div class="fw7 mb10">Webhooks</div>
+          <div class="fg"><label class="lbl">URL Webhook (nouvelles commandes)</label><input class="inp" placeholder="https://votre-site.ma/webhook/orders"></div>
+          <div class="fg"><label class="lbl">URL Webhook (leads qualifiés)</label><input class="inp" placeholder="https://votre-site.ma/webhook/leads"></div>
+          <button class="btn btn-p btn-sm" onclick="toast('Webhooks sauvegardés ✓','g')">Sauvegarder</button>
+        </div>
+      </div>
+
+      <!-- Theme -->
+      <div class="s-panel" id="sp-theme">
+        <div class="card glow"><div class="ct mb16">🎨 Apparence & Thème</div>
+          <div class="fg"><label class="lbl">Mode</label>
+            <div class="chips"><div class="chip on" onclick="toggleChip(this)">🌙 Sombre</div><div class="chip" onclick="toggleChip(this)">☀️ Clair</div><div class="chip" onclick="toggleChip(this)">💻 Système</div></div>
+          </div>
+          <div class="fg"><label class="lbl">Couleur principale</label>
+            <div class="color-swatches">
+              <div class="swatch on" style="background:var(--sky)" onclick="setColor(this,'#38bdf8')" title="Sky"></div>
+              <div class="swatch" style="background:#8b5cf6" onclick="setColor(this,'#8b5cf6')" title="Violet"></div>
+              <div class="swatch" style="background:#10b981" onclick="setColor(this,'#10b981')" title="Emerald"></div>
+              <div class="swatch" style="background:#f59e0b" onclick="setColor(this,'#f59e0b')" title="Amber"></div>
+              <div class="swatch" style="background:#f43f5e" onclick="setColor(this,'#f43f5e')" title="Rose"></div>
+              <div class="swatch" style="background:#06b6d4" onclick="setColor(this,'#06b6d4')" title="Cyan"></div>
+            </div>
+          </div>
+          <div class="fg"><label class="lbl">Taille de police</label>
+            <div class="chips"><div class="chip" onclick="toggleChip(this)">Petite</div><div class="chip on" onclick="toggleChip(this)">Normale</div><div class="chip" onclick="toggleChip(this)">Grande</div></div>
+          </div>
+          <div class="flex aic jcsb" style="padding:12px;background:var(--input);border-radius:var(--r-sm)"><span class="fs13">Animations de l'interface</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="flex aic jcsb mt8" style="padding:12px;background:var(--input);border-radius:var(--r-sm)"><span class="fs13">Barre latérale compacte</span><div class="tog" onclick="this.classList.toggle('on')"></div></div>
+        </div>
+      </div>
+
+      <div class="s-panel" id="sp-plan"><div class="card glow"><div class="ct mb16">💳 Abonnement actuel: <span class="cs">Pro · 499 MAD/mois</span></div><div class="fs13 t2">Prochaine facturation: 01/07/2025 · <span class="cg fw6">Paiement automatique actif</span></div><div class="sep"></div><button class="btn btn-g mt8" onclick="toast('Passage en Enterprise initié 🚀','s')">Upgrader vers Enterprise</button><button class="btn btn-rose mt8 ml8" onclick="toast('Confirmation d\'annulation envoyée 📧','r')">Annuler l'abonnement</button></div></div>
+      <div class="s-panel" id="sp-danger"><div class="card" style="border-color:rgba(251,113,133,.2)"><div class="ct cr mb16">⚠️ Zone de danger</div><div style="padding:14px;background:rgba(251,113,133,.06);border:1px solid rgba(251,113,133,.2);border-radius:var(--r-md);margin-bottom:10px"><div class="fw7 cr mb4">Supprimer toutes les données</div><div class="fs12 t2 mb10">Cette action est irréversible. Toutes vos données seront supprimées définitivement.</div><button class="btn btn-rose btn-sm" onclick="toast('Confirmez par email ✉','r')">Supprimer mon compte</button></div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════
+     LOGISTIQUE
+══════════════════════════ -->
+<div class="page" id="page-logistique">
+  <div class="g4">
+    <div class="kpi s"><div class="kpi-lbl">📦 Expéditions actives</div><div class="kpi-val">89</div><div class="up">▲ +14% cette semaine</div></div>
+    <div class="kpi g"><div class="kpi-lbl">✓ Livrées aujourd'hui</div><div class="kpi-val">34</div><div class="up">Taux: 96.2%</div></div>
+    <div class="kpi a"><div class="kpi-lbl">⏳ En transit</div><div class="kpi-val">42</div><div class="kpi-sub">Délai moyen: 1.4 jours</div></div>
+    <div class="kpi r"><div class="kpi-lbl">↩ Retours</div><div class="kpi-val">4</div><div class="kpi-sub">2.1% taux retour</div></div>
+  </div>
+
+  <div class="g2">
+    <div class="card glow"><div class="ch"><div><div class="ct">Transporteurs connectés</div><div class="cs">4 partenaires Maroc</div></div><button class="btn btn-p btn-sm" onclick="toast('Bordereau groupé généré (89 colis) 📦','g')">📦 Bordereaux groupés</button></div>
+      <div class="g2" style="gap:10px;margin-bottom:14px">
+        <div class="carrier-card active-conn" onclick="toast('Tableau Amana ouvert 🚚','g')">
+          <div class="carrier-logo">🏃</div>
+          <div class="carrier-name">Amana</div>
+          <div class="carrier-desc">Leader livraison Maroc. 24h Casa/Rabat, 48h autres villes. Tracking temps réel.</div>
+          <div class="flex aic jcsb"><span class="tag g">✓ Connecté</span><span class="fs12 t2">51 colis actifs</span></div>
+          <div class="prog mt8"><div class="prog-f" style="width:74%;background:var(--green)"></div></div>
+        </div>
+        <div class="carrier-card active-conn" onclick="toast('Tableau Ozone ouvert 🚚','g')">
+          <div class="carrier-logo">⚡</div>
+          <div class="carrier-name">Ozone</div>
+          <div class="carrier-desc">Express J+1 garanti. Idéal grandes villes. Notifications SMS automatiques.</div>
+          <div class="flex aic jcsb"><span class="tag g">✓ Connecté</span><span class="fs12 t2">28 colis actifs</span></div>
+          <div class="prog mt8"><div class="prog-f" style="width:45%;background:var(--sky))"></div></div>
+        </div>
+        <div class="carrier-card" onclick="toast('Configuration Cathedis ⚙️','s')">
+          <div class="carrier-logo">🚛</div>
+          <div class="carrier-name">Cathedis</div>
+          <div class="carrier-desc">Réseau national. Zones rurales couvertes. Tarifs préférentiels volume.</div>
+          <div class="flex aic jcsb"><span class="tag a">Config. requise</span><button class="btn btn-g btn-sm" onclick="event.stopPropagation();toast('Config Cathedis ouverte ⚙️','s')">Configurer</button></div>
+        </div>
+        <div class="carrier-card" onclick="toast('Configuration Chronodiali ⚙️','s')">
+          <div class="carrier-logo">⏱</div>
+          <div class="carrier-name">Chronodiali</div>
+          <div class="carrier-desc">Livraison express international + national. Idéal e-commerce premium.</div>
+          <div class="flex aic jcsb"><span class="tag a">Config. requise</span><button class="btn btn-g btn-sm" onclick="event.stopPropagation()">Configurer</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card"><div class="ch"><div><div class="ct">Tracking en temps réel</div><div class="cs">Suivi commandes actives</div></div><input style="background:var(--input);border:1px solid var(--border);border-radius:var(--r-sm);padding:7px 12px;color:var(--t1);font-family:var(--fd);font-size:13px;outline:none;width:180px" placeholder="🔍 N° tracking..."></div>
+      <div class="tracking-item">
+        <div style="flex:1;min-width:0">
+          <div class="flex aic jcsb mb6"><div><div class="fw7">#CMD-4821 · Fatima Zahra A.</div><div class="fs11 t2">AMN-8821447 · Casablanca · Bd Anfa</div></div><span class="tag g">Livré ✓</span></div>
+          <div class="track-timeline">
+            <div class="track-event done"><div><div class="fw6 fs12">Commande confirmée</div><div class="fs11 t2">01/06 09:15 · Casa Centre</div></div></div>
+            <div class="track-event done"><div><div class="fw6 fs12">Pris en charge par Amana</div><div class="fs11 t2">01/06 11:30 · Hub Casablanca</div></div></div>
+            <div class="track-event done"><div><div class="fw6 fs12">En transit vers destinataire</div><div class="fs11 t2">01/06 14:20 · En route</div></div></div>
+            <div class="track-event active"><div><div class="fw6 fs12 cs">✓ Livré au destinataire</div><div class="fs11 t2">01/06 16:42 · Signé par client</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="tracking-item">
+        <div style="flex:1;min-width:0">
+          <div class="flex aic jcsb mb6"><div><div class="fw7">#CMD-4820 · Ahmed Khalil</div><div class="fs11 t2">OZN-2274518 · Rabat · Hay Riad</div></div><span class="tag s">En transit</span></div>
+          <div class="track-timeline">
+            <div class="track-event done"><div><div class="fw6 fs12">Commande confirmée</div><div class="fs11 t2">01/06 10:00</div></div></div>
+            <div class="track-event done"><div><div class="fw6 fs12">Pris en charge par Ozone</div><div class="fs11 t2">01/06 13:00 · Hub Casablanca</div></div></div>
+            <div class="track-event active"><div><div class="fw6 fs12 cs">→ En route vers Rabat</div><div class="fs11 t2">Livraison prévue: 02/06 avant 18h</div></div></div>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-g w100 mt10" style="justify-content:center" onclick="toast('Notifications clients envoyées (89) 📱','g')">📱 Notifier tous les clients en attente</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════
+     CONTENU IA
+══════════════════════════ -->
+<div class="page" id="page-content">
+  <div class="card glow"><div class="ch">
+    <div><div class="ct">✍️ Générateur de Contenu IA</div><div class="cs">Publications, emails, SMS, scripts vidéo · Darija · Arabe · Français</div></div>
+    <div class="content-tabs" id="ctabs">
+      <div class="ct-tab on" onclick="ctab(this,'social')">📱 Réseaux sociaux</div>
+      <div class="ct-tab" onclick="ctab(this,'email')">📧 Email</div>
+      <div class="ct-tab" onclick="ctab(this,'sms')">💬 SMS</div>
+      <div class="ct-tab" onclick="ctab(this,'video')">🎬 Script vidéo</div>
+      <div class="ct-tab" onclick="ctab(this,'produit')">🛍 Fiche produit</div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div>
+      <!-- Social -->
+      <div id="ct-social">
+        <div class="fg"><label class="lbl">Plateforme cible</label>
+          <div class="flex gap8 mb12">
+            <div class="platform-card sel" onclick="selectPlatform(this)" style="flex:1"><span style="font-size:18px">📘</span><div><div class="fw6 fs12">Facebook</div></div></div>
+            <div class="platform-card" onclick="selectPlatform(this)" style="flex:1"><span style="font-size:18px">📸</span><div><div class="fw6 fs12">Instagram</div></div></div>
+            <div class="platform-card" onclick="selectPlatform(this)" style="flex:1"><span style="font-size:18px">💼</span><div><div class="fw6 fs12">LinkedIn</div></div></div>
+            <div class="platform-card" onclick="selectPlatform(this)" style="flex:1"><span style="font-size:18px">🎵</span><div><div class="fw6 fs12">TikTok</div></div></div>
+          </div>
+        </div>
+        <div class="fg"><label class="lbl">Sujet / Produit à promouvoir</label><input class="inp" value="Collection Hijab Premium — Promo Été 2025" placeholder="..."></div>
+        <div class="g2 mb12">
+          <div class="fg"><label class="lbl">Langue</label>
+            <div class="chips"><div class="chip on" onclick="toggleChip(this)">Darija</div><div class="chip" onclick="toggleChip(this)">Français</div><div class="chip" onclick="toggleChip(this)">Arabe</div></div>
+          </div>
+          <div class="fg"><label class="lbl">Ton</label>
+            <div class="chips"><div class="chip on" onclick="toggleChip(this)">Promotionnel</div><div class="chip" onclick="toggleChip(this)">Informatif</div><div class="chip" onclick="toggleChip(this)">Humour</div></div>
+          </div>
+        </div>
+        <div class="fg"><label class="lbl">Informations supplémentaires</label><textarea class="inp" rows="2" placeholder="Promotion, prix, hashtags voulus...">-20% avec code RAMADAN2025 · Livraison gratuite · Stock limité</textarea></div>
+        <button class="btn btn-p w100" style="justify-content:center" onclick="generateContent()">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          Générer avec IA
+        </button>
+      </div>
+      <div id="ct-email" style="display:none"><div class="fg"><label class="lbl">Objet de l'email</label><input class="inp" placeholder="Ex: Promo exclusive ce week-end..."></div><div class="fg"><label class="lbl">Audience cible</label><select class="sel"><option>Tous les clients (8472)</option><option>Leads chauds (342)</option><option>Paniers abandonnés</option></select></div><div class="fg"><label class="lbl">Objectif</label><div class="chips"><div class="chip on" onclick="toggleChip(this)">Vente</div><div class="chip" onclick="toggleChip(this)">Fidélisation</div><div class="chip" onclick="toggleChip(this)">Réactivation</div></div></div><button class="btn btn-p w100 mt10" style="justify-content:center" onclick="generateContent('email')">Générer email complet</button></div>
+      <div id="ct-sms" style="display:none"><div class="fg"><label class="lbl">Message SMS (max 160 caractères)</label><textarea class="inp" rows="2" placeholder="L'IA génère un SMS percutant de moins de 160 caractères"></textarea></div><div class="fg"><label class="lbl">Langue</label><div class="chips"><div class="chip on" onclick="toggleChip(this)">Darija</div><div class="chip" onclick="toggleChip(this)">Français</div></div></div><button class="btn btn-p w100 mt10" style="justify-content:center" onclick="generateContent('sms')">Générer SMS</button></div>
+      <div id="ct-video" style="display:none"><div class="fg"><label class="lbl">Type de vidéo</label><div class="chips"><div class="chip on" onclick="toggleChip(this)">Unboxing</div><div class="chip" onclick="toggleChip(this)">Témoignage</div><div class="chip" onclick="toggleChip(this)">Tutoriel</div><div class="chip" onclick="toggleChip(this)">Promo flash</div></div></div><div class="fg"><label class="lbl">Durée cible</label><div class="chips"><div class="chip on" onclick="toggleChip(this)">30 sec (TikTok)</div><div class="chip" onclick="toggleChip(this)">60 sec (Reels)</div><div class="chip" onclick="toggleChip(this)">3 min (YouTube)</div></div></div><button class="btn btn-p w100 mt10" style="justify-content:center" onclick="generateContent('video')">Générer script</button></div>
+      <div id="ct-produit" style="display:none"><div class="fg"><label class="lbl">Nom du produit</label><input class="inp" placeholder="Hijab Premium Soie Bordeaux"></div><div class="fg"><label class="lbl">Caractéristiques clés</label><textarea class="inp" rows="2" placeholder="Matière, couleurs, taille, prix..."></textarea></div><div class="fg"><label class="lbl">Langues</label><div class="chips"><div class="chip on" onclick="toggleChip(this)">FR</div><div class="chip on" onclick="toggleChip(this)">AR</div><div class="chip" onclick="toggleChip(this)">EN</div></div></div><button class="btn btn-p w100 mt10" style="justify-content:center" onclick="generateContent('produit')">Générer fiche produit</button></div>
+    </div>
+
+    <div>
+      <div class="card" style="border:1px solid rgba(56,189,248,.15);padding:0;overflow:hidden">
+        <div class="content-preview-header" style="padding:12px 16px">
+          <span style="font-size:16px">📘</span>
+          <span class="fw6 fs12">Aperçu — Facebook</span>
+          <div class="flex gap6 ml-auto" style="margin-left:auto">
+            <button class="btn btn-g btn-sm" onclick="toast('Copié dans le presse-papier ✓','g')">📋 Copier</button>
+            <button class="btn btn-p btn-sm" onclick="toast('Publié sur Facebook ✓','g')">Publier</button>
+          </div>
+        </div>
+        <div class="content-preview" id="content-output" style="border-radius:0;border:none;border-top:1px solid var(--border)">
+          Cliquez sur <strong>"Générer avec IA"</strong> pour créer votre contenu automatiquement en Darija, Arabe ou Français.
+        </div>
+      </div>
+
+      <div class="card mt12">
+        <div class="ct mb12 fs13">🎨 Visuels IA suggérés</div>
+        <div class="g3" style="gap:8px">
+          <div class="media-preview" onclick="toast('Visuel téléchargé ✓','g')" style="font-size:36px">🧕</div>
+          <div class="media-preview" onclick="toast('Visuel téléchargé ✓','g')" style="font-size:36px">✨</div>
+          <div class="media-preview" onclick="toast('Visuel téléchargé ✓','g')" style="font-size:36px">🌸</div>
+        </div>
+        <div class="flex gap6 mt10">
+          <button class="btn btn-g btn-sm w100" style="justify-content:center" onclick="toast('Planifié pour demain 9h 📅','s')">📅 Planifier</button>
+          <button class="btn btn-p btn-sm w100" style="justify-content:center" onclick="toast('Publiés sur toutes les plateformes 🚀','g')">🚀 Multi-publier</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════
+     NOTIFICATIONS CENTER
+══════════════════════════ -->
+<div class="page" id="page-notifs">
+  <div class="card glow"><div class="ch">
+    <div><div class="ct">Centre de notifications</div><div class="cs">14 non lues · Temps réel</div></div>
+    <div class="flex gap8">
+      <button class="btn btn-g btn-sm" onclick="markAllRead()">✓ Tout lire</button>
+      <select style="background:var(--input);border:1px solid var(--border);border-radius:var(--r-sm);padding:6px 12px;color:var(--t1);font-family:var(--fd);font-size:12px;cursor:pointer;outline:none">
+        <option>Toutes</option><option>Non lues</option><option>Commandes</option><option>IA Alerts</option><option>Finance</option>
+      </select>
+    </div>
+  </div>
+  <div class="notif-center" id="notif-list">
+    <div class="notif-item unread" onclick="readNotif(this)"><div class="notif-dot-badge"></div><div class="notif-ic" style="background:rgba(52,211,153,.12)">🛒</div><div class="notif-content"><div class="notif-title-n">Nouvelle commande #4822 — 592 MAD</div><div class="notif-body">Fatima Zahra A. a passé une commande de 4 Hijabs Soie via WhatsApp. Paiement: Cash livraison.</div><div class="notif-time">Il y a 2 minutes</div></div><button class="btn btn-p btn-sm" onclick="event.stopPropagation();toast('Commande traitée ✓','g')">Traiter</button></div>
+    <div class="notif-item unread" onclick="readNotif(this)"><div class="notif-dot-badge"></div><div class="notif-ic" style="background:rgba(56,189,248,.12)">🤖</div><div class="notif-content"><div class="notif-title-n">IA Media Buyer: Opportunité détectée</div><div class="notif-body">Votre ROAS Meta a augmenté de 34%. Recommandation: +3 000 MAD sur la campagne Ramadan pour maximiser avant la fin de période.</div><div class="notif-time">Il y a 15 minutes</div></div><button class="btn btn-violet btn-sm" onclick="event.stopPropagation();toast('Budget Meta augmenté +3000 MAD 🚀','s')">Appliquer</button></div>
+    <div class="notif-item unread" onclick="readNotif(this)"><div class="notif-dot-badge"></div><div class="notif-ic" style="background:rgba(251,191,36,.12)">⚠️</div><div class="notif-content"><div class="notif-title-n">Stock critique: Caftan Brodé Luxe</div><div class="notif-body">Il ne reste que 6 unités en stock (seuil: 10). Réapprovisionnement urgent recommandé pour éviter les ruptures.</div><div class="notif-time">Il y a 32 minutes</div></div><button class="btn btn-g btn-sm" onclick="event.stopPropagation();toast('Commande fournisseur envoyée 📦','a')">Commander</button></div>
+    <div class="notif-item unread" onclick="readNotif(this)"><div class="notif-dot-badge"></div><div class="notif-ic" style="background:rgba(251,113,133,.12)">🚨</div><div class="notif-content"><div class="notif-title-n">Facture FAC-0085 impayée — 3 800 MAD</div><div class="notif-body">La facture de SARL Concept Mode est impayée depuis 18 jours. L'IA peut lancer une relance automatique par appel + WhatsApp.</div><div class="notif-time">Il y a 1 heure</div></div><button class="btn btn-rose btn-sm" onclick="event.stopPropagation();toast('Relance IA lancée 📞','r')">Relancer IA</button></div>
+    <div class="notif-item" onclick="readNotif(this)"><div class="notif-ic" style="background:rgba(52,211,153,.12)">📦</div><div class="notif-content"><div class="notif-title-n">Livraison confirmée #CMD-4821</div><div class="notif-body">Fatima Zahra A. a reçu sa commande. Amana tracking: AMN-8821447 · Livré à 16:42 · Signé par destinataire.</div><div class="notif-time">Il y a 2 heures</div></div></div>
+    <div class="notif-item" onclick="readNotif(this)"><div class="notif-ic" style="background:rgba(167,139,250,.12)">💰</div><div class="notif-content"><div class="notif-title-n">IA Financière: Prévision Juin +22%</div><div class="notif-body">Revenus juin estimés à 239 000 MAD (+22% vs mai). Facteurs: fin Ramadan, stocks optimisés, campagnes Meta performantes.</div><div class="notif-time">Il y a 3 heures</div></div></div>
+    <div class="notif-item" onclick="readNotif(this)"><div class="notif-ic" style="background:rgba(56,189,248,.12)">💬</div><div class="notif-content"><div class="notif-title-n">Bot WhatsApp: 14 leads qualifiés aujourd'hui</div><div class="notif-body">L'IA a qualifié 14 nouveaux prospects depuis WhatsApp. Score moyen: 74/100. 3 prêts à acheter maintenant.</div><div class="notif-time">Il y a 4 heures</div></div><button class="btn btn-g btn-sm" onclick="event.stopPropagation();toast('CRM ouvert sur leads chauds 🎯','s')">Voir CRM</button></div>
+  </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════
+     INTEGRATIONS
+══════════════════════════ -->
+<div class="page" id="page-integrations">
+  <div class="card glow"><div class="ch"><div><div class="ct">🔗 Hub d'Intégrations</div><div class="cs">Connectez tous vos outils · 24 intégrations disponibles</div></div></div>
+    <div class="g3" style="gap:10px">
+      <!-- Paiements -->
+      <div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px">
+        <div class="fw7 mb12 cs fs13">💳 Paiements Maroc</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="flex aic jcsb" style="padding:10px;background:var(--input);border-radius:var(--r-sm)"><div class="flex aic gap8"><span style="font-size:18px">💳</span><div><div class="fw6 fs12">CMI</div><div class="fs10 t2">Visa/Mastercard</div></div></div><div class="flex aic gap6"><span class="tag g">✓ Actif</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div></div>
+          <div class="flex aic jcsb" style="padding:10px;background:var(--input);border-radius:var(--r-sm)"><div class="flex aic gap8"><span style="font-size:18px">📱</span><div><div class="fw6 fs12">NAPS</div><div class="fs10 t2">Réseau national</div></div></div><div class="flex aic gap6"><span class="tag g">✓ Actif</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div></div>
+          <div class="flex aic jcsb" style="padding:10px;background:var(--input);border-radius:var(--r-sm)"><div class="flex aic gap8"><span style="font-size:18px">💰</span><div><div class="fw6 fs12">Payzone</div><div class="fs10 t2">Mobile payment</div></div></div><div class="flex aic gap6"><span class="tag a">Config.</span><button class="btn btn-g btn-sm" onclick="toast('Config Payzone ouverte ⚙️','s')">Connecter</button></div></div>
+          <div class="flex aic jcsb" style="padding:10px;background:var(--input);border-radius:var(--r-sm)"><div class="flex aic gap8"><span style="font-size:18px">🏪</span><div><div class="fw6 fs12">Cash Plus</div><div class="fs10 t2">Paiement cash</div></div></div><div class="flex aic gap6"><span class="tag r">Inactif</span><button class="btn btn-g btn-sm" onclick="toast('Config Cash Plus ⚙️','s')">Connecter</button></div></div>
+          <div class="flex aic jcsb" style="padding:10px;background:var(--input);border-radius:var(--r-sm)"><div class="flex aic gap8"><span style="font-size:18px">🏦</span><div><div class="fw6 fs12">Wafacash</div><div class="fs10 t2">Transfert d'argent</div></div></div><div class="flex aic gap6"><span class="tag r">Inactif</span><button class="btn btn-g btn-sm">Connecter</button></div></div>
+        </div>
+      </div>
+
+      <!-- Livraison -->
+      <div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px">
+        <div class="fw7 mb12 cg fs13">🚚 Livraison Maroc</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="flex aic jcsb" style="padding:10px;background:var(--input);border-radius:var(--r-sm)"><div class="flex aic gap8"><span style="font-size:18px">🏃</span><div><div class="fw6 fs12">Amana</div><div class="fs10 t2">Leader Maroc</div></div></div><div class="flex aic gap6"><span class="tag g">✓ Actif</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div></div>
+          <div class="flex aic jcsb" style="padding:10px;background:var(--input);border-radius:var(--r-sm)"><div class="flex aic gap8"><span style="font-size:18px">⚡</span><div><div class="fw6 fs12">Ozone</div><div class="fs10 t2">Express J+1</div></div></div><div class="flex aic gap6"><span class="tag g">✓ Actif</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div></div>
+          <div class="flex aic jcsb" style="padding:10px;background:var(--input);border-radius:var(--r-sm)"><div class="flex aic gap8"><span style="font-size:18px">🚛</span><div><div class="fw6 fs12">Cathedis</div><div class="fs10 t2">National</div></div></div><div class="flex aic gap6"><span class="tag a">Config.</span><button class="btn btn-g btn-sm" onclick="toast('Config Cathedis ⚙️','s')">Connecter</button></div></div>
+          <div class="flex aic jcsb" style="padding:10px;background:var(--input);border-radius:var(--r-sm)"><div class="flex aic gap8"><span style="font-size:18px">⏱</span><div><div class="fw6 fs12">Chronodiali</div><div class="fs10 t2">Express premium</div></div></div><div class="flex aic gap6"><span class="tag r">Inactif</span><button class="btn btn-g btn-sm">Connecter</button></div></div>
+        </div>
+      </div>
+
+      <!-- Communications & IA -->
+      <div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px">
+        <div class="fw7 mb12 cv fs13">🤖 IA & Communication</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="flex aic jcsb" style="padding:10px;background:var(--input);border-radius:var(--r-sm)"><div class="flex aic gap8"><span style="font-size:18px">💬</span><div><div class="fw6 fs12">WhatsApp Business</div><div class="fs10 t2">Cloud API v18</div></div></div><div class="flex aic gap6"><span class="tag g">✓ Actif</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div></div>
+          <div class="flex aic jcsb" style="padding:10px;background:var(--input);border-radius:var(--r-sm)"><div class="flex aic gap8"><span style="font-size:18px">🤖</span><div><div class="fw6 fs12">Claude AI (Anthropic)</div><div class="fs10 t2">LLM principal</div></div></div><div class="flex aic gap6"><span class="tag g">✓ Actif</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div></div>
+          <div class="flex aic jcsb" style="padding:10px;background:var(--input);border-radius:var(--r-sm)"><div class="flex aic gap8"><span style="font-size:18px">📞</span><div><div class="fw6 fs12">Twilio (Appels)</div><div class="fs10 t2">Voice + SMS</div></div></div><div class="flex aic gap6"><span class="tag g">✓ Actif</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div></div>
+          <div class="flex aic jcsb" style="padding:10px;background:var(--input);border-radius:var(--r-sm)"><div class="flex aic gap8"><span style="font-size:18px">📧</span><div><div class="fw6 fs12">SendGrid</div><div class="fs10 t2">Email marketing</div></div></div><div class="flex aic gap6"><span class="tag a">Config.</span><button class="btn btn-g btn-sm" onclick="toast('API SendGrid configurée ✓','s')">Connecter</button></div></div>
+          <div class="flex aic jcsb" style="padding:10px;background:var(--input);border-radius:var(--r-sm)"><div class="flex aic gap8"><span style="font-size:18px">📘</span><div><div class="fw6 fs12">Meta Ads</div><div class="fs10 t2">Graph API v19</div></div></div><div class="flex aic gap6"><span class="tag g">✓ Actif</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div></div>
+          <div class="flex aic jcsb" style="padding:10px;background:var(--input);border-radius:var(--r-sm)"><div class="flex aic gap8"><span style="font-size:18px">🔴</span><div><div class="fw6 fs12">Google Ads</div><div class="fs10 t2">API v16</div></div></div><div class="flex aic gap6"><span class="tag g">✓ Actif</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div></div>
+          <div class="flex aic jcsb" style="padding:10px;background:var(--input);border-radius:var(--r-sm)"><div class="flex aic gap8"><span style="font-size:18px">🎵</span><div><div class="fw6 fs12">TikTok Ads</div><div class="fs10 t2">Marketing API</div></div></div><div class="flex aic gap6"><span class="tag g">✓ Actif</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- TOAST -->
+<div class="toast hidden" id="toast-el"><span id="t-ic">✅</span>&nbsp;<span id="t-msg"></span></div>
+
+<script>
+/* ══ ROUTING ══ */
+const META_HDR = {
+  checklist:    { t:'Ce qui restait — Complété ✅',           s:'NexaMarket Pro · 100% opérationnel' },
+  auth:         { t:'Authentification',                        s:'Login · Register · OAuth Google/Facebook · 2FA TOTP' },
+  onboarding:   { t:'Onboarding PME',                          s:'Wizard 6 étapes · Configuration boutique · IA ready' },
+  settings:     { t:'Paramètres',                              s:'Profil · Équipe · Notifications · API Keys · Thème' },
+  logistique:   { t:'Logistique Maroc',                        s:'Amana · Ozone · Cathedis · Chronodiali · Tracking live' },
+  content:      { t:'Générateur de Contenu IA',                s:'Posts · Emails · SMS · Scripts · Fiches produits · Darija' },
+  notifs:       { t:'Centre de Notifications',                 s:'14 non lues · Temps réel · Alertes IA intelligentes' },
+  integrations: { t:'Hub d\'Intégrations',                     s:'Paiements Maroc · Livraison · Ads · IA · WhatsApp · Email' },
+};
+function goTo(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const pg = document.getElementById('page-'+id);
+  if(pg) pg.classList.add('active');
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('on'));
+  const nav = document.getElementById('nav-'+id);
+  if(nav) nav.classList.add('on');
+  if(META_HDR[id]) {
+    document.getElementById('hdr-t').textContent = META_HDR[id].t;
+    document.getElementById('hdr-s').textContent = META_HDR[id].s;
+  }
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+/* ══ AUTH ══ */
+function authView(v) {
+  ['login','register','2fa','reset'].forEach(k => {
+    const el = document.getElementById('av-'+k);
+    if(el) el.style.display = k===v ? 'block' : 'none';
+  });
+  const tabs = document.getElementById('auth-tabs');
+  const footer = document.getElementById('auth-footer-toggle');
+  if(v==='2fa'||v==='reset') { tabs.style.display='none'; if(footer) footer.style.display='none'; }
+  else { tabs.style.display='flex'; if(footer) footer.style.display='block'; }
+  if(v==='onboard-trigger') { toast('Compte créé! Bienvenue 🎉','g'); setTimeout(()=>goTo('onboarding'),800); return; }
+  // Update tab styles
+  document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('on', (i===0&&v==='login')||(i===1&&v==='register')));
+}
+function doLogin() {
+  toast('Connexion réussie! Bienvenue Youssef 👋','g');
+  setTimeout(()=>goTo('checklist'),900);
+}
+function togglePass(id) {
+  const inp = document.getElementById(id);
+  inp.type = inp.type==='password' ? 'text' : 'password';
+}
+function checkStrength(pw) {
+  const fill = document.getElementById('strength-fill');
+  const lbl  = document.getElementById('strength-label');
+  let score = 0, color = 'var(--rose)', text = 'Trop faible';
+  if(pw.length >= 6)  { score += 25; color = 'var(--amber)'; text = 'Moyen'; }
+  if(pw.length >= 10) { score += 25; }
+  if(/[A-Z]/.test(pw)) score += 25;
+  if(/[0-9!@#$]/.test(pw)) { score += 25; }
+  if(score >= 75) { color='var(--green)'; text='Fort ✓'; }
+  else if(score >= 50) { color='var(--amber)'; text='Moyen'; }
+  fill.style.width = score + '%';
+  fill.style.background = color;
+  lbl.textContent = text;
+  lbl.style.color = color;
+}
+function otpNext(el, idx) {
+  if(el.value && idx < 5) document.getElementById('otp'+(idx+1)).focus();
+  if(idx===5 && el.value) { toast('Code vérifié ✓','g'); setTimeout(()=>authView('onboard-trigger'),600); }
+}
+
+/* ══ ONBOARDING ══ */
+let obCurrent = 1;
+const OB_MAX = 5;
+function obStep(dir) {
+  obCurrent = Math.max(1, Math.min(OB_MAX+1, obCurrent + dir));
+  // Update panels
+  for(let i=1; i<=OB_MAX+1; i++) {
+    const p = document.getElementById('sp'+i);
+    if(p) p.classList.toggle('active', i===obCurrent);
+  }
+  // Update dots
+  for(let i=0; i<=OB_MAX; i++) {
+    const d = document.getElementById('ps'+i);
+    if(d) { d.classList.remove('done','active'); if(i<obCurrent) d.classList.add('done'); else if(i===obCurrent) d.classList.add('active'); }
+  }
+  // Update step labels
+  const steps = ['os1','os2','os3','os4','os5','os6'];
+  steps.forEach((id,i) => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    const dot = el.querySelector('.os-dot');
+    const name = el.querySelector('.os-name');
+    const stepN = i+1;
+    dot.classList.remove('done','active','pending');
+    name.classList.remove('done','active','pending');
+    if(stepN < obCurrent) { dot.classList.add('done'); dot.textContent='✓'; name.classList.add('done'); }
+    else if(stepN === obCurrent) { dot.classList.add('active'); dot.textContent=stepN; name.classList.add('active'); }
+    else { dot.classList.add('pending'); dot.textContent=stepN; name.classList.add('pending'); }
+  });
+  document.getElementById('ob-step-ind').textContent = `Étape ${Math.min(obCurrent,OB_MAX)} sur ${OB_MAX}`;
+  document.getElementById('ob-back').style.opacity = obCurrent > 1 ? '1' : '0.3';
+  if(obCurrent > OB_MAX) document.getElementById('onboard-footer').style.display='none';
+}
+
+/* ══ SETTINGS TABS ══ */
+function settingTab(el, id) {
+  document.querySelectorAll('.sn-item').forEach(n => n.classList.remove('on'));
+  el.classList.add('on');
+  document.querySelectorAll('.s-panel').forEach(p => p.classList.remove('active'));
+  const panel = document.getElementById('sp-'+id);
+  if(panel) panel.classList.add('active');
+}
+
+/* ══ CONTENT GENERATOR ══ */
+const GENERATED = {
+  social: `🧕✨ PROMO EXCLUSIVE — Collection Hijab Premium Été 2025!\n\nSoldes jusqu'à -20% avec le code RAMADAN2025 🎉\n\n✅ Livraison gratuite dans tout le Maroc\n⏰ Stock LIMITÉ — Commandez maintenant!\n📱 WhatsApp: +212 661 234 567\n\n#HijabMaroc #ModeModeste #Casablanca #LivraisonGratuite #NexaMarket`,
+  email: `Objet: 🎁 Offre exclusive — 20% de réduction pour vous!\n\nChère cliente,\n\nNous avons une surprise pour vous: -20% sur toute notre collection Hijab Premium avec le code RAMADAN2025.\n\n🛍️ Voir la collection → boutique.ma/hijab\n\nValable jusqu'au 15/06/2025.\n\nCordialement,\nL'équipe Boutique Mode Casa`,
+  sms: `Boutique Mode: PROMO -20% sur tout! Code: RAMADAN2025. Livraison gratuite Maroc. Stock limité! Commandez: wa.me/+212661234567`,
+  video: `[INTRO — 0:00-0:05]\nMusique dynamique. Plan serré sur hijab coloré.\n\n[DÉVOILEMENT — 0:05-0:15]\nVoix (Darija): "Shof had lhijab premium! Wesh zin?"\nPan sur 3 couleurs disponibles.\n\n[CALL TO ACTION — 0:15-0:25]\nPrix en grand: "185 MAD"\nCode promo animé: "RAMADAN2025"\nLogo boutique + numéro WhatsApp`,
+  produit: `**Hijab Premium Soie — Collection Été 2025**\n\n🌟 Matière: 100% Soie naturelle, ultra-douce\n🎨 Coloris: Bleu Marine, Bordeaux, Ivoire, Nude, Noir\n📐 Dimensions: 180cm x 70cm · One size\n💰 Prix: 185 MAD (livraison gratuite dès 300 MAD)\n\n✓ Anti-transpiration · Respirant · Brillance naturelle\n✓ Parfait pour: quotidien, événements, travail\n📦 Livraison 24-48h dans tout le Maroc`,
+};
+let genRunning = false;
+function generateContent(type) {
+  const types = { social:'social', email:'email', sms:'sms', video:'video', produit:'produit' };
+  const key = type || 'social';
+  const output = document.getElementById('content-output');
+  if(genRunning) return;
+  genRunning = true;
+  output.textContent = '';
+  output.className = 'content-preview ai-cursor';
+  const text = GENERATED[key] || GENERATED.social;
+  let i = 0;
+  const iv = setInterval(() => {
+    output.textContent += text[i++];
+    if(i >= text.length) { clearInterval(iv); output.className='content-preview'; genRunning=false; toast('Contenu IA généré ✨','g'); }
+  }, 16);
+}
+function ctab(el, id) {
+  document.querySelectorAll('.ct-tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  ['social','email','sms','video','produit'].forEach(k => {
+    const d = document.getElementById('ct-'+k);
+    if(d) d.style.display = k===id ? 'block' : 'none';
+  });
+}
+function selectPlatform(el) {
+  document.querySelectorAll('.platform-card').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+}
+function selectPlan(el) {
+  document.querySelectorAll('.plan-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+/* ══ NOTIFICATIONS ══ */
+function markAllRead() {
+  document.querySelectorAll('.notif-item').forEach(n => { n.classList.remove('unread'); n.querySelector('.notif-dot-badge') && (n.querySelector('.notif-dot-badge').style.display='none'); });
+  toast('Toutes les notifications marquées comme lues ✓','g');
+}
+function readNotif(el) { el.classList.remove('unread'); }
+
+/* ══ CHIPS ══ */
+function toggleChip(el) { el.classList.toggle('on'); }
+
+/* ══ SETTINGS ══ */
+function setColor(el, col) {
+  document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('on'));
+  el.classList.add('on');
+  document.documentElement.style.setProperty('--sky', col);
+  toast('Couleur appliquée ✓','g');
+}
+
+/* ══ TOAST ══ */
+const ICONS = { g:'✅', r:'🚨', a:'⚡', s:'ℹ️', v:'✨' };
+let toastTimer;
+function toast(msg, type='g') {
+  document.getElementById('t-ic').textContent = ICONS[type]||'✅';
+  document.getElementById('t-msg').textContent = msg;
+  document.getElementById('toast-el').classList.remove('hidden');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>document.getElementById('toast-el').classList.add('hidden'), 3500);
+}
+
+/* ══ INIT ══ */
+document.addEventListener('DOMContentLoaded', () => {
+  goTo('checklist');
+  obStep(0);
+});
+</script>
+</body>
+</html>

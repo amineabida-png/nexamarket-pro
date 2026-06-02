@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexaMarket Pro — Architecture Technique Complète</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Cabinet+Grotesk:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════
+   DESIGN SYSTEM — Blueprint / Technical
+   Aesthetic: Dark Blueprint — Engineering Precision
+═══════════════════════════════════════════════ */
+:root {
+  --bg:       #040609;
+  --bg2:      #070a10;
+  --surface:  #090d18;
+  --card:     #0d1220;
+  --card2:    #111828;
+  --input:    #141c2e;
+  --border:   rgba(99,179,237,0.08);
+  --border-a: rgba(99,179,237,0.35);
+
+  --blue:     #3b82f6;
+  --blue-2:   #60a5fa;
+  --blue-g:   rgba(59,130,246,0.15);
+  --cyan:     #06b6d4;
+  --teal:     #14b8a6;
+  --green:    #22c55e;
+  --amber:    #f59e0b;
+  --rose:     #f43f5e;
+  --violet:   #8b5cf6;
+  --orange:   #f97316;
+  --lime:     #84cc16;
+  --pink:     #ec4899;
+
+  --t1: #e2eaf8;
+  --t2: #6b7a99;
+  --t3: #2a3550;
+
+  --r-xs:4px; --r-sm:8px; --r-md:12px; --r-lg:18px; --r-xl:24px;
+  --sw: 220px; --hh: 58px;
+  --sh: 0 8px 40px rgba(0,0,0,.6);
+  --tr: .2s cubic-bezier(.4,0,.2,1);
+  --fd: 'Cabinet Grotesk', sans-serif;
+  --fm: 'JetBrains Mono', monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--fm);background:var(--bg);color:var(--t1);display:flex;min-height:100vh;font-size:12.5px;overflow-x:hidden}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--t3);border-radius:4px}
+
+/* Blueprint grid background */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(59,130,246,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(59,130,246,.03) 1px,transparent 1px);
+  background-size:32px 32px;
+  pointer-events:none;z-index:0;
+}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:var(--sw);background:var(--surface);
+  border-right:1px solid var(--border);
+  position:fixed;inset:0 auto 0 0;z-index:100;
+  display:flex;flex-direction:column;overflow-y:auto;
+}
+.s-logo{padding:18px 16px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.s-mark{width:32px;height:32px;border-radius:7px;background:linear-gradient(135deg,var(--blue),var(--blue-2));display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-weight:900;font-size:14px;color:#fff;box-shadow:0 4px 14px var(--blue-g)}
+.s-name{font-family:var(--fd);font-weight:800;font-size:14px;letter-spacing:-.3px;color:var(--t1)}
+.s-sub{font-size:9px;color:var(--t3);letter-spacing:.5px;text-transform:uppercase;margin-top:1px}
+.s-sect{padding:12px 10px 4px}
+.s-lbl{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);padding:0 6px;margin-bottom:4px}
+.ni{display:flex;align-items:center;gap:8px;padding:8px 8px;border-radius:var(--r-sm);cursor:pointer;color:var(--t2);font-size:11.5px;font-weight:500;transition:all var(--tr);position:relative;margin-bottom:1px;font-family:var(--fm)}
+.ni:hover{background:var(--card);color:var(--t1)}
+.ni.on{background:rgba(59,130,246,.1);color:var(--blue-2)}
+.ni.on::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:2px;background:var(--blue);border-radius:0 2px 2px 0}
+.ni-n{font-size:10px;background:var(--input);border:1px solid var(--border);border-radius:4px;padding:1px 5px;margin-left:auto;color:var(--t2)}
+
+/* ── MAIN ── */
+.main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;position:relative;z-index:1}
+.hdr{height:var(--hh);background:rgba(9,13,24,.95);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px;gap:12px;position:sticky;top:0;z-index:50;backdrop-filter:blur(12px)}
+.hdr-t{font-family:var(--fd);font-size:17px;font-weight:800;letter-spacing:-.4px}
+.hdr-s{font-size:10.5px;color:var(--t2);margin-top:1px;font-family:var(--fm)}
+.hdr-sp{flex:1}
+.version-badge{font-family:var(--fm);font-size:10px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);border-radius:4px;padding:4px 10px;color:var(--blue-2)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--r-sm);font-family:var(--fm);font-size:11.5px;font-weight:600;cursor:pointer;border:none;transition:all var(--tr)}
+.btn-p{background:linear-gradient(135deg,var(--blue),var(--blue-2));color:#fff;box-shadow:0 4px 14px var(--blue-g)}
+.btn-p:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(59,130,246,.35)}
+.btn-g{background:var(--input);color:var(--t2);border:1px solid var(--border)}
+.btn-g:hover{background:var(--card2);color:var(--t1)}
+
+/* ── PAGES ── */
+.page{display:none;flex-direction:column;gap:20px;padding:24px;animation:fadeIn .3s ease}
+.page.active{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── CARDS ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:22px;box-shadow:var(--sh)}
+.card.blue-glow{border-color:rgba(59,130,246,.2);box-shadow:0 0 40px rgba(59,130,246,.06)}
+.ch{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:10px}
+.ct{font-family:var(--fd);font-size:14px;font-weight:800;letter-spacing:-.3px}
+.cs{font-size:10.5px;color:var(--t2);margin-top:2px;font-family:var(--fm)}
+
+/* ── CODE BLOCKS ── */
+.code-block{background:var(--bg);border:1px solid var(--border);border-radius:var(--r-md);padding:18px;overflow-x:auto;position:relative;font-size:11.5px;line-height:1.75}
+.code-block pre{color:var(--t1)}
+.code-block .cb-header{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.code-block .cb-lang{font-size:10px;font-weight:600;color:var(--blue-2);background:rgba(59,130,246,.1);padding:2px 8px;border-radius:4px}
+.code-block .cb-copy{margin-left:auto;cursor:pointer;font-size:10px;color:var(--t3);transition:color var(--tr);background:none;border:none;font-family:var(--fm)}
+.code-block .cb-copy:hover{color:var(--t1)}
+/* Syntax */
+.kw{color:#c792ea}.fn{color:#82aaff}.str{color:#c3e88d}.num{color:#f78c6c}.cmt{color:#546e7a;font-style:italic}.cls{color:#ffcb6b}.dec{color:#89ddff}.prop{color:#f07178}.op{color:#89ddff}.type{color:#ffcb6b}.ann{color:#c3e88d}
+
+/* ── ARCHITECTURE DIAGRAM ── */
+.arch-diagram{position:relative;overflow:hidden}
+.layer{margin-bottom:12px;border-radius:var(--r-md);border:1px solid var(--border);overflow:hidden}
+.layer-hdr{padding:10px 16px;font-family:var(--fd);font-size:12px;font-weight:700;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
+.layer-body{padding:14px;display:flex;flex-wrap:wrap;gap:10px}
+.svc-box{
+  display:flex;flex-direction:column;gap:4px;
+  padding:12px 14px;border-radius:var(--r-sm);
+  border:1px solid var(--border);
+  cursor:pointer;transition:all var(--tr);
+  min-width:130px;flex:1;
+  position:relative;overflow:hidden;
+}
+.svc-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.svc-box:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.svc-icon{font-size:18px;margin-bottom:4px}
+.svc-name{font-family:var(--fd);font-size:12px;font-weight:700}
+.svc-tech{font-size:10px;color:var(--t2)}
+.svc-port{font-size:9px;color:var(--t3);font-family:var(--fm);margin-top:2px}
+
+/* Layer colors */
+.layer.client  .layer-hdr{background:rgba(99,179,237,.06)} 
+.layer.gateway .layer-hdr{background:rgba(245,158,11,.06)}
+.layer.services.layer-hdr{background:rgba(59,130,246,.06)}
+.layer.data    .layer-hdr{background:rgba(20,184,166,.06)}
+.layer.infra   .layer-hdr{background:rgba(139,92,246,.06)}
+.layer.ext     .layer-hdr{background:rgba(244,63,94,.06)}
+
+/* ── DB SCHEMA ── */
+.db-tables{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.db-table{background:var(--card);border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;transition:all var(--tr)}
+.db-table:hover{border-color:var(--border-a);transform:translateY(-1px)}
+.db-table-hdr{padding:10px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
+.db-table-name{font-family:var(--fd);font-size:13px;font-weight:800;color:var(--blue-2)}
+.db-table-rows{font-size:10px;color:var(--t3);margin-left:auto}
+.db-field{display:grid;grid-template-columns:16px 1fr 80px 60px;gap:8px;align-items:center;padding:7px 14px;border-bottom:1px solid rgba(255,255,255,.03);font-size:11px}
+.db-field:last-child{border-bottom:none}
+.db-field:hover{background:rgba(59,130,246,.04)}
+.field-pk{color:var(--amber);font-size:12px}
+.field-fk{color:var(--violet);font-size:12px}
+.field-name{font-family:var(--fm);color:var(--t1);font-weight:500}
+.field-type{font-family:var(--fm);color:var(--cyan);font-size:10px}
+.field-constraint{font-size:9px;color:var(--t3);text-align:right}
+
+/* ── API ENDPOINTS ── */
+.endpoint{display:grid;grid-template-columns:70px 1fr auto;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.03);transition:background var(--tr);cursor:pointer;font-size:11.5px}
+.endpoint:hover{background:rgba(59,130,246,.04)}
+.method{font-family:var(--fm);font-weight:700;font-size:10.5px;padding:3px 7px;border-radius:4px;text-align:center}
+.method.GET{background:rgba(34,197,94,.12);color:var(--green)}
+.method.POST{background:rgba(59,130,246,.12);color:var(--blue-2)}
+.method.PUT{background:rgba(245,158,11,.12);color:var(--amber)}
+.method.DELETE{background:rgba(244,63,94,.12);color:var(--rose)}
+.method.PATCH{background:rgba(139,92,246,.12);color:var(--violet)}
+.endpoint-path{font-family:var(--fm);color:var(--t1)}
+.endpoint-desc{font-size:10.5px;color:var(--t2);text-align:right}
+
+/* ── FLOW DIAGRAM (SVG-based) ── */
+.flow-svg{width:100%;overflow:visible}
+
+/* ── INFRA / DEVOPS ── */
+.infra-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.infra-card{background:var(--card2);border:1px solid var(--border);border-radius:var(--r-md);padding:16px;transition:all var(--tr)}
+.infra-card:hover{border-color:var(--border-a)}
+.infra-icon{font-size:24px;margin-bottom:10px}
+.infra-name{font-family:var(--fd);font-size:13px;font-weight:700;margin-bottom:4px}
+.infra-desc{font-size:11px;color:var(--t2);line-height:1.6}
+.infra-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.itag{font-size:9px;font-family:var(--fm);padding:2px 6px;border-radius:3px;border:1px solid var(--border);color:var(--t2)}
+
+/* ── ROADMAP ── */
+.roadmap-item{display:flex;gap:16px;padding-bottom:24px;position:relative}
+.roadmap-item::before{content:'';position:absolute;left:19px;top:40px;bottom:0;width:2px;background:var(--border)}
+.roadmap-item:last-child::before{display:none}
+.rm-dot{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;border:2px solid}
+.rm-content{flex:1;min-width:0}
+.rm-phase{font-family:var(--fd);font-size:12px;font-weight:700;color:var(--t3);margin-bottom:2px;text-transform:uppercase;letter-spacing:1px}
+.rm-title{font-family:var(--fd);font-size:15px;font-weight:800;margin-bottom:6px}
+.rm-desc{font-size:11.5px;color:var(--t2);line-height:1.7;margin-bottom:8px}
+.rm-items{display:flex;flex-wrap:wrap;gap:5px}
+.rm-item{font-size:10.5px;font-family:var(--fm);padding:3px 9px;border-radius:4px;border:1px solid var(--border);color:var(--t2)}
+
+/* ── TAGS ── */
+.tag{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:600;font-family:var(--fm)}
+.tag.b{background:rgba(59,130,246,.1);color:var(--blue-2)}
+.tag.g{background:rgba(34,197,94,.1);color:var(--green)}
+.tag.a{background:rgba(245,158,11,.1);color:var(--amber)}
+.tag.r{background:rgba(244,63,94,.1);color:var(--rose)}
+.tag.v{background:rgba(139,92,246,.1);color:var(--violet)}
+.tag.c{background:rgba(6,182,212,.1);color:var(--cyan)}
+.tag.t{background:rgba(20,184,166,.1);color:var(--teal)}
+
+/* ── GRIDS ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.gc2{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}
+
+/* ── STAT BOXES ── */
+.stat-box{background:var(--card2);border:1px solid var(--border);border-radius:var(--r-md);padding:14px 16px;text-align:center}
+.stat-val{font-family:var(--fd);font-size:24px;font-weight:900;letter-spacing:-1px}
+.stat-lbl{font-size:10px;color:var(--t2);margin-top:3px;font-family:var(--fm)}
+
+/* ── SECTION DIVIDER ── */
+.divider{display:flex;align-items:center;gap:12px;margin:4px 0}
+.divider-line{flex:1;height:1px;background:var(--border)}
+.divider-txt{font-size:10px;color:var(--t3);font-family:var(--fm);letter-spacing:1px;text-transform:uppercase}
+
+/* ── TOOLTIP ── */
+.tip-wrap{position:relative;display:inline-flex}
+.tip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--border-a);border-radius:var(--r-sm);padding:6px 10px;font-size:10.5px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;z-index:200;color:var(--t1)}
+.tip-wrap:hover .tip{opacity:1}
+
+/* ── SECURITY TABLE ── */
+.sec-row{display:grid;grid-template-columns:160px 1fr 80px;gap:12px;align-items:center;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.03)}
+.sec-row:last-child{border-bottom:none}
+.sec-row:hover{background:rgba(59,130,246,.03)}
+.sec-name{font-family:var(--fm);font-size:11px;font-weight:600}
+.sec-desc{font-size:11px;color:var(--t2);line-height:1.5}
+.sec-level{font-size:10px;font-weight:700;font-family:var(--fm)}
+
+/* ── K8S DIAGRAM ── */
+.k8s-cluster{border:2px solid rgba(59,130,246,.2);border-radius:var(--r-lg);padding:16px;background:rgba(59,130,246,.03)}
+.k8s-ns{border:1px dashed rgba(99,179,237,.15);border-radius:var(--r-md);padding:12px;margin-bottom:10px}
+.k8s-ns-lbl{font-size:9.5px;font-family:var(--fm);color:var(--t3);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
+.k8s-pods{display:flex;flex-wrap:wrap;gap:6px}
+.k8s-pod{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:var(--r-sm);padding:6px 10px;font-size:10px;font-family:var(--fm);display:flex;align-items:center;gap:5px}
+.pod-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pod-pulse 2s ease-in-out infinite}
+@keyframes pod-pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--card2);border:1px solid var(--border-a);border-radius:var(--r-md);padding:12px 18px;z-index:999;display:flex;align-items:center;gap:8px;font-size:12px;font-family:var(--fm);box-shadow:var(--sh);animation:fadeIn .3s ease}
+.toast.hidden{display:none}
+
+/* ── MISC ── */
+.flex{display:flex}.aic{align-items:center}.jcsb{justify-content:space-between}.wrap{flex-wrap:wrap}
+.gap4{gap:4px}.gap6{gap:6px}.gap8{gap:8px}.gap10{gap:10px}.gap12{gap:12px}
+.mb4{margin-bottom:4px}.mb6{margin-bottom:6px}.mb8{margin-bottom:8px}.mb10{margin-bottom:10px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}
+.fw7{font-weight:700}.fw8{font-weight:800}
+.t2{color:var(--t2)}.t3{color:var(--t3)}
+.cb{color:var(--blue-2)}.cg{color:var(--green)}.cr{color:var(--rose)}.ca{color:var(--amber)}.cv{color:var(--violet)}.cc{color:var(--cyan)}.ct{color:var(--teal)}
+.fd{font-family:var(--fd)}.fm{font-family:var(--fm)}
+.w100{width:100%}
+.sep{height:1px;background:var(--border);margin:12px 0}
+.fs10{font-size:10px}.fs11{font-size:11px}.fs12{font-size:12px}
+</style>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar">
+  <div class="s-logo">
+    <div class="s-mark">N</div>
+    <div>
+      <div class="s-name">NexaMarket</div>
+      <div class="s-sub">Architecture v2.0</div>
+    </div>
+  </div>
+
+  <div class="s-sect">
+    <div class="s-lbl">Vue d'ensemble</div>
+    <div class="ni on" onclick="goTo('overview')">📐 Architecture globale</div>
+    <div class="ni" onclick="goTo('microservices')">⚙️ Microservices<span class="ni-n">10</span></div>
+    <div class="ni" onclick="goTo('database')">🗄️ Base de données<span class="ni-n">18</span></div>
+  </div>
+  <div class="s-sect">
+    <div class="s-lbl">Backend & APIs</div>
+    <div class="ni" onclick="goTo('api')">🔌 APIs REST / gRPC<span class="ni-n">47</span></div>
+    <div class="ni" onclick="goTo('auth')">🔐 Auth & Sécurité</div>
+    <div class="ni" onclick="goTo('ai')">🤖 Stack IA</div>
+  </div>
+  <div class="s-sect">
+    <div class="s-lbl">Infrastructure</div>
+    <div class="ni" onclick="goTo('devops')">🚀 DevOps & CI/CD</div>
+    <div class="ni" onclick="goTo('k8s')">☸️ Kubernetes</div>
+    <div class="ni" onclick="goTo('monitoring')">📊 Monitoring</div>
+  </div>
+  <div class="s-sect">
+    <div class="s-lbl">Planification</div>
+    <div class="ni" onclick="goTo('roadmap')">🗺️ Roadmap 24 mois</div>
+    <div class="ni" onclick="goTo('costs')">💰 Coûts & Scaling</div>
+  </div>
+</aside>
+
+<main class="main">
+<header class="hdr">
+  <div>
+    <div class="hdr-t" id="hdr-title">Architecture Globale</div>
+    <div class="hdr-s" id="hdr-sub">NexaMarket Pro · SaaS Multi-tenant · 100K+ PME marocaines</div>
+  </div>
+  <div class="hdr-sp"></div>
+  <div class="flex aic gap8">
+    <span class="version-badge">v2.0.0 · Production Ready</span>
+    <button class="btn btn-g" onclick="printPage()">📥 Exporter PDF</button>
+    <button class="btn btn-p" onclick="toast('Architecture copiée dans le presse-papier ✓','b')">📋 Copier ref.</button>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════
+     PAGE 1 — ARCHITECTURE GLOBALE
+══════════════════════════════════════ -->
+<div class="page active" id="page-overview">
+
+  <!-- Stats row -->
+  <div class="g4">
+    <div class="stat-box"><div class="stat-val cb">10</div><div class="stat-lbl">Microservices NestJS</div></div>
+    <div class="stat-box"><div class="stat-val cg">18</div><div class="stat-lbl">Tables PostgreSQL</div></div>
+    <div class="stat-box"><div class="stat-val ca">47</div><div class="stat-lbl">Endpoints API REST</div></div>
+    <div class="stat-box"><div class="stat-val cv">100K+</div><div class="stat-lbl">PME simultanées</div></div>
+  </div>
+
+  <!-- Architecture layers diagram -->
+  <div class="card blue-glow">
+    <div class="ch"><div><div class="ct">Diagramme d'architecture en couches</div><div class="cs">Pattern: API-First · Multi-tenant SaaS · Microservices</div></div><span class="tag b">Production</span></div>
+
+    <!-- Layer: Clients -->
+    <div class="layer client">
+      <div class="layer-hdr" style="background:rgba(99,179,237,.06)">
+        <span>🖥️</span><span class="fd fw8">COUCHE CLIENT</span><span class="t2 fs10">— Frontend Next.js 15 · Mobile React Native · PWA</span>
+      </div>
+      <div class="layer-body">
+        <div class="svc-box" style="background:rgba(99,179,237,.05)" onclick="toast('Next.js 15 · SSR/SSG · TypeScript · Tailwind','b')">
+          <div class="svc-icon">💻</div><div class="svc-name">Web App</div><div class="svc-tech">Next.js 15 + TypeScript</div><div class="svc-port">Port 3000</div>
+          <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--blue),var(--cyan))"></div>
+        </div>
+        <div class="svc-box" style="background:rgba(99,179,237,.05)" onclick="toast('React Native · Expo · iOS & Android','b')">
+          <div class="svc-icon">📱</div><div class="svc-name">Mobile App</div><div class="svc-tech">React Native · Expo</div><div class="svc-port">iOS + Android</div>
+          <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--blue),var(--cyan))"></div>
+        </div>
+        <div class="svc-box" style="background:rgba(99,179,237,.05)" onclick="toast('Shadcn/UI · Storybook · Design System','b')">
+          <div class="svc-icon">🎨</div><div class="svc-name">UI Kit</div><div class="svc-tech">Shadcn/UI + Tailwind</div><div class="svc-port">Design System</div>
+          <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--blue),var(--cyan))"></div>
+        </div>
+        <div class="svc-box" style="background:rgba(99,179,237,.05)" onclick="toast('Cloudflare CDN · Cache global · WAF','b')">
+          <div class="svc-icon">☁️</div><div class="svc-name">CDN + WAF</div><div class="svc-tech">Cloudflare Enterprise</div><div class="svc-port">Global Edge</div>
+          <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--blue),var(--cyan))"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Arrow -->
+    <div style="text-align:center;padding:4px 0;font-size:18px;color:var(--t3)">↕ HTTPS / WSS</div>
+
+    <!-- Layer: API Gateway -->
+    <div class="layer gateway">
+      <div class="layer-hdr" style="background:rgba(245,158,11,.06)">
+        <span>🚪</span><span class="fd fw8">API GATEWAY & LOAD BALANCER</span><span class="t2 fs10">— Point d'entrée unique · Rate limiting · Auth JWT</span>
+      </div>
+      <div class="layer-body">
+        <div class="svc-box" style="background:rgba(245,158,11,.05)" onclick="toast('NGINX · SSL Termination · Rate limit · LB','a')">
+          <div class="svc-icon">🔀</div><div class="svc-name">API Gateway</div><div class="svc-tech">NestJS Gateway</div><div class="svc-port">Port 8080</div>
+          <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--amber),var(--orange))"></div>
+        </div>
+        <div class="svc-box" style="background:rgba(245,158,11,.05)" onclick="toast('JWT · OAuth2 · 2FA · Session Redis','a')">
+          <div class="svc-icon">🔐</div><div class="svc-name">Auth Service</div><div class="svc-tech">JWT + OAuth2 + 2FA</div><div class="svc-port">Port 8081</div>
+          <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--amber),var(--orange))"></div>
+        </div>
+        <div class="svc-box" style="background:rgba(245,158,11,.05)" onclick="toast('BullMQ · Redis Streams · Event Bus','a')">
+          <div class="svc-icon">📨</div><div class="svc-name">Message Queue</div><div class="svc-tech">BullMQ + Redis</div><div class="svc-port">Port 6379</div>
+          <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--amber),var(--orange))"></div>
+        </div>
+        <div class="svc-box" style="background:rgba(245,158,11,.05)" onclick="toast('WebSocket Gateway · Real-time events · Socket.io','a')">
+          <div class="svc-icon">⚡</div><div class="svc-name">WebSocket</div><div class="svc-tech">Socket.io + Redis</div><div class="svc-port">Port 8082</div>
+          <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--amber),var(--orange))"></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center;padding:4px 0;font-size:18px;color:var(--t3)">↕ gRPC / REST / Events</div>
+
+    <!-- Layer: Core Microservices -->
+    <div class="layer services">
+      <div class="layer-hdr" style="background:rgba(59,130,246,.06)">
+        <span>⚙️</span><span class="fd fw8">MICROSERVICES MÉTIER</span><span class="t2 fs10">— 10 services NestJS indépendants · Docker · Kubernetes</span>
+      </div>
+      <div class="layer-body">
+        <div class="svc-box" style="background:rgba(59,130,246,.05)" onclick="toast('CRM · Contacts · Pipeline · Scoring IA','b')"><div class="svc-icon">👥</div><div class="svc-name">CRM Service</div><div class="svc-tech">NestJS · :3001</div></div>
+        <div class="svc-box" style="background:rgba(59,130,246,.05)" onclick="toast('Catalogue · Stock · Commandes · Paiements','b')"><div class="svc-icon">🛒</div><div class="svc-name">E-com Service</div><div class="svc-tech">NestJS · :3002</div></div>
+        <div class="svc-box" style="background:rgba(59,130,246,.05)" onclick="toast('Meta · Google · TikTok Ads Integration','b')"><div class="svc-icon">📣</div><div class="svc-name">Ads Service</div><div class="svc-tech">NestJS · :3003</div></div>
+        <div class="svc-box" style="background:rgba(59,130,246,.05)" onclick="toast('WhatsApp Business API · Bot IA · Flows','b')"><div class="svc-icon">💬</div><div class="svc-name">WhatsApp Service</div><div class="svc-tech">NestJS · :3004</div></div>
+        <div class="svc-box" style="background:rgba(59,130,246,.05)" onclick="toast('Devis · Factures · Avoirs · Export PDF','b')"><div class="svc-icon">🧾</div><div class="svc-name">Billing Service</div><div class="svc-tech">NestJS · :3005</div></div>
+        <div class="svc-box" style="background:rgba(59,130,246,.05)" onclick="toast('Amana · Ozone · Cathedis · Tracking','b')"><div class="svc-icon">🚚</div><div class="svc-name">Logistics Service</div><div class="svc-tech">NestJS · :3006</div></div>
+        <div class="svc-box" style="background:rgba(59,130,246,.05)" onclick="toast('Revenus · Dépenses · Prévisions · Alertes','b')"><div class="svc-icon">💰</div><div class="svc-name">Finance Service</div><div class="svc-tech">NestJS · :3007</div></div>
+        <div class="svc-box" style="background:rgba(59,130,246,.05)" onclick="toast('Agent Vocal IA · Transcription · Queue','b')"><div class="svc-icon">📞</div><div class="svc-name">CallCenter Service</div><div class="svc-tech">NestJS · :3008</div></div>
+        <div class="svc-box" style="background:rgba(59,130,246,.05)" onclick="toast('Génération contenu · Multi-langue · Darija','b')"><div class="svc-icon">✍️</div><div class="svc-name">Content Service</div><div class="svc-tech">NestJS · :3009</div></div>
+        <div class="svc-box" style="background:rgba(59,130,246,.05)" onclick="toast('Notifications Push · Email · SMS · WA','b')"><div class="svc-icon">🔔</div><div class="svc-name">Notif Service</div><div class="svc-tech">NestJS · :3010</div></div>
+      </div>
+    </div>
+
+    <div style="text-align:center;padding:4px 0;font-size:18px;color:var(--t3)">↕ TCP / SQL / Cache</div>
+
+    <!-- Layer: Data -->
+    <div class="layer data">
+      <div class="layer-hdr" style="background:rgba(20,184,166,.06)">
+        <span>🗄️</span><span class="fd fw8">COUCHE DATA</span><span class="t2 fs10">— PostgreSQL · Redis · S3 · Elasticsearch</span>
+      </div>
+      <div class="layer-body">
+        <div class="svc-box" style="background:rgba(20,184,166,.05)" onclick="toast('PostgreSQL 16 · Multi-tenant · RLS · TimescaleDB','t')"><div class="svc-icon">🐘</div><div class="svc-name">PostgreSQL</div><div class="svc-tech">Primary + 2 Replicas</div><div class="svc-port">:5432</div></div>
+        <div class="svc-box" style="background:rgba(20,184,166,.05)" onclick="toast('Redis Cluster · Cache · Sessions · Pub/Sub','t')"><div class="svc-icon">⚡</div><div class="svc-name">Redis Cluster</div><div class="svc-tech">Cache + Sessions</div><div class="svc-port">:6379</div></div>
+        <div class="svc-box" style="background:rgba(20,184,166,.05)" onclick="toast('Elasticsearch · Logs · Search · Analytics','t')"><div class="svc-icon">🔍</div><div class="svc-name">Elasticsearch</div><div class="svc-tech">Logs + Search</div><div class="svc-port">:9200</div></div>
+        <div class="svc-box" style="background:rgba(20,184,166,.05)" onclick="toast('MinIO S3 compatible · Images · PDFs · Backups','t')"><div class="svc-icon">🪣</div><div class="svc-name">Object Storage</div><div class="svc-tech">MinIO / AWS S3</div><div class="svc-port">:9000</div></div>
+        <div class="svc-box" style="background:rgba(20,184,166,.05)" onclick="toast('TimescaleDB · KPIs · Métriques temps réel','t')"><div class="svc-icon">📈</div><div class="svc-name">TimescaleDB</div><div class="svc-tech">Time-series metrics</div><div class="svc-port">:5433</div></div>
+      </div>
+    </div>
+
+    <div style="text-align:center;padding:4px 0;font-size:18px;color:var(--t3)">↕ APIs tiers</div>
+
+    <!-- Layer: External -->
+    <div class="layer ext">
+      <div class="layer-hdr" style="background:rgba(244,63,94,.06)">
+        <span>🌐</span><span class="fd fw8">SERVICES EXTERNES</span><span class="t2 fs10">— Intégrations Maroc + Global</span>
+      </div>
+      <div class="layer-body">
+        <div class="svc-box" style="background:rgba(244,63,94,.04);border-color:rgba(244,63,94,.15)"><div class="svc-icon">📘</div><div class="svc-name">Meta Ads API</div><div class="svc-tech">Graph API v19</div></div>
+        <div class="svc-box" style="background:rgba(244,63,94,.04);border-color:rgba(244,63,94,.15)"><div class="svc-icon">🔴</div><div class="svc-name">Google Ads API</div><div class="svc-tech">v16</div></div>
+        <div class="svc-box" style="background:rgba(244,63,94,.04);border-color:rgba(244,63,94,.15)"><div class="svc-icon">🎵</div><div class="svc-name">TikTok Ads API</div><div class="svc-tech">Marketing API</div></div>
+        <div class="svc-box" style="background:rgba(244,63,94,.04);border-color:rgba(244,63,94,.15)"><div class="svc-icon">💬</div><div class="svc-name">WhatsApp BA</div><div class="svc-tech">Cloud API v18</div></div>
+        <div class="svc-box" style="background:rgba(244,63,94,.04);border-color:rgba(244,63,94,.15)"><div class="svc-icon">💳</div><div class="svc-name">CMI / NAPS</div><div class="svc-tech">Paiement Maroc</div></div>
+        <div class="svc-box" style="background:rgba(244,63,94,.04);border-color:rgba(244,63,94,.15)"><div class="svc-icon">📦</div><div class="svc-name">Amana / Ozone</div><div class="svc-tech">Livraison Maroc</div></div>
+        <div class="svc-box" style="background:rgba(244,63,94,.04);border-color:rgba(244,63,94,.15)"><div class="svc-icon">🤖</div><div class="svc-name">OpenAI / Claude</div><div class="svc-tech">LLM · Vision</div></div>
+        <div class="svc-box" style="background:rgba(244,63,94,.04);border-color:rgba(244,63,94,.15)"><div class="svc-icon">📧</div><div class="svc-name">SendGrid / Twilio</div><div class="svc-tech">Email + SMS</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tech stack summary -->
+  <div class="g2">
+    <div class="card">
+      <div class="ch"><div class="ct">Stack Frontend</div></div>
+      <div class="code-block">
+        <div class="cb-header"><span class="cb-lang">package.json</span><button class="cb-copy" onclick="toast('Copié ✓','g')">copy</button></div>
+<pre><span class="cmt">// next.config.js — NexaMarket Frontend</span>
+<span class="kw">const</span> <span class="fn">config</span> = {
+  <span class="prop">framework</span>: <span class="str">"next"</span>, <span class="prop">version</span>: <span class="str">"15.0"</span>,
+  <span class="prop">runtime</span>:   <span class="str">"edge"</span>,
+  <span class="prop">features</span>: [
+    <span class="str">"App Router"</span>,   <span class="str">"Server Components"</span>,
+    <span class="str">"Streaming SSR"</span>, <span class="str">"Parallel Routes"</span>
+  ],
+  <span class="prop">ui</span>: {
+    <span class="prop">components</span>: <span class="str">"shadcn/ui"</span>,
+    <span class="prop">styling</span>:    <span class="str">"tailwindcss@3.4"</span>,
+    <span class="prop">animation</span>:  <span class="str">"framer-motion"</span>,
+    <span class="prop">charts</span>:     <span class="str">"recharts + d3"</span>
+  },
+  <span class="prop">state</span>: <span class="str">"zustand + react-query@5"</span>,
+  <span class="prop">forms</span>: <span class="str">"react-hook-form + zod"</span>,
+  <span class="prop">i18n</span>:  <span class="str">"next-intl"</span>, <span class="cmt">// AR, FR, DAR, EN</span>
+}</pre>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ct">Stack Backend</div></div>
+      <div class="code-block">
+        <div class="cb-header"><span class="cb-lang">nest-cli.json</span><button class="cb-copy" onclick="toast('Copié ✓','g')">copy</button></div>
+<pre><span class="cmt">// NestJS Microservice Template</span>
+<span class="dec">@Module</span>({
+  <span class="prop">imports</span>: [
+    <span class="cls">TypeOrmModule</span>.forRoot({
+      <span class="prop">type</span>: <span class="str">'postgres'</span>,
+      <span class="prop">schema</span>: <span class="str">'tenant_schema'</span>, <span class="cmt">// RLS</span>
+    }),
+    <span class="cls">BullModule</span>.forRoot({ <span class="prop">redis</span>: config }),
+    <span class="cls">ThrottlerModule</span>.forRoot([{
+      <span class="prop">limit</span>: <span class="num">100</span>, <span class="prop">ttl</span>: <span class="num">60000</span>
+    }]),
+    <span class="cls">CacheModule</span>.registerAsync(), <span class="cmt">// Redis</span>
+    <span class="cls">EventEmitterModule</span>.forRoot(),
+  ],
+  <span class="prop">providers</span>: [<span class="cls">JwtAuthGuard</span>, <span class="cls">TenantGuard</span>],
+})</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE 2 — MICROSERVICES
+══════════════════════════════════════ -->
+<div class="page" id="page-microservices">
+  <div class="card blue-glow">
+    <div class="ch"><div><div class="ct">Détail des 10 Microservices NestJS</div><div class="cs">Architecture événementielle · gRPC inter-services · BullMQ queues</div></div></div>
+
+    <div class="g2" style="gap:12px">
+      <!-- Service 1: CRM -->
+      <div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--r-md);padding:16px">
+        <div class="flex aic gap8 mb10"><span style="font-size:20px">👥</span><div><div class="fd fw8 fs12">crm-service</div><div class="fs10 t2">Port 3001 · 8 modules</div></div><span class="tag b">Core</span></div>
+        <div class="code-block" style="padding:12px">
+<pre><span class="dec">@Controller</span>(<span class="str">'/crm'</span>)
+<span class="kw">export class</span> <span class="cls">CrmController</span> {
+  <span class="cmt">// Contacts, Companies, Deals</span>
+  <span class="cmt">// Pipeline, Activities, Notes</span>
+  <span class="cmt">// AI Scoring (OpenAI embedding)</span>
+  <span class="cmt">// Lead qualification flow</span>
+  <span class="ann">@UseGuards</span>(<span class="cls">JwtAuthGuard</span>, <span class="cls">TenantGuard</span>)
+  <span class="ann">@Get</span>(<span class="str">':tenantId/contacts'</span>)
+  <span class="kw">async</span> <span class="fn">getContacts</span>() {}
+}</pre>
+        </div>
+        <div class="flex wrap gap4 mt8">
+          <span class="itag">TypeORM</span><span class="itag">BullMQ</span><span class="itag">OpenAI</span><span class="itag">WebSocket</span>
+        </div>
+      </div>
+
+      <!-- Service 2: E-commerce -->
+      <div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--r-md);padding:16px">
+        <div class="flex aic gap8 mb10"><span style="font-size:20px">🛒</span><div><div class="fd fw8 fs12">ecom-service</div><div class="fs10 t2">Port 3002 · 12 modules</div></div><span class="tag g">Core</span></div>
+        <div class="code-block" style="padding:12px">
+<pre><span class="dec">@Module</span>({
+  <span class="prop">imports</span>: [
+    <span class="cls">ProductModule</span>,    <span class="cmt">// catalogue + variantes</span>
+    <span class="cls">OrderModule</span>,      <span class="cmt">// commandes + workflow</span>
+    <span class="cls">StockModule</span>,      <span class="cmt">// inventaire + alertes</span>
+    <span class="cls">PaymentModule</span>,    <span class="cmt">// CMI / NAPS / Payzone</span>
+    <span class="cls">PromotionModule</span>,  <span class="cmt">// coupons + règles</span>
+    <span class="cls">CartModule</span>,       <span class="cmt">// panier persistant</span>
+  ]
+})</pre>
+        </div>
+        <div class="flex wrap gap4 mt8">
+          <span class="itag">Stripe-like</span><span class="itag">CMI SDK</span><span class="itag">Redis Cart</span><span class="itag">S3 Media</span>
+        </div>
+      </div>
+
+      <!-- Service 3: WhatsApp -->
+      <div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--r-md);padding:16px">
+        <div class="flex aic gap8 mb10"><span style="font-size:20px">💬</span><div><div class="fd fw8 fs12">whatsapp-service</div><div class="fs10 t2">Port 3004 · AI-powered</div></div><span class="tag c">IA</span></div>
+        <div class="code-block" style="padding:12px">
+<pre><span class="kw">class</span> <span class="cls">WhatsAppAIService</span> {
+  <span class="kw">async</span> <span class="fn">processMessage</span>(msg: <span class="type">WaMessage</span>) {
+    <span class="cmt">// 1. Detect language (Darija/AR/FR)</span>
+    <span class="kw">const</span> lang = <span class="kw">await</span> <span class="fn">detectLang</span>(msg)
+    <span class="cmt">// 2. Extract intent via LLM</span>
+    <span class="kw">const</span> intent = <span class="kw">await</span> <span class="fn">classifyIntent</span>(msg)
+    <span class="cmt">// 3. Route to handler</span>
+    <span class="kw">return</span> <span class="fn">intentRouter</span>(intent, lang)
+    <span class="cmt">// Handlers: order|quote|appt|info</span>
+  }
+}</pre>
+        </div>
+        <div class="flex wrap gap4 mt8">
+          <span class="itag">WA Cloud API</span><span class="itag">Claude AI</span><span class="itag">Lang detect</span><span class="itag">Webhooks</span>
+        </div>
+      </div>
+
+      <!-- Service 4: Ads -->
+      <div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--r-md);padding:16px">
+        <div class="flex aic gap8 mb10"><span style="font-size:20px">📣</span><div><div class="fd fw8 fs12">ads-service</div><div class="fs10 t2">Port 3003 · Media Buyer IA</div></div><span class="tag c">IA</span></div>
+        <div class="code-block" style="padding:12px">
+<pre><span class="kw">class</span> <span class="cls">AdsOptimizer</span> {
+  <span class="cmt">// Cron: every 4h</span>
+  <span class="ann">@Cron</span>(<span class="str">'0 */4 * * *'</span>)
+  <span class="kw">async</span> <span class="fn">optimize</span>() {
+    <span class="kw">const</span> campaigns = <span class="kw">await</span> <span class="fn">fetchAll</span>()
+    <span class="kw">for</span> (<span class="kw">const</span> camp <span class="kw">of</span> campaigns) {
+      <span class="kw">const</span> rec = <span class="kw">await</span> <span class="fn">aiRecommend</span>(camp)
+      <span class="kw">if</span> (rec.confidence > <span class="num">0.85</span>)
+        <span class="kw">await</span> <span class="fn">autoApply</span>(rec)
+    }
+  }
+}</pre>
+        </div>
+        <div class="flex wrap gap4 mt8">
+          <span class="itag">Meta Graph</span><span class="itag">Google Ads</span><span class="itag">TikTok API</span><span class="itag">CRON</span>
+        </div>
+      </div>
+
+      <!-- Service 5: Finance -->
+      <div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--r-md);padding:16px">
+        <div class="flex aic gap8 mb10"><span style="font-size:20px">💰</span><div><div class="fd fw8 fs12">finance-service</div><div class="fs10 t2">Port 3007 · IA Prévisions</div></div><span class="tag c">IA</span></div>
+        <div class="code-block" style="padding:12px">
+<pre><span class="kw">interface</span> <span class="cls">ForecastResult</span> {
+  <span class="prop">month</span>:      <span class="type">string</span>
+  <span class="prop">revenue</span>:    <span class="type">number</span>
+  <span class="prop">confidence</span>: <span class="type">number</span> <span class="cmt">// 0-1</span>
+  <span class="prop">factors</span>:    <span class="type">string</span>[]
+  <span class="prop">alerts</span>:     <span class="cls">FinanceAlert</span>[]
+}
+<span class="cmt">// Time-series model: Prophet + ARIMA</span>
+<span class="cmt">// Retrain weekly on new data</span>
+<span class="cmt">// Alert thresholds configurable</span></pre>
+        </div>
+        <div class="flex wrap gap4 mt8">
+          <span class="itag">TimescaleDB</span><span class="itag">Prophet</span><span class="itag">Python ML</span><span class="itag">Alerts</span>
+        </div>
+      </div>
+
+      <!-- Service 6: CallCenter -->
+      <div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--r-md);padding:16px">
+        <div class="flex aic gap8 mb10"><span style="font-size:20px">📞</span><div><div class="fd fw8 fs12">callcenter-service</div><div class="fs10 t2">Port 3008 · Agent Vocal IA</div></div><span class="tag c">IA</span></div>
+        <div class="code-block" style="padding:12px">
+<pre><span class="kw">class</span> <span class="cls">VoiceAgent</span> {
+  <span class="cmt">// Stack: Twilio + Whisper + TTS</span>
+  <span class="prop">pipeline</span>: [
+    <span class="str">'AudioCapture'</span>,     <span class="cmt">// Twilio Media</span>
+    <span class="str">'SpeechToText'</span>,     <span class="cmt">// Whisper v3</span>
+    <span class="str">'LangDetect'</span>,       <span class="cmt">// Darija/AR/FR</span>
+    <span class="str">'IntentClassify'</span>,   <span class="cmt">// Claude AI</span>
+    <span class="str">'ResponseGenerate'</span>, <span class="cmt">// GPT-4o</span>
+    <span class="str">'TextToSpeech'</span>,     <span class="cmt">// ElevenLabs</span>
+    <span class="str">'AudioPlayback'</span>,    <span class="cmt">// Twilio</span>
+  ]
+}</pre>
+        </div>
+        <div class="flex wrap gap4 mt8">
+          <span class="itag">Twilio</span><span class="itag">Whisper</span><span class="itag">ElevenLabs</span><span class="itag">Claude</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Event bus diagram -->
+  <div class="card">
+    <div class="ch"><div><div class="ct">Bus d'événements inter-services</div><div class="cs">BullMQ + Redis Streams — Communication asynchrone</div></div></div>
+    <div class="code-block">
+      <div class="cb-header"><span class="cb-lang">TypeScript · event-bus.ts</span><button class="cb-copy" onclick="toast('Copié ✓','g')">copy</button></div>
+<pre><span class="cmt">// Événements principaux du système</span>
+<span class="kw">enum</span> <span class="cls">NexaEvents</span> {
+  <span class="cmt">// CRM Events</span>
+  LEAD_CREATED          = <span class="str">'crm.lead.created'</span>,
+  LEAD_SCORED           = <span class="str">'crm.lead.scored'</span>,        <span class="cmt">// → Notif, WA, Ads</span>
+  DEAL_WON              = <span class="str">'crm.deal.won'</span>,           <span class="cmt">// → Billing, Notif</span>
+
+  <span class="cmt">// E-commerce Events</span>
+  ORDER_CREATED         = <span class="str">'ecom.order.created'</span>,     <span class="cmt">// → Logistics, WA, Billing</span>
+  ORDER_CONFIRMED       = <span class="str">'ecom.order.confirmed'</span>,   <span class="cmt">// → CallCenter (confirmation)</span>
+  PAYMENT_SUCCESS       = <span class="str">'ecom.payment.success'</span>,   <span class="cmt">// → Finance, Notif</span>
+  STOCK_LOW             = <span class="str">'ecom.stock.low'</span>,         <span class="cmt">// → Notif, Finance (alert)</span>
+
+  <span class="cmt">// WhatsApp Events</span>
+  WA_MESSAGE_RECEIVED   = <span class="str">'wa.message.received'</span>,    <span class="cmt">// → AI Engine → CRM</span>
+  WA_LEAD_QUALIFIED     = <span class="str">'wa.lead.qualified'</span>,      <span class="cmt">// → CRM (create contact)</span>
+  WA_ORDER_PLACED       = <span class="str">'wa.order.placed'</span>,        <span class="cmt">// → Ecom</span>
+
+  <span class="cmt">// Finance Events</span>
+  INVOICE_OVERDUE       = <span class="str">'billing.invoice.overdue'</span>, <span class="cmt">// → CallCenter (relance)</span>
+  REVENUE_ALERT         = <span class="str">'finance.revenue.alert'</span>,  <span class="cmt">// → Notif (dashboard)</span>
+
+  <span class="cmt">// AI Events</span>
+  AI_CAMPAIGN_OPTIMIZED = <span class="str">'ads.campaign.optimized'</span>, <span class="cmt">// → Notif</span>
+  AI_FORECAST_READY     = <span class="str">'finance.forecast.ready'</span>, <span class="cmt">// → Dashboard WS</span>
+}</pre>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE 3 — DATABASE
+══════════════════════════════════════ -->
+<div class="page" id="page-database">
+  <div class="card blue-glow">
+    <div class="ch"><div><div class="ct">Schéma PostgreSQL — Multi-tenant avec Row Level Security</div><div class="cs">18 tables · Relations · Index · RLS policies</div></div>
+    <div class="flex gap6">
+      <span class="tag b">PostgreSQL 16</span><span class="tag g">RLS Active</span><span class="tag a">TimescaleDB</span>
+    </div></div>
+
+    <!-- Multi-tenant strategy -->
+    <div class="code-block mb16">
+      <div class="cb-header"><span class="cb-lang">SQL · Multi-tenant RLS Strategy</span><button class="cb-copy" onclick="toast('Copié ✓','g')">copy</button></div>
+<pre><span class="cmt">-- Stratégie: Schema-per-tenant pour isolation maximale</span>
+<span class="cmt">-- 100K+ tenants → shared schema + RLS pour optimiser</span>
+
+<span class="kw">CREATE SCHEMA</span> nexa_shared;
+
+<span class="cmt">-- Tenant registry (schema public)</span>
+<span class="kw">CREATE TABLE</span> <span class="cls">tenants</span> (
+  id          <span class="type">UUID</span>         <span class="kw">DEFAULT</span> gen_random_uuid() <span class="kw">PRIMARY KEY</span>,
+  slug        <span class="type">VARCHAR</span>(50)  <span class="kw">UNIQUE NOT NULL</span>,
+  plan        <span class="type">VARCHAR</span>(20)  <span class="kw">DEFAULT</span> <span class="str">'starter'</span>,  <span class="cmt">-- starter|pro|enterprise</span>
+  created_at  <span class="type">TIMESTAMPTZ</span> <span class="kw">DEFAULT</span> NOW()
+);
+
+<span class="cmt">-- Enable RLS on all tenant tables</span>
+<span class="kw">ALTER TABLE</span> <span class="cls">contacts</span> <span class="kw">ENABLE ROW LEVEL SECURITY</span>;
+<span class="kw">CREATE POLICY</span> tenant_isolation <span class="kw">ON</span> <span class="cls">contacts</span>
+  <span class="kw">USING</span> (tenant_id = current_setting(<span class="str">'app.tenant_id'</span>)<span class="op">::</span><span class="type">UUID</span>);
+
+<span class="cmt">-- Set tenant context in each request</span>
+<span class="kw">SELECT</span> set_config(<span class="str">'app.tenant_id'</span>, <span class="str">$1</span>, <span class="kw">true</span>);</pre>
+    </div>
+
+    <!-- Tables grid -->
+    <div class="db-tables">
+      <!-- tenants -->
+      <div class="db-table">
+        <div class="db-table-hdr"><div class="db-table-name">tenants</div><div class="db-table-rows">Core</div></div>
+        <div class="db-field"><span class="field-pk">⬡</span><span class="field-name">id</span><span class="field-type">UUID</span><span class="field-constraint">PK</span></div>
+        <div class="db-field"><span></span><span class="field-name">slug</span><span class="field-type">VARCHAR(50)</span><span class="field-constraint">UNIQUE</span></div>
+        <div class="db-field"><span></span><span class="field-name">name</span><span class="field-type">VARCHAR(255)</span><span class="field-constraint">NOT NULL</span></div>
+        <div class="db-field"><span></span><span class="field-name">plan</span><span class="field-type">VARCHAR(20)</span><span class="field-constraint">DEFAULT</span></div>
+        <div class="db-field"><span></span><span class="field-name">settings</span><span class="field-type">JSONB</span><span class="field-constraint"></span></div>
+        <div class="db-field"><span></span><span class="field-name">created_at</span><span class="field-type">TIMESTAMPTZ</span><span class="field-constraint">NOW()</span></div>
+      </div>
+
+      <!-- users -->
+      <div class="db-table">
+        <div class="db-table-hdr"><div class="db-table-name">users</div><div class="db-table-rows">Auth</div></div>
+        <div class="db-field"><span class="field-pk">⬡</span><span class="field-name">id</span><span class="field-type">UUID</span><span class="field-constraint">PK</span></div>
+        <div class="db-field"><span class="field-fk">◈</span><span class="field-name">tenant_id</span><span class="field-type">UUID</span><span class="field-constraint">FK→tenants</span></div>
+        <div class="db-field"><span></span><span class="field-name">email</span><span class="field-type">VARCHAR(255)</span><span class="field-constraint">UNIQUE</span></div>
+        <div class="db-field"><span></span><span class="field-name">password_hash</span><span class="field-type">VARCHAR(255)</span><span class="field-constraint">bcrypt</span></div>
+        <div class="db-field"><span></span><span class="field-name">role</span><span class="field-type">user_role</span><span class="field-constraint">ENUM</span></div>
+        <div class="db-field"><span></span><span class="field-name">two_factor</span><span class="field-type">JSONB</span><span class="field-constraint"></span></div>
+        <div class="db-field"><span></span><span class="field-name">last_login</span><span class="field-type">TIMESTAMPTZ</span><span class="field-constraint"></span></div>
+      </div>
+
+      <!-- contacts -->
+      <div class="db-table">
+        <div class="db-table-hdr"><div class="db-table-name">contacts</div><div class="db-table-rows">CRM · RLS</div></div>
+        <div class="db-field"><span class="field-pk">⬡</span><span class="field-name">id</span><span class="field-type">UUID</span><span class="field-constraint">PK</span></div>
+        <div class="db-field"><span class="field-fk">◈</span><span class="field-name">tenant_id</span><span class="field-type">UUID</span><span class="field-constraint">FK·RLS</span></div>
+        <div class="db-field"><span></span><span class="field-name">first_name</span><span class="field-type">VARCHAR(100)</span><span class="field-constraint">NOT NULL</span></div>
+        <div class="db-field"><span></span><span class="field-name">last_name</span><span class="field-type">VARCHAR(100)</span><span class="field-constraint"></span></div>
+        <div class="db-field"><span></span><span class="field-name">phone_wa</span><span class="field-type">VARCHAR(20)</span><span class="field-constraint">UNIQUE</span></div>
+        <div class="db-field"><span></span><span class="field-name">email</span><span class="field-type">VARCHAR(255)</span><span class="field-constraint"></span></div>
+        <div class="db-field"><span></span><span class="field-name">ai_score</span><span class="field-type">SMALLINT</span><span class="field-constraint">0-100</span></div>
+        <div class="db-field"><span></span><span class="field-name">source</span><span class="field-type">VARCHAR(50)</span><span class="field-constraint">ENUM</span></div>
+        <div class="db-field"><span></span><span class="field-name">custom_fields</span><span class="field-type">JSONB</span><span class="field-constraint"></span></div>
+        <div class="db-field"><span></span><span class="field-name">embedding</span><span class="field-type">vector(1536)</span><span class="field-constraint">pgvector</span></div>
+      </div>
+
+      <!-- products -->
+      <div class="db-table">
+        <div class="db-table-hdr"><div class="db-table-name">products</div><div class="db-table-rows">E-com · RLS</div></div>
+        <div class="db-field"><span class="field-pk">⬡</span><span class="field-name">id</span><span class="field-type">UUID</span><span class="field-constraint">PK</span></div>
+        <div class="db-field"><span class="field-fk">◈</span><span class="field-name">tenant_id</span><span class="field-type">UUID</span><span class="field-constraint">FK·RLS</span></div>
+        <div class="db-field"><span></span><span class="field-name">sku</span><span class="field-type">VARCHAR(100)</span><span class="field-constraint">UNIQUE</span></div>
+        <div class="db-field"><span></span><span class="field-name">name</span><span class="field-type">JSONB</span><span class="field-constraint">i18n</span></div>
+        <div class="db-field"><span></span><span class="field-name">price</span><span class="field-type">DECIMAL(12,2)</span><span class="field-constraint">MAD</span></div>
+        <div class="db-field"><span></span><span class="field-name">stock_qty</span><span class="field-type">INTEGER</span><span class="field-constraint">NOT NULL</span></div>
+        <div class="db-field"><span></span><span class="field-name">stock_alert</span><span class="field-type">INTEGER</span><span class="field-constraint">DEFAULT 10</span></div>
+        <div class="db-field"><span></span><span class="field-name">variants</span><span class="field-type">JSONB</span><span class="field-constraint">[]</span></div>
+        <div class="db-field"><span></span><span class="field-name">images</span><span class="field-type">TEXT[]</span><span class="field-constraint">S3 URLs</span></div>
+      </div>
+
+      <!-- orders -->
+      <div class="db-table">
+        <div class="db-table-hdr"><div class="db-table-name">orders</div><div class="db-table-rows">E-com · RLS</div></div>
+        <div class="db-field"><span class="field-pk">⬡</span><span class="field-name">id</span><span class="field-type">UUID</span><span class="field-constraint">PK</span></div>
+        <div class="db-field"><span class="field-fk">◈</span><span class="field-name">tenant_id</span><span class="field-type">UUID</span><span class="field-constraint">FK</span></div>
+        <div class="db-field"><span class="field-fk">◈</span><span class="field-name">contact_id</span><span class="field-type">UUID</span><span class="field-constraint">FK→contacts</span></div>
+        <div class="db-field"><span></span><span class="field-name">order_number</span><span class="field-type">VARCHAR(30)</span><span class="field-constraint">UNIQUE</span></div>
+        <div class="db-field"><span></span><span class="field-name">status</span><span class="field-type">order_status</span><span class="field-constraint">ENUM</span></div>
+        <div class="db-field"><span></span><span class="field-name">items</span><span class="field-type">JSONB</span><span class="field-constraint">[]</span></div>
+        <div class="db-field"><span></span><span class="field-name">total_ttc</span><span class="field-type">DECIMAL(12,2)</span><span class="field-constraint">MAD</span></div>
+        <div class="db-field"><span></span><span class="field-name">payment_method</span><span class="field-type">VARCHAR(30)</span><span class="field-constraint"></span></div>
+        <div class="db-field"><span></span><span class="field-name">logistics_ref</span><span class="field-type">VARCHAR(100)</span><span class="field-constraint"></span></div>
+        <div class="db-field"><span></span><span class="field-name">source</span><span class="field-type">VARCHAR(30)</span><span class="field-constraint">wa|web|call</span></div>
+      </div>
+
+      <!-- invoices -->
+      <div class="db-table">
+        <div class="db-table-hdr"><div class="db-table-name">invoices</div><div class="db-table-rows">Billing · RLS</div></div>
+        <div class="db-field"><span class="field-pk">⬡</span><span class="field-name">id</span><span class="field-type">UUID</span><span class="field-constraint">PK</span></div>
+        <div class="db-field"><span class="field-fk">◈</span><span class="field-name">tenant_id</span><span class="field-type">UUID</span><span class="field-constraint">FK</span></div>
+        <div class="db-field"><span class="field-fk">◈</span><span class="field-name">order_id</span><span class="field-type">UUID</span><span class="field-constraint">FK→orders</span></div>
+        <div class="db-field"><span></span><span class="field-name">invoice_no</span><span class="field-type">VARCHAR(30)</span><span class="field-constraint">UNIQUE</span></div>
+        <div class="db-field"><span></span><span class="field-name">type</span><span class="field-type">VARCHAR(10)</span><span class="field-constraint">inv|devis|avoir</span></div>
+        <div class="db-field"><span></span><span class="field-name">subtotal_ht</span><span class="field-type">DECIMAL(12,2)</span><span class="field-constraint"></span></div>
+        <div class="db-field"><span></span><span class="field-name">tva_rate</span><span class="field-type">DECIMAL(5,2)</span><span class="field-constraint">DEFAULT 20</span></div>
+        <div class="db-field"><span></span><span class="field-name">total_ttc</span><span class="field-type">DECIMAL(12,2)</span><span class="field-constraint">NOT NULL</span></div>
+        <div class="db-field"><span></span><span class="field-name">status</span><span class="field-type">inv_status</span><span class="field-constraint">ENUM</span></div>
+        <div class="db-field"><span></span><span class="field-name">due_date</span><span class="field-type">DATE</span><span class="field-constraint"></span></div>
+        <div class="db-field"><span></span><span class="field-name">pdf_url</span><span class="field-type">TEXT</span><span class="field-constraint">S3</span></div>
+      </div>
+
+      <!-- campaigns -->
+      <div class="db-table">
+        <div class="db-table-hdr"><div class="db-table-name">ad_campaigns</div><div class="db-table-rows">Ads · RLS</div></div>
+        <div class="db-field"><span class="field-pk">⬡</span><span class="field-name">id</span><span class="field-type">UUID</span><span class="field-constraint">PK</span></div>
+        <div class="db-field"><span class="field-fk">◈</span><span class="field-name">tenant_id</span><span class="field-type">UUID</span><span class="field-constraint">FK</span></div>
+        <div class="db-field"><span></span><span class="field-name">platform</span><span class="field-type">VARCHAR(20)</span><span class="field-constraint">meta|google|tt</span></div>
+        <div class="db-field"><span></span><span class="field-name">external_id</span><span class="field-type">VARCHAR(100)</span><span class="field-constraint"></span></div>
+        <div class="db-field"><span></span><span class="field-name">budget_daily</span><span class="field-type">DECIMAL(10,2)</span><span class="field-constraint">MAD</span></div>
+        <div class="db-field"><span></span><span class="field-name">status</span><span class="field-type">camp_status</span><span class="field-constraint">ENUM</span></div>
+        <div class="db-field"><span></span><span class="field-name">ai_config</span><span class="field-type">JSONB</span><span class="field-constraint">targeting</span></div>
+        <div class="db-field"><span></span><span class="field-name">metrics</span><span class="field-type">JSONB</span><span class="field-constraint">roas|cpa|ctr</span></div>
+      </div>
+
+      <!-- wa_conversations -->
+      <div class="db-table">
+        <div class="db-table-hdr"><div class="db-table-name">wa_conversations</div><div class="db-table-rows">WA · RLS</div></div>
+        <div class="db-field"><span class="field-pk">⬡</span><span class="field-name">id</span><span class="field-type">UUID</span><span class="field-constraint">PK</span></div>
+        <div class="db-field"><span class="field-fk">◈</span><span class="field-name">tenant_id</span><span class="field-type">UUID</span><span class="field-constraint">FK</span></div>
+        <div class="db-field"><span class="field-fk">◈</span><span class="field-name">contact_id</span><span class="field-type">UUID</span><span class="field-constraint">FK→contacts</span></div>
+        <div class="db-field"><span></span><span class="field-name">wa_id</span><span class="field-type">VARCHAR(50)</span><span class="field-constraint">WA Thread ID</span></div>
+        <div class="db-field"><span></span><span class="field-name">language</span><span class="field-type">VARCHAR(10)</span><span class="field-constraint">ar|fr|dar</span></div>
+        <div class="db-field"><span></span><span class="field-name">ai_mode</span><span class="field-type">BOOLEAN</span><span class="field-constraint">DEFAULT true</span></div>
+        <div class="db-field"><span></span><span class="field-name">messages</span><span class="field-type">JSONB</span><span class="field-constraint">[]</span></div>
+        <div class="db-field"><span></span><span class="field-name">intent</span><span class="field-type">VARCHAR(50)</span><span class="field-constraint">classified</span></div>
+        <div class="db-field"><span></span><span class="field-name">lead_score</span><span class="field-type">SMALLINT</span><span class="field-constraint">0-100</span></div>
+      </div>
+
+      <!-- metrics (TimescaleDB) -->
+      <div class="db-table">
+        <div class="db-table-hdr"><div class="db-table-name">metrics <span style="color:var(--amber);font-size:10px">hypertable</span></div><div class="db-table-rows">Analytics</div></div>
+        <div class="db-field"><span class="field-fk">◈</span><span class="field-name">tenant_id</span><span class="field-type">UUID</span><span class="field-constraint">FK</span></div>
+        <div class="db-field"><span></span><span class="field-name">ts</span><span class="field-type">TIMESTAMPTZ</span><span class="field-constraint">PK (time)</span></div>
+        <div class="db-field"><span></span><span class="field-name">metric_name</span><span class="field-type">VARCHAR(100)</span><span class="field-constraint">NOT NULL</span></div>
+        <div class="db-field"><span></span><span class="field-name">value</span><span class="field-type">DOUBLE PRECISION</span><span class="field-constraint">NOT NULL</span></div>
+        <div class="db-field"><span></span><span class="field-name">tags</span><span class="field-type">JSONB</span><span class="field-constraint">dimensions</span></div>
+        <div class="db-field" style="background:rgba(245,158,11,.05)"><span></span><span class="field-name ca" style="font-size:10px">PARTITION BY ts (1 week)</span><span class="field-type"></span><span></span></div>
+      </div>
+    </div>
+
+    <!-- Indexes -->
+    <div class="code-block mt16">
+      <div class="cb-header"><span class="cb-lang">SQL · Index Strategy</span><button class="cb-copy" onclick="toast('Copié ✓','g')">copy</button></div>
+<pre><span class="cmt">-- Composite indexes for multi-tenant queries</span>
+<span class="kw">CREATE INDEX</span> idx_contacts_tenant_score
+  <span class="kw">ON</span> <span class="cls">contacts</span>(tenant_id, ai_score <span class="kw">DESC</span>);
+
+<span class="kw">CREATE INDEX</span> idx_orders_tenant_status_date
+  <span class="kw">ON</span> <span class="cls">orders</span>(tenant_id, status, created_at <span class="kw">DESC</span>);
+
+<span class="cmt">-- Full-text search for contacts (Darija + Arabic + French)</span>
+<span class="kw">CREATE INDEX</span> idx_contacts_fts
+  <span class="kw">ON</span> <span class="cls">contacts</span> <span class="kw">USING</span> GIN(to_tsvector(<span class="str">'arabic'</span>, first_name || <span class="str">' '</span> || last_name));
+
+<span class="cmt">-- Vector similarity search for AI lead matching</span>
+<span class="kw">CREATE INDEX</span> idx_contacts_embedding
+  <span class="kw">ON</span> <span class="cls">contacts</span> <span class="kw">USING</span> ivfflat (embedding vector_cosine_ops)
+  <span class="kw">WITH</span> (lists = <span class="num">100</span>);  <span class="cmt">-- pgvector</span>
+
+<span class="cmt">-- TimescaleDB continuous aggregates</span>
+<span class="kw">CREATE MATERIALIZED VIEW</span> revenue_daily
+  <span class="kw">WITH</span> (timescaledb.continuous) <span class="kw">AS</span>
+  <span class="kw">SELECT</span> time_bucket(<span class="str">'1 day'</span>, ts), tenant_id,
+         <span class="fn">sum</span>(value) <span class="kw">AS</span> daily_revenue
+  <span class="kw">FROM</span> <span class="cls">metrics</span> <span class="kw">WHERE</span> metric_name = <span class="str">'revenue'</span>
+  <span class="kw">GROUP BY</span> <span class="num">1</span>, <span class="num">2</span>;</pre>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE 4 — API
+══════════════════════════════════════ -->
+<div class="page" id="page-api">
+  <div class="card blue-glow">
+    <div class="ch"><div><div class="ct">Documentation API REST — 47 endpoints</div><div class="cs">Base URL: https://api.nexamarket.ma/v1 · JWT Bearer · Rate limit: 100 req/min</div></div>
+    <div class="flex gap6"><span class="tag b">REST</span><span class="tag g">gRPC</span><span class="tag a">WebSocket</span></div></div>
+
+    <div class="g2" style="gap:16px">
+      <!-- Auth API -->
+      <div>
+        <div class="fd fw8 mb8" style="color:var(--amber)">🔐 Auth &amp; Tenant</div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden">
+          <div class="endpoint"><span class="method POST">POST</span><span class="endpoint-path">/auth/login</span><span class="endpoint-desc">JWT + refresh token</span></div>
+          <div class="endpoint"><span class="method POST">POST</span><span class="endpoint-path">/auth/register</span><span class="endpoint-desc">Créer compte tenant</span></div>
+          <div class="endpoint"><span class="method POST">POST</span><span class="endpoint-path">/auth/refresh</span><span class="endpoint-desc">Renouveler token</span></div>
+          <div class="endpoint"><span class="method POST">POST</span><span class="endpoint-path">/auth/2fa/enable</span><span class="endpoint-desc">Activer 2FA TOTP</span></div>
+          <div class="endpoint"><span class="method GET">GET</span><span class="endpoint-path">/auth/me</span><span class="endpoint-desc">Profil utilisateur</span></div>
+          <div class="endpoint"><span class="method GET">GET</span><span class="endpoint-path">/tenants/:id/settings</span><span class="endpoint-desc">Config tenant</span></div>
+          <div class="endpoint"><span class="method PUT">PUT</span><span class="endpoint-path">/tenants/:id/settings</span><span class="endpoint-desc">MAJ settings</span></div>
+        </div>
+
+        <div class="fd fw8 mb8 mt16" style="color:var(--blue-2)">👥 CRM</div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden">
+          <div class="endpoint"><span class="method GET">GET</span><span class="endpoint-path">/crm/contacts</span><span class="endpoint-desc">Liste + filtres + pagination</span></div>
+          <div class="endpoint"><span class="method POST">POST</span><span class="endpoint-path">/crm/contacts</span><span class="endpoint-desc">Créer contact</span></div>
+          <div class="endpoint"><span class="method GET">GET</span><span class="endpoint-path">/crm/contacts/:id</span><span class="endpoint-desc">Fiche contact + historique</span></div>
+          <div class="endpoint"><span class="method PUT">PUT</span><span class="endpoint-path">/crm/contacts/:id</span><span class="endpoint-desc">Mettre à jour</span></div>
+          <div class="endpoint"><span class="method GET">GET</span><span class="endpoint-path">/crm/contacts/:id/score</span><span class="endpoint-desc">Score IA temps réel</span></div>
+          <div class="endpoint"><span class="method GET">GET</span><span class="endpoint-path">/crm/pipeline</span><span class="endpoint-desc">Vue Kanban deals</span></div>
+          <div class="endpoint"><span class="method POST">POST</span><span class="endpoint-path">/crm/deals</span><span class="endpoint-desc">Créer opportunité</span></div>
+          <div class="endpoint"><span class="method PATCH">PATCH</span><span class="endpoint-path">/crm/deals/:id/stage</span><span class="endpoint-desc">Changer étape pipeline</span></div>
+        </div>
+
+        <div class="fd fw8 mb8 mt16" style="color:var(--teal)">💬 WhatsApp IA</div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden">
+          <div class="endpoint"><span class="method POST">POST</span><span class="endpoint-path">/wa/webhook</span><span class="endpoint-desc">Webhook WA Business</span></div>
+          <div class="endpoint"><span class="method POST">POST</span><span class="endpoint-path">/wa/send</span><span class="endpoint-desc">Envoyer message</span></div>
+          <div class="endpoint"><span class="method POST">POST</span><span class="endpoint-path">/wa/broadcast</span><span class="endpoint-desc">Broadcast multi-contacts</span></div>
+          <div class="endpoint"><span class="method GET">GET</span><span class="endpoint-path">/wa/conversations</span><span class="endpoint-desc">Liste conversations</span></div>
+          <div class="endpoint"><span class="method GET">GET</span><span class="endpoint-path">/wa/conversations/:id</span><span class="endpoint-desc">Messages + score IA</span></div>
+          <div class="endpoint"><span class="method POST">POST</span><span class="endpoint-path">/wa/flows</span><span class="endpoint-desc">Créer flow automatisé</span></div>
+          <div class="endpoint"><span class="method PUT">PUT</span><span class="endpoint-path">/wa/conversations/:id/mode</span><span class="endpoint-desc">AI/Manuel toggle</span></div>
+        </div>
+      </div>
+
+      <!-- Right column -->
+      <div>
+        <div class="fd fw8 mb8" style="color:var(--green)">🛒 E-commerce</div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden">
+          <div class="endpoint"><span class="method GET">GET</span><span class="endpoint-path">/ecom/products</span><span class="endpoint-desc">Catalogue + filtres</span></div>
+          <div class="endpoint"><span class="method POST">POST</span><span class="endpoint-path">/ecom/products</span><span class="endpoint-desc">Ajouter produit</span></div>
+          <div class="endpoint"><span class="method PUT">PUT</span><span class="endpoint-path">/ecom/products/:id</span><span class="endpoint-desc">Modifier produit</span></div>
+          <div class="endpoint"><span class="method GET">GET</span><span class="endpoint-path">/ecom/orders</span><span class="endpoint-desc">Liste commandes</span></div>
+          <div class="endpoint"><span class="method POST">POST</span><span class="endpoint-path">/ecom/orders</span><span class="endpoint-desc">Créer commande</span></div>
+          <div class="endpoint"><span class="method PATCH">PATCH</span><span class="endpoint-path">/ecom/orders/:id/status</span><span class="endpoint-desc">MAJ statut</span></div>
+          <div class="endpoint"><span class="method POST">POST</span><span class="endpoint-path">/ecom/payments/initiate</span><span class="endpoint-desc">Initier paiement CMI/NAPS</span></div>
+          <div class="endpoint"><span class="method POST">POST</span><span class="endpoint-path">/ecom/promotions</span><span class="endpoint-desc">Créer promotion</span></div>
+        </div>
+
+        <div class="fd fw8 mb8 mt16" style="color:var(--violet)">📣 Ads IA</div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden">
+          <div class="endpoint"><span class="method GET">GET</span><span class="endpoint-path">/ads/campaigns</span><span class="endpoint-desc">Toutes plateformes</span></div>
+          <div class="endpoint"><span class="method POST">POST</span><span class="endpoint-path">/ads/campaigns</span><span class="endpoint-desc">Créer via IA</span></div>
+          <div class="endpoint"><span class="method GET">GET</span><span class="endpoint-path">/ads/campaigns/:id/insights</span><span class="endpoint-desc">Performances</span></div>
+          <div class="endpoint"><span class="method POST">POST</span><span class="endpoint-path">/ads/campaigns/:id/optimize</span><span class="endpoint-desc">Optimisation IA</span></div>
+          <div class="endpoint"><span class="method GET">GET</span><span class="endpoint-path">/ads/recommendations</span><span class="endpoint-desc">Recs IA temps réel</span></div>
+        </div>
+
+        <div class="fd fw8 mb8 mt16" style="color:var(--rose)">💰 Finance IA</div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden">
+          <div class="endpoint"><span class="method GET">GET</span><span class="endpoint-path">/finance/dashboard</span><span class="endpoint-desc">KPIs temps réel</span></div>
+          <div class="endpoint"><span class="method GET">GET</span><span class="endpoint-path">/finance/forecast/:months</span><span class="endpoint-desc">Prévisions IA</span></div>
+          <div class="endpoint"><span class="method GET">GET</span><span class="endpoint-path">/finance/alerts</span><span class="endpoint-desc">Alertes intelligentes</span></div>
+          <div class="endpoint"><span class="method GET">GET</span><span class="endpoint-path">/finance/expenses</span><span class="endpoint-desc">Répartition dépenses</span></div>
+          <div class="endpoint"><span class="method POST">POST</span><span class="endpoint-path">/billing/invoices</span><span class="endpoint-desc">Créer facture/devis</span></div>
+          <div class="endpoint"><span class="method GET">GET</span><span class="endpoint-path">/billing/invoices/:id/pdf</span><span class="endpoint-desc">Générer PDF</span></div>
+          <div class="endpoint"><span class="method POST">POST</span><span class="endpoint-path">/billing/invoices/remind</span><span class="endpoint-desc">Relance auto IA</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- API Response example -->
+    <div class="mt16">
+      <div class="code-block">
+        <div class="cb-header"><span class="cb-lang">JSON · Response example: GET /crm/contacts/:id/score</span><button class="cb-copy" onclick="toast('Copié ✓','g')">copy</button></div>
+<pre>{
+  <span class="str">"contact_id"</span>: <span class="str">"c7f3a-..."</span>,
+  <span class="str">"ai_score"</span>: <span class="num">88</span>,
+  <span class="str">"probability_close"</span>: <span class="num">0.94</span>,
+  <span class="str">"analysis"</span>: {
+    <span class="str">"purchase_intent"</span>: <span class="str">"very_high"</span>,
+    <span class="str">"estimated_budget_mad"</span>: { <span class="str">"min"</span>: <span class="num">500</span>, <span class="str">"max"</span>: <span class="num">800</span> },
+    <span class="str">"best_contact_channel"</span>: <span class="str">"whatsapp"</span>,
+    <span class="str">"best_contact_time"</span>: <span class="str">"14:00-18:00"</span>,
+    <span class="str">"language_preference"</span>: <span class="str">"darija"</span>
+  },
+  <span class="str">"recommended_action"</span>: <span class="str">"call_now"</span>,
+  <span class="str">"action_reason"</span>: <span class="str">"3rd interaction - ready to buy"</span>,
+  <span class="str">"scored_at"</span>: <span class="str">"2025-06-01T14:32:00Z"</span>,
+  <span class="str">"model_version"</span>: <span class="str">"nexascore-v2.1"</span>
+}</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE 5 — AUTH & SECURITY
+══════════════════════════════════════ -->
+<div class="page" id="page-auth">
+  <div class="card blue-glow">
+    <div class="ch"><div><div class="ct">Sécurité & Authentification</div><div class="cs">Zero-trust · AES-256 · OWASP Top 10 · RGPD</div></div><span class="tag r">🔐 Critique</span></div>
+
+    <div class="g2">
+      <div>
+        <div class="fd fw8 mb10" style="font-size:13px">Flux d'authentification JWT</div>
+        <div class="code-block mb16">
+          <div class="cb-header"><span class="cb-lang">TypeScript · auth.strategy.ts</span><button class="cb-copy" onclick="toast('Copié ✓','g')">copy</button></div>
+<pre><span class="kw">interface</span> <span class="cls">JwtPayload</span> {
+  sub:       <span class="type">string</span>  <span class="cmt">// user UUID</span>
+  tenant:    <span class="type">string</span>  <span class="cmt">// tenant UUID</span>
+  role:      <span class="type">UserRole</span>
+  plan:      <span class="type">TenantPlan</span>
+  iat:       <span class="type">number</span>
+  exp:       <span class="type">number</span>  <span class="cmt">// 15 min access token</span>
+}
+
+<span class="kw">class</span> <span class="cls">AuthService</span> {
+  <span class="cmt">// Access token: 15 minutes</span>
+  <span class="cmt">// Refresh token: 7 days (Redis)</span>
+  <span class="cmt">// 2FA: TOTP (Google Auth)</span>
+  <span class="cmt">// OAuth: Google + Facebook</span>
+
+  <span class="kw">async</span> <span class="fn">login</span>(dto: <span class="cls">LoginDto</span>) {
+    <span class="kw">const</span> user = <span class="kw">await</span> <span class="fn">validateUser</span>(dto)
+    <span class="kw">if</span> (user.two_factor_enabled)
+      <span class="kw">return</span> { requires2FA: <span class="kw">true</span>, tempToken }
+    <span class="kw">return</span> <span class="fn">generateTokenPair</span>(user)
+  }
+}</pre>
+        </div>
+
+        <div class="fd fw8 mb10" style="font-size:13px">Couches de sécurité</div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden">
+          <div class="sec-row"><div class="sec-name cb">Cloudflare WAF</div><div class="sec-desc">Filtrage DDoS, bots, injection SQL/XSS avant d'atteindre l'API</div><div class="sec-level cg">L1 · Edge</div></div>
+          <div class="sec-row"><div class="sec-name cb">Rate Limiting</div><div class="sec-desc">100 req/min par IP · 1000 req/min par tenant. BullMQ throttle.</div><div class="sec-level cg">L2 · Gateway</div></div>
+          <div class="sec-row"><div class="sec-name cb">JWT + Refresh</div><div class="sec-desc">Access 15min · Refresh 7j Redis · Rotation automatique</div><div class="sec-level cg">L3 · Auth</div></div>
+          <div class="sec-row"><div class="sec-name cb">RBAC Guards</div><div class="sec-desc">Rôles: SUPER_ADMIN · ADMIN · MANAGER · AGENT · VIEWER</div><div class="sec-level cg">L4 · Service</div></div>
+          <div class="sec-row"><div class="sec-name cb">Tenant Guard</div><div class="sec-desc">Isolation stricte — chaque requête injecte app.tenant_id</div><div class="sec-level cg">L5 · Service</div></div>
+          <div class="sec-row"><div class="sec-name cb">PostgreSQL RLS</div><div class="sec-desc">Row Level Security — impossible d'accéder aux données d'un autre tenant</div><div class="sec-level cg">L6 · Data</div></div>
+          <div class="sec-row"><div class="sec-name cb">AES-256 at rest</div><div class="sec-desc">Données sensibles chiffrées en base + S3 SSE-256</div><div class="sec-level cg">L7 · Storage</div></div>
+          <div class="sec-row"><div class="sec-name cb">Audit Logs</div><div class="sec-desc">Toutes les actions loggées en immuable (Elasticsearch + S3)</div><div class="sec-level ca">L8 · Audit</div></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="fd fw8 mb10" style="font-size:13px">Conformité & Chiffrement</div>
+        <div class="code-block mb12">
+          <div class="cb-header"><span class="cb-lang">TypeScript · encryption.service.ts</span><button class="cb-copy" onclick="toast('Copié ✓','g')">copy</button></div>
+<pre><span class="kw">import</span> { <span class="cls">createCipheriv</span>, <span class="cls">randomBytes</span> } <span class="kw">from</span> <span class="str">'crypto'</span>
+
+<span class="kw">class</span> <span class="cls">EncryptionService</span> {
+  <span class="kw">private readonly</span> algo = <span class="str">'aes-256-gcm'</span>
+
+  <span class="fn">encrypt</span>(plaintext: <span class="type">string</span>): <span class="cls">EncryptedData</span> {
+    <span class="kw">const</span> iv  = <span class="fn">randomBytes</span>(<span class="num">16</span>)
+    <span class="kw">const</span> key = <span class="cls">Buffer</span>.from(process.env.ENCRYPTION_KEY)
+    <span class="kw">const</span> cipher = <span class="fn">createCipheriv</span>(<span class="kw">this</span>.algo, key, iv)
+    <span class="kw">const</span> encrypted = <span class="cls">Buffer</span>.concat([
+      cipher.<span class="fn">update</span>(plaintext, <span class="str">'utf8'</span>),
+      cipher.<span class="fn">final</span>()
+    ])
+    <span class="kw">return</span> { encrypted, iv, tag: cipher.<span class="fn">getAuthTag</span>() }
+  }
+  <span class="cmt">// Used for: phone numbers, payment data</span>
+  <span class="cmt">// card numbers, personal info (RGPD)</span>
+}</pre>
+        </div>
+
+        <div style="background:rgba(244,63,94,.04);border:1px solid rgba(244,63,94,.15);border-radius:var(--r-md);padding:16px">
+          <div class="fd fw8 mb10 cr" style="font-size:13px">⚡ OWASP Top 10 — Mesures</div>
+          <div style="display:flex;flex-direction:column;gap:7px;font-size:11px">
+            <div class="flex aic gap8"><span class="tag g" style="font-size:9px;min-width:70px">A01 ✓</span><span class="t2">Access Control — RBAC + RLS + Tenant Guard</span></div>
+            <div class="flex aic gap8"><span class="tag g" style="font-size:9px;min-width:70px">A02 ✓</span><span class="t2">Cryptographic — AES-256-GCM + TLS 1.3</span></div>
+            <div class="flex aic gap8"><span class="tag g" style="font-size:9px;min-width:70px">A03 ✓</span><span class="t2">Injection — TypeORM parameterized queries</span></div>
+            <div class="flex aic gap8"><span class="tag g" style="font-size:9px;min-width:70px">A05 ✓</span><span class="t2">Misconfiguration — Helmet.js + CORS strict</span></div>
+            <div class="flex aic gap8"><span class="tag g" style="font-size:9px;min-width:70px">A07 ✓</span><span class="t2">Auth failures — Brute force block + 2FA</span></div>
+            <div class="flex aic gap8"><span class="tag g" style="font-size:9px;min-width:70px">A09 ✓</span><span class="t2">Logging — Immutable audit trail Elasticsearch</span></div>
+          </div>
+        </div>
+
+        <div class="code-block mt12">
+          <div class="cb-header"><span class="cb-lang">NestJS · Security Headers</span></div>
+<pre><span class="fn">app</span>.<span class="fn">use</span>(<span class="fn">helmet</span>({
+  contentSecurityPolicy: { directives: {
+    defaultSrc: [<span class="str">"'self'"</span>],
+    scriptSrc:  [<span class="str">"'self'"</span>, <span class="str">"'nonce-{random}'"</span>],
+    styleSrc:   [<span class="str">"'self'"</span>, <span class="str">"'unsafe-inline'"</span>],
+  }},
+  hsts: { maxAge: <span class="num">31536000</span>, includeSubDomains: <span class="kw">true</span> },
+  referrerPolicy: { policy: <span class="str">'no-referrer'</span> },
+}))
+<span class="fn">app</span>.<span class="fn">enableCors</span>({ origin: [<span class="str">'https://app.nexamarket.ma'</span>] })
+<span class="fn">app</span>.<span class="fn">useGlobalPipes</span>(<span class="kw">new</span> <span class="cls">ValidationPipe</span>({ whitelist: <span class="kw">true</span> }))</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE 6 — AI STACK
+══════════════════════════════════════ -->
+<div class="page" id="page-ai">
+  <div class="card blue-glow">
+    <div class="ch"><div><div class="ct">Stack IA — NexaMarket Intelligence</div><div class="cs">LLM · RAG · Voice · Vision · Time-series · Embeddings</div></div><span class="tag c">IA Multi-modèle</span></div>
+
+    <div class="g3 mb16">
+      <div style="background:var(--card2);border:1px solid rgba(6,182,212,.2);border-radius:var(--r-md);padding:16px">
+        <div class="fd fw8 mb6 cc" style="font-size:13px">🧠 LLM Principal</div>
+        <div class="code-block" style="padding:10px;font-size:11px">
+<pre><span class="cmt">// Claude 3.5 Sonnet (Anthropic)</span>
+<span class="prop">tasks</span>: [
+  <span class="str">"WhatsApp responses"</span>,
+  <span class="str">"Lead qualification"</span>,
+  <span class="str">"Content generation"</span>,
+  <span class="str">"Finance analysis"</span>,
+  <span class="str">"Ad copy creation"</span>,
+]
+<span class="prop">fallback</span>: <span class="str">"GPT-4o"</span> <span class="cmt">// OpenAI</span>
+<span class="prop">context</span>: <span class="num">200000</span> <span class="cmt">// tokens</span>
+<span class="prop">languages</span>: [<span class="str">"dar"</span>,<span class="str">"ar"</span>,<span class="str">"fr"</span>,<span class="str">"en"</span>]</pre>
+        </div>
+      </div>
+      <div style="background:var(--card2);border:1px solid rgba(139,92,246,.2);border-radius:var(--r-md);padding:16px">
+        <div class="fd fw8 mb6 cv" style="font-size:13px">🎙️ Voice Pipeline</div>
+        <div class="code-block" style="padding:10px;font-size:11px">
+<pre><span class="cmt">// Call Center IA</span>
+<span class="prop">stt</span>: <span class="str">"Whisper-v3"</span>
+<span class="prop">tts</span>: <span class="str">"ElevenLabs"</span>
+<span class="prop">lang_detect</span>: <span class="str">"FastText"</span>
+<span class="prop">telephony</span>: <span class="str">"Twilio"</span>
+<span class="prop">latency</span>: <span class="str">"&lt; 800ms"</span>
+<span class="prop">voices</span>: [
+  <span class="str">"samia-darija-v2"</span>,
+  <span class="str">"khalid-mixed-v1"</span>
+]</pre>
+        </div>
+      </div>
+      <div style="background:var(--card2);border:1px solid rgba(245,158,11,.2);border-radius:var(--r-md);padding:16px">
+        <div class="fd fw8 mb6 ca" style="font-size:13px">📊 ML & Analytics</div>
+        <div class="code-block" style="padding:10px;font-size:11px">
+<pre><span class="cmt">// Finance Forecast</span>
+<span class="prop">model</span>: <span class="str">"Prophet + ARIMA"</span>
+<span class="prop">lead_scoring</span>: <span class="str">"XGBoost"</span>
+<span class="prop">embeddings</span>: <span class="str">"text-embedding-3"</span>
+<span class="prop">vector_db</span>: <span class="str">"pgvector"</span>
+<span class="prop">retrain</span>: <span class="str">"weekly cron"</span>
+<span class="prop">pipeline</span>: <span class="str">"Python FastAPI"</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="cb-header"><span class="cb-lang">TypeScript · AI Orchestrator</span><button class="cb-copy" onclick="toast('Copié ✓','g')">copy</button></div>
+<pre><span class="kw">class</span> <span class="cls">NexaAIOrchestrator</span> {
+  <span class="cmt">/** WhatsApp: Multi-step conversation pipeline */</span>
+  <span class="kw">async</span> <span class="fn">processWaMessage</span>(msg: <span class="cls">WaMessage</span>): Promise<<span class="cls">AiResponse</span>> {
+    <span class="cmt">// Step 1: Language detection (FastText — 98% accuracy Darija)</span>
+    <span class="kw">const</span> lang = <span class="kw">await</span> <span class="kw">this</span>.langDetect.<span class="fn">detect</span>(msg.body)
+
+    <span class="cmt">// Step 2: Retrieve conversation history + tenant context (RAG)</span>
+    <span class="kw">const</span> context = <span class="kw">await</span> <span class="kw">this</span>.rag.<span class="fn">retrieve</span>({
+      tenantId: msg.tenantId, contactId: msg.contactId,
+      query: msg.body, topK: <span class="num">5</span>
+    })
+
+    <span class="cmt">// Step 3: Classify intent (order|quote|info|complaint|appointment)</span>
+    <span class="kw">const</span> intent = <span class="kw">await</span> <span class="kw">this</span>.classifier.<span class="fn">classify</span>(msg.body, lang)
+
+    <span class="cmt">// Step 4: Generate response with Claude 3.5</span>
+    <span class="kw">const</span> response = <span class="kw">await</span> <span class="kw">this</span>.llm.<span class="fn">generate</span>({
+      model:  <span class="str">'claude-3-5-sonnet-20241022'</span>,
+      system: <span class="fn">buildSystemPrompt</span>(lang, intent, context),
+      messages: [{ role: <span class="str">'user'</span>, content: msg.body }],
+      max_tokens: <span class="num">500</span>
+    })
+
+    <span class="cmt">// Step 5: Post-process (extract order, quote, appointment data)</span>
+    <span class="kw">const</span> extracted = <span class="kw">await</span> <span class="kw">this</span>.extractor.<span class="fn">extract</span>(response, intent)
+
+    <span class="cmt">// Step 6: Trigger business actions (create order, update CRM...)</span>
+    <span class="kw">if</span> (extracted.order)      <span class="kw">await</span> <span class="kw">this</span>.ecom.<span class="fn">createOrder</span>(extracted.order)
+    <span class="kw">if</span> (extracted.lead)       <span class="kw">await</span> <span class="kw">this</span>.crm.<span class="fn">qualifyLead</span>(extracted.lead)
+    <span class="kw">if</span> (extracted.appointment) <span class="kw">await</span> <span class="kw">this</span>.calendar.<span class="fn">book</span>(extracted.appointment)
+
+    <span class="kw">return</span> { message: response, actions: extracted, lang, intent }
+  }
+}</pre>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE 7 — DEVOPS
+══════════════════════════════════════ -->
+<div class="page" id="page-devops">
+  <div class="card blue-glow">
+    <div class="ch"><div><div class="ct">Pipeline CI/CD — GitHub Actions</div><div class="cs">Build → Test → Security Scan → Deploy · Zero downtime</div></div><span class="tag g">Automatisé</span></div>
+    <div class="code-block mb16">
+      <div class="cb-header"><span class="cb-lang">YAML · .github/workflows/deploy.yml</span><button class="cb-copy" onclick="toast('Copié ✓','g')">copy</button></div>
+<pre><span class="prop">name</span>: NexaMarket CI/CD Pipeline
+
+<span class="prop">on</span>:
+  <span class="prop">push</span>:
+    <span class="prop">branches</span>: [main, develop]
+  <span class="prop">pull_request</span>:
+    <span class="prop">branches</span>: [main]
+
+<span class="prop">jobs</span>:
+  <span class="prop">test</span>:
+    <span class="prop">runs-on</span>: ubuntu-24.04
+    <span class="prop">services</span>:
+      <span class="prop">postgres</span>: { <span class="prop">image</span>: postgres:16, <span class="prop">env</span>: {POSTGRES_DB: nexatest} }
+      <span class="prop">redis</span>:    { <span class="prop">image</span>: redis:7-alpine }
+    <span class="prop">steps</span>:
+      - <span class="prop">uses</span>: actions/checkout@v4
+      - <span class="prop">name</span>: Unit tests (Jest)
+        <span class="prop">run</span>: <span class="str">pnpm test:unit --coverage --threshold=80</span>
+      - <span class="prop">name</span>: Integration tests
+        <span class="prop">run</span>: <span class="str">pnpm test:e2e</span>
+      - <span class="prop">name</span>: Upload coverage → Codecov
+        <span class="prop">uses</span>: codecov/codecov-action@v4
+
+  <span class="prop">security</span>:
+    <span class="prop">needs</span>: [test]
+    <span class="prop">steps</span>:
+      - <span class="prop">name</span>: SAST — Semgrep
+        <span class="prop">uses</span>: semgrep/semgrep-action@v1
+      - <span class="prop">name</span>: Dependency scan — Snyk
+        <span class="prop">run</span>: <span class="str">snyk test --severity-threshold=high</span>
+      - <span class="prop">name</span>: Docker image scan — Trivy
+        <span class="prop">uses</span>: aquasecurity/trivy-action@master
+
+  <span class="prop">build-push</span>:
+    <span class="prop">needs</span>: [security]
+    <span class="prop">steps</span>:
+      - <span class="prop">name</span>: Build & push Docker image
+        <span class="prop">run</span>: |
+          docker buildx build --platform linux/amd64,linux/arm64 \
+            -t ghcr.io/nexamarket/$SERVICE:${{ github.sha }} \
+            --cache-from type=registry,ref=ghcr.io/nexamarket/$SERVICE:cache \
+            --push .
+
+  <span class="prop">deploy-staging</span>:
+    <span class="prop">needs</span>: [build-push]
+    <span class="prop">environment</span>: staging
+    <span class="prop">steps</span>:
+      - <span class="prop">name</span>: Deploy to K8s staging
+        <span class="prop">run</span>: <span class="str">kubectl set image deploy/$SERVICE $SERVICE=ghcr.io/nexamarket/$SERVICE:$SHA</span>
+      - <span class="prop">name</span>: Smoke tests
+        <span class="prop">run</span>: <span class="str">pnpm test:smoke --env=staging</span>
+
+  <span class="prop">deploy-prod</span>:
+    <span class="prop">needs</span>: [deploy-staging]
+    <span class="prop">environment</span>: production    <span class="cmt"># Requires manual approval</span>
+    <span class="prop">steps</span>:
+      - <span class="prop">name</span>: Blue/Green deploy
+        <span class="prop">run</span>: <span class="str">./scripts/blue-green-deploy.sh $SERVICE $SHA</span>
+      - <span class="prop">name</span>: Health check
+        <span class="prop">run</span>: <span class="str">./scripts/health-check.sh --timeout=120</span></pre>
+    </div>
+
+    <div class="infra-grid">
+      <div class="infra-card"><div class="infra-icon">🐳</div><div class="infra-name">Docker Multi-stage</div><div class="infra-desc">Images optimisées &lt;150MB par service. BuildKit cache. Multi-arch (amd64 + arm64).</div><div class="infra-tags"><span class="itag">alpine:3.19</span><span class="itag">node:20-slim</span><span class="itag">distroless</span></div></div>
+      <div class="infra-card"><div class="infra-icon">☸️</div><div class="infra-name">Kubernetes 1.29</div><div class="infra-desc">HPA auto-scaling. Pod Disruption Budget. Rolling updates. Namespace isolation par env.</div><div class="infra-tags"><span class="itag">Helm 3</span><span class="itag">HPA</span><span class="itag">PDB</span><span class="itag">Ingress-NGINX</span></div></div>
+      <div class="infra-card"><div class="infra-icon">🌐</div><div class="infra-name">Cloudflare</div><div class="infra-desc">CDN global. WAF. DDoS protection. R2 storage. Workers edge. DNS + SSL auto.</div><div class="infra-tags"><span class="itag">WAF</span><span class="itag">CDN</span><span class="itag">Workers</span><span class="itag">R2</span></div></div>
+      <div class="infra-card"><div class="infra-icon">📦</div><div class="infra-name">Terraform IaC</div><div class="infra-desc">Infrastructure as Code. Modules réutilisables. State Terraform Cloud. Drift detection.</div><div class="infra-tags"><span class="itag">AWS</span><span class="itag">OVH</span><span class="itag">Cloudflare</span></div></div>
+      <div class="infra-card"><div class="infra-icon">🔒</div><div class="infra-name">Vault HashiCorp</div><div class="infra-desc">Secrets management centralisé. Rotation automatique clés DB. Dynamic credentials.</div><div class="infra-tags"><span class="itag">PKI</span><span class="itag">Dynamic secrets</span><span class="itag">K8s auth</span></div></div>
+      <div class="infra-card"><div class="infra-icon">💾</div><div class="infra-name">Backup Strategy</div><div class="infra-desc">PG: WAL-G streaming + daily snapshot. Redis: RDB + AOF. S3: versioning + lifecycle.</div><div class="infra-tags"><span class="itag">WAL-G</span><span class="itag">RPO:1h</span><span class="itag">RTO:15min</span></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE 8 — KUBERNETES
+══════════════════════════════════════ -->
+<div class="page" id="page-k8s">
+  <div class="card blue-glow">
+    <div class="ch"><div><div class="ct">Cluster Kubernetes — Topologie de production</div><div class="cs">3 nœuds masters + 10 workers · Auto-scaling · HA</div></div><span class="tag b">K8s 1.29</span></div>
+    <div class="k8s-cluster">
+      <div style="font-size:10px;color:var(--t3);margin-bottom:12px;font-family:var(--fm);letter-spacing:1px">CLUSTER: nexamarket-prod-ma · Region: Casablanca + Rabat · HA Active-Active</div>
+
+      <div class="k8s-ns">
+        <div class="k8s-ns-lbl">namespace: nexamarket-core</div>
+        <div class="k8s-pods">
+          <div class="k8s-pod"><div class="pod-dot"></div>gateway-7d4f9 (×2)</div>
+          <div class="k8s-pod"><div class="pod-dot"></div>auth-svc-5c8b2 (×3)</div>
+          <div class="k8s-pod"><div class="pod-dot"></div>crm-svc-9f2a1 (×2)</div>
+          <div class="k8s-pod"><div class="pod-dot"></div>ecom-svc-3e7c4 (×3)</div>
+          <div class="k8s-pod"><div class="pod-dot"></div>ads-svc-1b9d6 (×2)</div>
+          <div class="k8s-pod"><div class="pod-dot"></div>wa-svc-8a2f3 (×4)</div>
+          <div class="k8s-pod"><div class="pod-dot"></div>billing-svc-4c1e9 (×2)</div>
+          <div class="k8s-pod"><div class="pod-dot"></div>finance-svc-7b5d2 (×2)</div>
+          <div class="k8s-pod"><div class="pod-dot"></div>callcenter-svc-2f8a1 (×3)</div>
+          <div class="k8s-pod"><div class="pod-dot"></div>notif-svc-6e3c7 (×2)</div>
+          <div class="k8s-pod"><div class="pod-dot"></div>content-svc-5d1b8 (×2)</div>
+          <div class="k8s-pod"><div class="pod-dot"></div>logistics-svc-9a4f2 (×2)</div>
+        </div>
+      </div>
+      <div class="k8s-ns">
+        <div class="k8s-ns-lbl">namespace: nexamarket-data</div>
+        <div class="k8s-pods">
+          <div class="k8s-pod"><div class="pod-dot"></div>postgres-primary-0</div>
+          <div class="k8s-pod"><div class="pod-dot"></div>postgres-replica-1</div>
+          <div class="k8s-pod"><div class="pod-dot"></div>postgres-replica-2</div>
+          <div class="k8s-pod"><div class="pod-dot"></div>redis-cluster-0 (×3)</div>
+          <div class="k8s-pod"><div class="pod-dot"></div>elasticsearch-0 (×3)</div>
+          <div class="k8s-pod"><div class="pod-dot"></div>timescaledb-0</div>
+        </div>
+      </div>
+      <div class="k8s-ns">
+        <div class="k8s-ns-lbl">namespace: nexamarket-monitoring</div>
+        <div class="k8s-pods">
+          <div class="k8s-pod"><div class="pod-dot"></div>prometheus-0</div>
+          <div class="k8s-pod"><div class="pod-dot"></div>grafana-0</div>
+          <div class="k8s-pod"><div class="pod-dot"></div>alertmanager-0</div>
+          <div class="k8s-pod"><div class="pod-dot"></div>jaeger-0</div>
+          <div class="k8s-pod"><div class="pod-dot"></div>loki-0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-block mt16">
+      <div class="cb-header"><span class="cb-lang">YAML · Kubernetes HPA — WhatsApp Service</span><button class="cb-copy" onclick="toast('Copié ✓','g')">copy</button></div>
+<pre><span class="prop">apiVersion</span>: autoscaling/v2
+<span class="prop">kind</span>: HorizontalPodAutoscaler
+<span class="prop">metadata</span>:
+  <span class="prop">name</span>: wa-service-hpa
+  <span class="prop">namespace</span>: nexamarket-core
+<span class="prop">spec</span>:
+  <span class="prop">scaleTargetRef</span>:
+    <span class="prop">apiVersion</span>: apps/v1
+    <span class="prop">kind</span>: Deployment
+    <span class="prop">name</span>: wa-svc
+  <span class="prop">minReplicas</span>: <span class="num">2</span>
+  <span class="prop">maxReplicas</span>: <span class="num">20</span>   <span class="cmt"># Scale up during peak hours</span>
+  <span class="prop">metrics</span>:
+  - <span class="prop">type</span>: Resource
+    <span class="prop">resource</span>:
+      <span class="prop">name</span>: cpu
+      <span class="prop">target</span>: { <span class="prop">type</span>: Utilization, <span class="prop">averageUtilization</span>: <span class="num">60</span> }
+  - <span class="prop">type</span>: External  <span class="cmt"># Scale on WA message queue depth</span>
+    <span class="prop">external</span>:
+      <span class="prop">metric</span>: { <span class="prop">name</span>: redis_bullmq_queue_depth }
+      <span class="prop">target</span>: { <span class="prop">type</span>: Value, <span class="prop">value</span>: <span class="str">"100"</span> }
+  <span class="prop">behavior</span>:
+    <span class="prop">scaleUp</span>:   { <span class="prop">stabilizationWindowSeconds</span>: <span class="num">30</span> }
+    <span class="prop">scaleDown</span>: { <span class="prop">stabilizationWindowSeconds</span>: <span class="num">300</span> }</pre>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE 9 — MONITORING
+══════════════════════════════════════ -->
+<div class="page" id="page-monitoring">
+  <div class="card blue-glow">
+    <div class="ch"><div><div class="ct">Observabilité — Stack de Monitoring</div><div class="cs">Prometheus · Grafana · Jaeger · Loki · Alertmanager</div></div></div>
+    <div class="infra-grid">
+      <div class="infra-card"><div class="infra-icon">📊</div><div class="infra-name">Prometheus + Grafana</div><div class="infra-desc">Métriques système et métier. 50+ dashboards. Alertes automatiques sur SLOs définis.</div><div class="infra-tags"><span class="itag">SLO:99.9%</span><span class="itag">P95 latency</span><span class="itag">Error rate</span></div></div>
+      <div class="infra-card"><div class="infra-icon">🔍</div><div class="infra-name">Jaeger Tracing</div><div class="infra-desc">Distributed tracing complet. Visualiser chaque requête à travers tous les microservices.</div><div class="infra-tags"><span class="itag">OpenTelemetry</span><span class="itag">W3C TraceContext</span></div></div>
+      <div class="infra-card"><div class="infra-icon">📝</div><div class="infra-name">Loki + Promtail</div><div class="infra-desc">Agrégation logs centralisée. Requêtes LogQL. Retention 30 jours hot + 1 an S3 cold.</div><div class="infra-tags"><span class="itag">LogQL</span><span class="itag">S3 long-term</span></div></div>
+      <div class="infra-card"><div class="infra-icon">🚨</div><div class="infra-name">Alertmanager</div><div class="infra-desc">Alertes multi-canal : PagerDuty (critique), Slack (warning), Email (info). On-call rotation.</div><div class="infra-tags"><span class="itag">PagerDuty</span><span class="itag">Slack</span><span class="itag">WhatsApp</span></div></div>
+      <div class="infra-card"><div class="infra-icon">❤️</div><div class="infra-name">SLOs Définis</div><div class="infra-desc">API Gateway: p99 &lt;200ms. WA Response: &lt;2s. DB Queries: p95 &lt;50ms. Uptime: 99.95%.</div><div class="infra-tags"><span class="itag">p99</span><span class="itag">p95</span><span class="itag">MTTR&lt;15min</span></div></div>
+      <div class="infra-card"><div class="infra-icon">🔄</div><div class="infra-name">Chaos Engineering</div><div class="infra-desc">Litmus Chaos. Tests hebdomadaires pod/network failure. Gameday mensuel. DR drills.</div><div class="infra-tags"><span class="itag">Litmus</span><span class="itag">GameDay</span><span class="itag">DR Test</span></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE 10 — ROADMAP
+══════════════════════════════════════ -->
+<div class="page" id="page-roadmap">
+  <div class="card blue-glow">
+    <div class="ch"><div><div class="ct">Roadmap Produit — 24 mois</div><div class="cs">De 0 à 100 000 PME marocaines · Phases de croissance</div></div></div>
+
+    <div class="roadmap-item">
+      <div class="rm-dot" style="background:rgba(59,130,246,.15);border-color:var(--blue)">🚀</div>
+      <div class="rm-content">
+        <div class="rm-phase">Phase 1 · M1–M3</div>
+        <div class="rm-title">MVP — Fondations <span class="tag b" style="font-size:11px;vertical-align:middle">En cours</span></div>
+        <div class="rm-desc">Infrastructure de base, les 10 microservices NestJS, API Gateway, Auth JWT+OAuth, Dashboard, CRM, E-commerce basique, WhatsApp IA (qualification + commandes), Facturation PDF. Déploiement cloud Maroc (OVH Casablanca).</div>
+        <div class="rm-items">
+          <span class="rm-item">Auth + 2FA</span><span class="rm-item">API Gateway</span><span class="rm-item">CRM basique</span>
+          <span class="rm-item">E-commerce v1</span><span class="rm-item">WhatsApp IA</span><span class="rm-item">Facturation</span>
+          <span class="rm-item">Dashboard KPIs</span><span class="rm-item">CMI / NAPS</span><span class="rm-item">Amana / Ozone</span>
+        </div>
+        <div class="up mt8">Objectif: 500 PME beta · MRR: 50K MAD</div>
+      </div>
+    </div>
+
+    <div class="roadmap-item">
+      <div class="rm-dot" style="background:rgba(34,197,94,.15);border-color:var(--green)">📈</div>
+      <div class="rm-content">
+        <div class="rm-phase">Phase 2 · M4–M6</div>
+        <div class="rm-title">Growth — IA & Ads</div>
+        <div class="rm-desc">Intégration Meta Ads + Google Ads + TikTok Ads. IA Media Buyer avec optimisation automatique. Centre d'appels IA (Twilio + Whisper + ElevenLabs). Génération de contenu Darija/Arabe/Français. IA Financière avec prévisions Prophet.</div>
+        <div class="rm-items">
+          <span class="rm-item">Meta Ads API</span><span class="rm-item">Google Ads API</span><span class="rm-item">TikTok Ads</span>
+          <span class="rm-item">Call Center IA</span><span class="rm-item">Content Gen</span><span class="rm-item">Finance IA</span>
+          <span class="rm-item">Lead Scoring XGBoost</span><span class="rm-item">pgvector RAG</span>
+        </div>
+        <div class="up mt8">Objectif: 5 000 PME · MRR: 500K MAD</div>
+      </div>
+    </div>
+
+    <div class="roadmap-item">
+      <div class="rm-dot" style="background:rgba(245,158,11,.15);border-color:var(--amber)">⚡</div>
+      <div class="rm-content">
+        <div class="rm-phase">Phase 3 · M7–M12</div>
+        <div class="rm-title">Scale — Multi-tenant Enterprise</div>
+        <div class="rm-desc">Application mobile iOS + Android (React Native). Marketplace d'intégrations tierces. API publique + webhooks pour intégrateurs. Plans Enterprise avec SLA garanti. Support multi-langue complet (Tamazight). Expansion Maghreb (Tunisie, Algérie).</div>
+        <div class="rm-items">
+          <span class="rm-item">App iOS/Android</span><span class="rm-item">API Publique</span><span class="rm-item">Webhooks</span>
+          <span class="rm-item">Marketplace intégrations</span><span class="rm-item">Plan Enterprise</span>
+          <span class="rm-item">SLA 99.9%</span><span class="rm-item">Tamazight</span><span class="rm-item">Tunisie/Algérie</span>
+        </div>
+        <div class="up mt8">Objectif: 25 000 PME · MRR: 2.5M MAD</div>
+      </div>
+    </div>
+
+    <div class="roadmap-item">
+      <div class="rm-dot" style="background:rgba(139,92,246,.15);border-color:var(--violet)">🌍</div>
+      <div class="rm-content">
+        <div class="rm-phase">Phase 4 · M13–M24</div>
+        <div class="rm-title">Domination — 100K PME Maroc + MENA</div>
+        <div class="rm-desc">NexaMarket IA v3 avec modèle LLM fine-tuné sur le contexte marocain et Darija. Agent IA autonome capable de gérer une boutique 24h/24 sans intervention humaine. Expansion MENA (Égypte, UAE, Arabie Saoudite). Introduction en bourse ou acquisition stratégique.</div>
+        <div class="rm-items">
+          <span class="rm-item">LLM Fine-tuned Darija</span><span class="rm-item">Agent IA autonome</span>
+          <span class="rm-item">100K tenants</span><span class="rm-item">MENA expansion</span>
+          <span class="rm-item">Series B fundraising</span><span class="rm-item">IPO ready</span>
+        </div>
+        <div class="up mt8">Objectif: 100 000 PME · ARR: 120M MAD</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE 11 — COSTS & SCALING
+══════════════════════════════════════ -->
+<div class="page" id="page-costs">
+  <div class="card blue-glow">
+    <div class="ch"><div><div class="ct">Coûts Infrastructure & Modèle de Pricing</div><div class="cs">CapEx / OpEx · Marges SaaS · Projections à 24 mois</div></div></div>
+
+    <div class="g3 mb16">
+      <div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--r-md);padding:16px">
+        <div class="fd fw8 mb10 cb" style="font-size:13px">💻 Infra MVP (M1-M3)</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:12px">
+          <div class="flex jcsb"><span class="t2">K8s Cluster (3 nodes)</span><span class="fw7">4 200 MAD/mo</span></div>
+          <div class="flex jcsb"><span class="t2">PostgreSQL + Redis</span><span class="fw7">1 800 MAD/mo</span></div>
+          <div class="flex jcsb"><span class="t2">S3 Object Storage</span><span class="fw7">600 MAD/mo</span></div>
+          <div class="flex jcsb"><span class="t2">Cloudflare Pro</span><span class="fw7">800 MAD/mo</span></div>
+          <div class="flex jcsb"><span class="t2">LLM APIs (Claude/GPT)</span><span class="fw7">2 000 MAD/mo</span></div>
+          <div class="flex jcsb"><span class="t2">Twilio (Calls)</span><span class="fw7">1 200 MAD/mo</span></div>
+          <div class="sep"></div>
+          <div class="flex jcsb fw7"><span>Total MVP</span><span class="cg">~10 600 MAD/mo</span></div>
+        </div>
+      </div>
+      <div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--r-md);padding:16px">
+        <div class="fd fw8 mb10 ca" style="font-size:13px">🚀 Infra 5K PME (M6)</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:12px">
+          <div class="flex jcsb"><span class="t2">K8s (10 workers HA)</span><span class="fw7">18 000 MAD/mo</span></div>
+          <div class="flex jcsb"><span class="t2">PG Primary + 2 Replicas</span><span class="fw7">7 200 MAD/mo</span></div>
+          <div class="flex jcsb"><span class="t2">Redis Cluster (6 nodes)</span><span class="fw7">4 800 MAD/mo</span></div>
+          <div class="flex jcsb"><span class="t2">Elasticsearch (3 nodes)</span><span class="fw7">6 000 MAD/mo</span></div>
+          <div class="flex jcsb"><span class="t2">LLM APIs</span><span class="fw7">24 000 MAD/mo</span></div>
+          <div class="flex jcsb"><span class="t2">Twilio + ElevenLabs</span><span class="fw7">12 000 MAD/mo</span></div>
+          <div class="sep"></div>
+          <div class="flex jcsb fw7"><span>Total 5K PME</span><span class="ca">~80 000 MAD/mo</span></div>
+        </div>
+      </div>
+      <div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--r-md);padding:16px">
+        <div class="fd fw8 mb10 cg" style="font-size:13px">🌍 Infra 100K PME (M24)</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:12px">
+          <div class="flex jcsb"><span class="t2">Multi-region K8s</span><span class="fw7">180 000 MAD/mo</span></div>
+          <div class="flex jcsb"><span class="t2">PG Citus Distributed</span><span class="fw7">60 000 MAD/mo</span></div>
+          <div class="flex jcsb"><span class="t2">Redis Enterprise</span><span class="fw7">36 000 MAD/mo</span></div>
+          <div class="flex jcsb"><span class="t2">Fine-tuned LLM (propre)</span><span class="fw7">80 000 MAD/mo</span></div>
+          <div class="flex jcsb"><span class="t2">CDN + Storage</span><span class="fw7">24 000 MAD/mo</span></div>
+          <div class="flex jcsb"><span class="t2">Monitoring + Security</span><span class="fw7">20 000 MAD/mo</span></div>
+          <div class="sep"></div>
+          <div class="flex jcsb fw7"><span>Total 100K PME</span><span class="cg">~400 000 MAD/mo</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pricing plans -->
+    <div class="fd fw8 mb10" style="font-size:14px">Plans tarifaires NexaMarket Pro</div>
+    <div class="g3">
+      <div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px">
+        <div class="fd fw8 mb4" style="font-size:15px">Starter</div>
+        <div class="fd fw8 cb" style="font-size:28px">199 <span style="font-size:14px;font-weight:500">MAD/mo</span></div>
+        <div class="t2 fs11 mb10">Idéal pour les micro-entreprises</div>
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:12px">
+          <div class="flex aic gap6"><span class="cg">✓</span> Dashboard + CRM (500 contacts)</div>
+          <div class="flex aic gap6"><span class="cg">✓</span> E-commerce (50 produits)</div>
+          <div class="flex aic gap6"><span class="cg">✓</span> WhatsApp IA (1 000 msg/mo)</div>
+          <div class="flex aic gap6"><span class="cg">✓</span> Facturation (20 docs/mo)</div>
+          <div class="flex aic gap6"><span class="t3">✗</span> Ads IA · Centre d'appels</div>
+          <div class="flex aic gap6"><span class="t3">✗</span> IA Financière avancée</div>
+        </div>
+        <div class="up mt10">Marge brute: ~94%</div>
+      </div>
+      <div style="background:linear-gradient(135deg,rgba(59,130,246,.1),rgba(59,130,246,.03));border:1px solid rgba(59,130,246,.3);border-radius:var(--r-lg);padding:20px;position:relative">
+        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--blue);color:#fff;font-size:10px;font-weight:700;padding:3px 12px;border-radius:12px;font-family:var(--fm)">POPULAIRE</div>
+        <div class="fd fw8 mb4" style="font-size:15px">Pro</div>
+        <div class="fd fw8 cb" style="font-size:28px">499 <span style="font-size:14px;font-weight:500">MAD/mo</span></div>
+        <div class="t2 fs11 mb10">Pour les PME en croissance</div>
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:12px">
+          <div class="flex aic gap6"><span class="cg">✓</span> Tout Starter + illimité</div>
+          <div class="flex aic gap6"><span class="cg">✓</span> IA Media Buyer (3 plateformes)</div>
+          <div class="flex aic gap6"><span class="cg">✓</span> WhatsApp IA illimité</div>
+          <div class="flex aic gap6"><span class="cg">✓</span> Centre d'appels IA (100h/mo)</div>
+          <div class="flex aic gap6"><span class="cg">✓</span> IA Financière + prévisions</div>
+          <div class="flex aic gap6"><span class="cg">✓</span> Génération contenu IA</div>
+        </div>
+        <div class="up mt10">Marge brute: ~88% · ARR target principal</div>
+      </div>
+      <div style="background:var(--card2);border:1px solid rgba(139,92,246,.25);border-radius:var(--r-lg);padding:20px">
+        <div class="fd fw8 mb4" style="font-size:15px">Enterprise</div>
+        <div class="fd fw8 cv" style="font-size:28px">1 499 <span style="font-size:14px;font-weight:500">MAD/mo</span></div>
+        <div class="t2 fs11 mb10">Pour les chaînes & franchises</div>
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:12px">
+          <div class="flex aic gap6"><span class="cg">✓</span> Tout Pro + multi-boutiques</div>
+          <div class="flex aic gap6"><span class="cg">✓</span> API accès complet + webhooks</div>
+          <div class="flex aic gap6"><span class="cg">✓</span> SLA 99.9% garanti</div>
+          <div class="flex aic gap6"><span class="cg">✓</span> Onboarding dédié</div>
+          <div class="flex aic gap6"><span class="cg">✓</span> LLM fine-tuné marque</div>
+          <div class="flex aic gap6"><span class="cg">✓</span> Support 24/7 prioritaire</div>
+        </div>
+        <div class="up mt10">Marge brute: ~82% · LTV très élevé</div>
+      </div>
+    </div>
+
+    <div style="background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.15);border-radius:var(--r-md);padding:16px;margin-top:16px">
+      <div class="fd fw8 cg mb8" style="font-size:14px">📊 Projection financière — Chemin vers 100K PME</div>
+      <div class="g4" style="gap:10px">
+        <div class="stat-box"><div class="stat-val" style="font-size:18px;color:var(--blue-2)">M6</div><div class="stat-lbl">5K PME · MRR 2.2M MAD · Infra:80K</div></div>
+        <div class="stat-box"><div class="stat-val" style="font-size:18px;color:var(--green)">M12</div><div class="stat-lbl">25K PME · MRR 10M MAD · Marge 85%</div></div>
+        <div class="stat-box"><div class="stat-val" style="font-size:18px;color:var(--amber)">M18</div><div class="stat-lbl">60K PME · MRR 24M MAD · Series B</div></div>
+        <div class="stat-box"><div class="stat-val" style="font-size:18px;color:var(--violet)">M24</div><div class="stat-lbl">100K PME · ARR 120M MAD · MENA</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- TOAST -->
+<div class="toast hidden" id="toast-el"><span id="t-ic">✅</span>&nbsp;<span id="t-msg"></span></div>
+
+<script>
+/* ══ NAVIGATION ══ */
+const PAGES = ['overview','microservices','database','api','auth','ai','devops','k8s','monitoring','roadmap','costs'];
+const META = {
+  overview:      { t:'Architecture Globale',           s:'Couches · Services · Stack Frontend + Backend' },
+  microservices: { t:'Microservices NestJS',           s:'10 services · Event bus · gRPC inter-services' },
+  database:      { t:'Base de Données PostgreSQL',     s:'18 tables · RLS Multi-tenant · pgvector · TimescaleDB' },
+  api:           { t:'Documentation API',              s:'47 endpoints REST · JSON Schema · Rate limiting' },
+  auth:          { t:'Sécurité & Authentification',    s:'JWT · 2FA · AES-256 · OWASP · RBAC' },
+  ai:            { t:'Stack Intelligence Artificielle', s:'Claude · Whisper · pgvector · Prophet · XGBoost' },
+  devops:        { t:'DevOps & CI/CD',                 s:'GitHub Actions · Docker · Terraform · Zero-downtime' },
+  k8s:           { t:'Kubernetes — Topologie',         s:'3 masters · 10 workers · HPA · PDB · HA Active-Active' },
+  monitoring:    { t:'Observabilité',                  s:'Prometheus · Grafana · Jaeger · Loki · SLO 99.95%' },
+  roadmap:       { t:'Roadmap 24 Mois',               s:'MVP → Growth → Scale → 100K PME Maroc + MENA' },
+  costs:         { t:'Coûts & Modèle SaaS',           s:'CapEx/OpEx · Plans tarifaires · ARR projections' },
+};
+
+function goTo(id) {
+  PAGES.forEach(p => {
+    document.getElementById('page-'+p).classList.toggle('active', p===id);
+  });
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('on'));
+  // Find and activate correct nav item
+  document.querySelectorAll('.ni').forEach(n => {
+    if(n.getAttribute('onclick') && n.getAttribute('onclick').includes("'"+id+"'"))
+      n.classList.add('on');
+  });
+  if(META[id]){
+    document.getElementById('hdr-title').textContent = META[id].t;
+    document.getElementById('hdr-sub').textContent   = META[id].s;
+  }
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+/* ══ TOAST ══ */
+let toastT;
+function toast(msg, type='b') {
+  const icons = {b:'📋',g:'✅',r:'🚨',a:'⚡',c:'ℹ️'};
+  document.getElementById('t-ic').textContent  = icons[type]||'✅';
+  document.getElementById('t-msg').textContent = msg;
+  document.getElementById('toast-el').classList.remove('hidden');
+  clearTimeout(toastT);
+  toastT = setTimeout(()=>document.getElementById('toast-el').classList.add('hidden'), 3000);
+}
+
+/* ══ COPY BUTTONS ══ */
+document.querySelectorAll('.cb-copy').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const block = btn.closest('.code-block');
+    const code = block.querySelector('pre').textContent;
+    navigator.clipboard.writeText(code).then(()=>{
+      btn.textContent = '✓ copié';
+      btn.style.color = 'var(--green)';
+      setTimeout(()=>{ btn.textContent='copy'; btn.style.color=''; }, 2000);
+    });
+  });
+});
+
+/* ══ PRINT ══ */
+function printPage() {
+  toast('Préparation du PDF en cours...','b');
+  setTimeout(()=>window.print(), 500);
+}
+
+/* ══ INIT ══ */
+document.addEventListener('DOMContentLoaded', ()=> goTo('overview'));
+</script>
+</body>
+</html>
