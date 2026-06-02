@@ -2281,21 +2281,23 @@ function buildPrompt() {
   const colors  = document.getElementById('vis-colors').value;
   const text    = document.getElementById('vis-text').value;
 
-  let prompt = `${style}, ${product}`;
-  if (colors) prompt += `, ${colors}`;
-  if (text)   prompt += `, text overlay saying "${text}"`;
+  // Build a very specific prompt
+  let prompt = `professional commercial product photography of ${product}`;
+  prompt += `, ${style}`;
+  if (colors) prompt += `, color palette: ${colors}`;
+  if (text)   prompt += `, with promotional text overlay: "${text}"`;
+  prompt += ', ultra sharp, 4k resolution, studio lighting, photorealistic';
+  prompt += ', no text errors, clean professional look, magazine quality';
 
-  // Platform-specific additions
   const additions = {
-    facebook:        'square format, facebook ad optimized',
-    facebook_story:  'vertical portrait format, story optimized, mobile first',
-    instagram:       'square instagram post, high engagement visual',
-    instagram_reel:  'vertical video thumbnail, reel cover, mobile format',
-    tiktok:          'vertical tiktok format, gen-z aesthetic, trendy',
-    linkedin:        'professional linkedin post, wide format, business'
+    facebook:        ', square 1:1 format, facebook advertisement',
+    facebook_story:  ', vertical 9:16 portrait, instagram story style',
+    instagram:       ', square instagram feed post, lifestyle photography',
+    instagram_reel:  ', vertical 9:16 reel thumbnail, eye-catching',
+    tiktok:          ', vertical tiktok ad, trendy young audience',
+    linkedin:        ', wide 1.91:1 linkedin professional post'
   };
-  prompt += `, ${additions[visCurrPlat] || ''}`;
-  prompt += ', high quality, 4k, photorealistic, commercial photography';
+  prompt += additions[visCurrPlat] || '';
 
   return encodeURIComponent(prompt);
 }

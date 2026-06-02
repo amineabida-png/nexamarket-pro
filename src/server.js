@@ -1386,14 +1386,14 @@ app.post('/api/ai/analyze-image', auth, async (req, res) => {
             },
             {
               type: 'text',
-              text: `Analyse ce produit en détail pour générer une publicité professionnelle.
-Réponds en JSON uniquement avec ces champs:
+              text: `You are a professional product photographer AI. Analyze this product image in extreme detail.
+Reply ONLY with valid JSON, no markdown, no explanation:
 {
-  "productName": "nom court du produit en français",
-  "description": "description détaillée du produit (couleur, matière, style, forme) pour générer une image IA professionnelle",
-  "category": "catégorie du produit",
-  "suggestedColors": "couleurs et ambiance suggérées pour la pub",
-  "suggestedStyle": "style photographique recommandé"
+  "productName": "exact product name in French",
+  "description": "EXTREMELY DETAILED visual description for AI image generation: exact colors, materials, textures, shape, size, brand elements, patterns, style. Be very specific. Example: black leather Karl Lagerfeld handbag with silver chain strap, quilted texture, gold logo, luxury fashion accessory",
+  "category": "product category",
+  "suggestedColors": "exact color palette for ad background (example: black and gold on white)",
+  "suggestedStyle": "photography style (studio white background, lifestyle, flat lay, etc)"
 }`
             }
           ]
