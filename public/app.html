@@ -2731,17 +2731,23 @@ function visDownload() {
 }
 
 async function visCaption() {
-  const name  = document.getElementById('vis-name').value || 'produit';
-  const lang  = document.getElementById('vis-cap-lang')?.value || 'dar';
-  const langStr = lang==='dar' ? 'darija marocain' : lang==='ar' ? 'arabe' : 'français';
-  const box   = document.getElementById('vis-caption-box');
-  const txt   = document.getElementById('vis-caption-txt');
+  const name = document.getElementById('vis-name').value || 'produit';
+  const lang = document.getElementById('vis-cap-lang') ? document.getElementById('vis-cap-lang').value : 'dar';
+  const box  = document.getElementById('vis-caption-box');
+  const txt  = document.getElementById('vis-caption-txt');
   box.style.display = 'block';
-  txt.textContent = '⏳ Génération légende IA...';
-  const r = await API('POST', '/api/ai/chat', {
-    message: 'Crée une légende pub courte et accrocheuse en ' + langStr + ' pour: "' + name + '". 2-3 phrases max avec emojis et hashtags Maroc.'
-  });
-  txt.textContent = r.ok ? r.data.reply : 'Erreur IA — vérifiez Groq';
+  txt.textContent = 'Generation legende IA...';
+  try {
+    const r = await fetch('/api/ai/caption-public', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ product: name, lang: lang })
+    });
+    const data = await r.json();
+    txt.textContent = r.ok ? data.reply : 'Verifiez votre connexion Groq';
+  } catch(e) {
+    txt.textContent = 'Erreur reseau';
+  }
 }
 
 </script>

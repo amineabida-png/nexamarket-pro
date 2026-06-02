@@ -1437,6 +1437,23 @@ Reply ONLY with valid JSON, no markdown, no explanation:
   }
 });
 
+
+// ── Légende pub sans auth (pour Visuels IA) ──────────
+app.post('/api/ai/caption-public', async (req, res) => {
+  const { product, lang } = req.body;
+  if (!product) return res.status(400).json({ error: 'Produit requis' });
+  try {
+    const langStr = lang === 'dar' ? 'darija marocain' : lang === 'ar' ? 'arabe' : 'français';
+    const reply = await callGroq([{
+      role: 'user',
+      content: 'Crée une légende pub courte et accrocheuse en ' + langStr + ' pour: "' + product + '". 2-3 phrases max avec emojis et hashtags Maroc.'
+    }], 300);
+    res.json({ reply });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 app.get('/health', (req, res) => {
   const db = loadDB();
   res.json({
