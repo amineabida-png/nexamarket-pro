@@ -2371,112 +2371,184 @@ async function generateVisual() {
   await generateCaptionAI();
 }
 
-// ── CANVAS: Crée une pub pro avec la vraie photo ──────────────────
+// ── CANVAS PRO: Pub magazine professionnelle ─────────────────
 function buildCanvasAd(base64, w, h) {
   return new Promise((resolve, reject) => {
     const canvas = document.createElement('canvas');
     canvas.width = w; canvas.height = h;
     const ctx = canvas.getContext('2d');
 
-    const colorStr = (document.getElementById('vis-colors').value || '').toLowerCase();
+    const colorStr  = (document.getElementById('vis-colors').value || '').toLowerCase();
     const promoText = document.getElementById('vis-text').value || '';
-    const prodName  = (document.getElementById('vis-product').value || 'Produit Premium').toUpperCase();
+    const prodName  = document.getElementById('vis-product').value || 'Produit Premium';
+    const platform  = visCurrPlat;
 
-    // Pick background color
-    let bg1 = '#ffffff', bg2 = '#f0ede8', accent = '#1a1a1a';
-    if (colorStr.includes('noir') || colorStr.includes('black'))         { bg1='#111'; bg2='#222'; accent='#c9a84c'; }
-    else if (colorStr.includes('or') || colorStr.includes('gold'))       { bg1='#fffbf0'; bg2='#f5e6b8'; accent='#b8860b'; }
-    else if (colorStr.includes('bordeaux') || colorStr.includes('rouge')){ bg1='#fff5f5'; bg2='#fde8e8'; accent='#8b1a1a'; }
-    else if (colorStr.includes('rose') || colorStr.includes('pink'))     { bg1='#fff0f5'; bg2='#ffd6e7'; accent='#c2185b'; }
-    else if (colorStr.includes('bleu') || colorStr.includes('blue'))     { bg1='#f0f4ff'; bg2='#dce6ff'; accent='#1a237e'; }
-    else if (colorStr.includes('vert') || colorStr.includes('green'))    { bg1='#f0fff4'; bg2='#c8f5d8'; accent='#1b5e20'; }
+    // Color themes
+    let bg1='#0a0a0a', bg2='#1a1a1a', accent='#c9a84c', textCol='#ffffff', subCol='rgba(255,255,255,0.7)';
+    if (colorStr.includes('blanc') || colorStr.includes('white')) {
+      bg1='#fafafa'; bg2='#f0ede8'; accent='#1a1a1a'; textCol='#111'; subCol='rgba(0,0,0,0.6)';
+    } else if (colorStr.includes('or') && !colorStr.includes('noir')) {
+      bg1='#1a1200'; bg2='#2d2000'; accent='#c9a84c'; textCol='#fff'; subCol='rgba(201,168,76,0.8)';
+    } else if (colorStr.includes('bordeaux') || colorStr.includes('rouge')) {
+      bg1='#1a0000'; bg2='#2d0808'; accent='#c0392b'; textCol='#fff'; subCol='rgba(255,150,150,0.7)';
+    } else if (colorStr.includes('rose') || colorStr.includes('pink')) {
+      bg1='#1a0010'; bg2='#2d0020'; accent='#e91e8c'; textCol='#fff'; subCol='rgba(255,150,200,0.7)';
+    } else if (colorStr.includes('bleu') || colorStr.includes('blue')) {
+      bg1='#00051a'; bg2='#000d2d'; accent='#2979ff'; textCol='#fff'; subCol='rgba(100,150,255,0.7)';
+    } else if (colorStr.includes('vert') || colorStr.includes('green')) {
+      bg1='#001a08'; bg2='#002d10'; accent='#00c853'; textCol='#fff'; subCol='rgba(100,255,150,0.7)';
+    }
 
-    // Draw background gradient
-    const grad = ctx.createLinearGradient(0, 0, w, h);
-    grad.addColorStop(0, bg1);
-    grad.addColorStop(1, bg2);
-    ctx.fillStyle = grad;
+    // ── BACKGROUND ──
+    const bgGrad = ctx.createLinearGradient(0, 0, w * 0.3, h);
+    bgGrad.addColorStop(0, bg1);
+    bgGrad.addColorStop(1, bg2);
+    ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, w, h);
+
+    // Diagonal light effect
+    ctx.save();
+    const lightGrad = ctx.createLinearGradient(w * 0.3, 0, w, h * 0.6);
+    lightGrad.addColorStop(0, 'rgba(255,255,255,0.06)');
+    lightGrad.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = lightGrad;
+    ctx.beginPath();
+    ctx.moveTo(w * 0.25, 0);
+    ctx.lineTo(w, 0);
+    ctx.lineTo(w, h * 0.7);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    // Accent side bar (left)
+    ctx.fillStyle = accent;
+    ctx.fillRect(0, 0, w * 0.012, h);
 
     // Load product image
     const pImg = new Image();
     pImg.onload = () => {
-      // Compute product size (70% of canvas)
-      const maxW = w * 0.70;
-      const maxH = h * (promoText ? 0.58 : 0.70);
-      const scale = Math.min(maxW / pImg.width, maxH / pImg.height);
-      const pw = pImg.width * scale;
-      const ph = pImg.height * scale;
-      const px = (w - pw) / 2;
-      const headerH = h * 0.12;
-      const py = headerH + (maxH - ph) / 2 + h * 0.03;
+      // ── PRODUCT IMAGE ──
+      const isVertical = h > w;
+      const imgAreaW = isVertical ? w * 0.85 : w * 0.52;
+      const imgAreaH = isVertical ? h * 0.52 : h * 0.72;
+      const imgX     = isVertical ? (w - imgAreaW) / 2 : w * 0.42;
+      const imgY     = isVertical ? h * 0.18 : (h - imgAreaH) / 2;
 
-      // Drop shadow
+      const scale = Math.min(imgAreaW / pImg.width, imgAreaH / pImg.height);
+      const pw = pImg.width  * scale;
+      const ph = pImg.height * scale;
+      const px = imgX + (imgAreaW - pw) / 2;
+      const py = imgY + (imgAreaH - ph) / 2;
+
+      // Glow behind product
       ctx.save();
-      ctx.shadowColor = 'rgba(0,0,0,0.22)';
-      ctx.shadowBlur  = Math.round(w * 0.04);
-      ctx.shadowOffsetY = Math.round(h * 0.02);
+      const glow = ctx.createRadialGradient(px+pw/2, py+ph/2, 0, px+pw/2, py+ph/2, Math.max(pw,ph)*0.7);
+      glow.addColorStop(0, accent.replace(')', ',0.15)').replace('rgb','rgba').replace('#','rgba(').replace('rgba(','rgba(') + '0.12)');
+      glow.addColorStop(0, 'rgba(255,255,255,0.08)');
+      glow.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(px - pw*0.3, py - ph*0.3, pw*1.6, ph*1.6);
+      ctx.restore();
+
+      // Product shadow
+      ctx.save();
+      ctx.shadowColor = 'rgba(0,0,0,0.5)';
+      ctx.shadowBlur  = w * 0.06;
+      ctx.shadowOffsetX = w * 0.015;
+      ctx.shadowOffsetY = h * 0.025;
       ctx.drawImage(pImg, px, py, pw, ph);
       ctx.restore();
 
-      // Top header bar
+      // ── TEXT CONTENT ──
+      const textX = isVertical ? w * 0.08 : w * 0.05;
+      const textY = isVertical ? h * 0.75  : h * 0.12;
+      const textW = isVertical ? w * 0.84   : w * 0.38;
+
+      // Accent line before text
       ctx.fillStyle = accent;
-      ctx.fillRect(0, 0, w, h * 0.10);
+      ctx.fillRect(textX, textY - (isVertical ? h*0.015 : h*0.01), w*0.04, isVertical ? h*0.004 : h*0.003);
 
-      // Product name in header
-      const nameSize = Math.round(w * 0.042);
-      ctx.font = '700 ' + nameSize + 'px Arial, sans-serif';
-      ctx.fillStyle = '#ffffff';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      const maxName = Math.floor(w / (nameSize * 0.55));
-      ctx.fillText(prodName.slice(0, maxName), w/2, h * 0.05);
+      // Brand / product name
+      const nameSize = Math.round(Math.min(w,h) * (isVertical ? 0.048 : 0.038));
+      ctx.font = '300 ' + nameSize + 'px Arial, sans-serif';
+      ctx.fillStyle = subCol;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+      ctx.fillText('COLLECTION', textX, textY);
 
-      // Accent line under header
-      ctx.fillStyle = bg2;
-      ctx.fillRect(0, h * 0.10, w, h * 0.004);
+      // Big product title
+      const titleSize = Math.round(Math.min(w,h) * (isVertical ? 0.072 : 0.058));
+      ctx.font = '800 ' + titleSize + 'px Arial, sans-serif';
+      ctx.fillStyle = textCol;
 
-      // Bottom promo section
+      // Word wrap product name
+      const words = prodName.toUpperCase().split(' ');
+      let line = '', lineY = textY + nameSize * 1.4;
+      const maxLineW = textW;
+      words.forEach((word, i) => {
+        const test = line + (line ? ' ' : '') + word;
+        if (ctx.measureText(test).width > maxLineW && line) {
+          ctx.fillText(line, textX, lineY);
+          lineY += titleSize * 1.15;
+          line = word;
+        } else { line = test; }
+        if (i === words.length - 1) { ctx.fillText(line, textX, lineY); lineY += titleSize * 1.2; }
+      });
+
+      // Promo text
       if (promoText) {
-        const botH = h * 0.17;
-        const botY = h - botH;
-        ctx.fillStyle = accent;
-        ctx.fillRect(0, botY, w, botH);
+        lineY += titleSize * 0.3;
+        // Promo box
+        const promoSize = Math.round(Math.min(w,h) * (isVertical ? 0.052 : 0.042));
+        const promoLines = [];
+        let pLine = '';
+        const pWords = promoText.toUpperCase().split(' ');
+        ctx.font = '700 ' + promoSize + 'px Arial, sans-serif';
+        pWords.forEach((word, i) => {
+          const test = pLine + (pLine ? ' ' : '') + word;
+          if (ctx.measureText(test).width > textW && pLine) {
+            promoLines.push(pLine); pLine = word;
+          } else { pLine = test; }
+          if (i === pWords.length-1) promoLines.push(pLine);
+        });
 
-        const promoSize = Math.round(w * 0.052);
-        ctx.font = '800 ' + promoSize + 'px Arial, sans-serif';
-        ctx.fillStyle = '#ffffff';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-
-        // Wrap text
-        const maxChars = Math.floor(w / (promoSize * 0.58));
-        if (promoText.length > maxChars) {
-          const mid = Math.ceil(promoText.length / 2);
-          const breakAt = promoText.lastIndexOf(' ', mid) || mid;
-          const line1 = promoText.slice(0, breakAt);
-          const line2 = promoText.slice(breakAt + 1);
-          const s2 = Math.round(promoSize * 0.78);
-          ctx.font = '800 ' + promoSize + 'px Arial, sans-serif';
-          ctx.fillText(line1, w/2, botY + botH * 0.38);
-          ctx.font = '700 ' + s2 + 'px Arial, sans-serif';
-          ctx.fillText(line2, w/2, botY + botH * 0.72);
-        } else {
-          ctx.fillText(promoText, w/2, botY + botH/2);
-        }
-      } else {
-        // Simple bottom bar
+        const promoBoxH = promoLines.length * promoSize * 1.4 + promoSize * 0.8;
+        // Background box
         ctx.fillStyle = accent;
-        ctx.globalAlpha = 0.85;
-        ctx.fillRect(0, h * 0.88, w, h * 0.12);
-        ctx.globalAlpha = 1;
-        const s = Math.round(w * 0.036);
-        ctx.font = '600 ' + s + 'px Arial, sans-serif';
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(textX - w*0.02, lineY - promoSize*0.4, textW + w*0.04, promoBoxH, w*0.015);
+        else ctx.rect(textX - w*0.02, lineY - promoSize*0.4, textW + w*0.04, promoBoxH);
+        ctx.fill();
+
+        ctx.fillStyle = bg1 === '#fafafa' ? '#fff' : '#000';
         ctx.fillStyle = '#ffffff';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('QUALITÉ PREMIUM · MAROC', w/2, h * 0.94);
+        promoLines.forEach((pl, i) => {
+          ctx.fillText(pl, textX, lineY + i * promoSize * 1.4);
+        });
+        lineY += promoBoxH + promoSize * 0.5;
       }
+
+      // Tagline
+      const tagSize = Math.round(Math.min(w,h) * 0.028);
+      ctx.font = '400 ' + tagSize + 'px Arial, sans-serif';
+      ctx.fillStyle = subCol;
+      ctx.fillText('🇲🇦 Livraison partout au Maroc', textX, lineY + tagSize * 0.5);
+
+      // Bottom accent line
+      ctx.fillStyle = accent;
+      ctx.fillRect(0, h - h*0.008, w, h*0.008);
+
+      // Corner decoration
+      ctx.fillStyle = accent;
+      ctx.globalAlpha = 0.15;
+      ctx.beginPath();
+      ctx.arc(w, 0, w * 0.22, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 0.08;
+      ctx.beginPath();
+      ctx.arc(w, 0, w * 0.35, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
 
       resolve(canvas.toDataURL('image/jpeg', 0.95));
     };
@@ -2484,6 +2556,7 @@ function buildCanvasAd(base64, w, h) {
     pImg.src = base64;
   });
 }
+
 
 async function generateCaptionAI() {
   const product  = document.getElementById('vis-product').value;
