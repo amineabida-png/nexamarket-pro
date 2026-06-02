@@ -2548,7 +2548,7 @@ function selFmt(el, name, w, h) {
 }
 
 async function visGenerate() {
-  if (!visPhoto) { setAlert('vis-gen-alert','Uploadez d'abord une photo produit','err'); return; }
+  if (!visPhoto) { setAlert("vis-gen-alert","Uploadez une photo produit","err"); return; }
   const name  = document.getElementById('vis-name').value.trim() || 'Produit Premium';
   const promo = document.getElementById('vis-promo').value.trim();
   document.getElementById('vis-gen-alert').textContent = '';
@@ -2709,7 +2709,7 @@ async function visGenerate() {
   const tagSz = Math.round(Math.min(W,H) * 0.026);
   ctx.font = '400 ' + tagSz + 'px Arial';
   ctx.fillStyle = T.subC;
-  ctx.fillText('🇲🇦 Livraison partout au Maroc', tX, lineY + tagSz * 0.3);
+  ctx.fillText('Livraison partout au Maroc', tX, lineY + tagSz * 0.3);
 
   // Bottom accent line
   ctx.fillStyle = T.accent;
