@@ -633,6 +633,7 @@ input[type="password"], input[type="email"], input[type="text"] {
       <div class="ni" onclick="showPage('broadcasts',this)">📣 Broadcasts WA</div>
       <div class="ni" onclick="showPage('reports',this)">📊 Rapports</div>
       <div class="ni" onclick="showPage('store',this)">🏪 Ma Boutique</div>
+      <div class="ni" onclick="showPage('settings',this)">⚙️ Paramètres</div>
     </div>
 
     <!-- Super Admin only -->
@@ -2176,6 +2177,7 @@ function showPage(id, navEl) {
   if (id === 'broadcasts') loadBroadcasts();
   if (id === 'reports')    loadReports();
   if (id === 'store')      loadStore();
+  if (id === 'settings')   loadSettings();
 }
 
 /* ═══════════════════════════════════════════════
