@@ -45,3 +45,4 @@ YOUCAN_WEBHOOK_SECRET     = (optionnel)
 - 📅 Mensuel : 299 MAD / 30 jours
 - 📆 Annuel : 2 699 MAD / 365 jours
 - ♾️ À vie : 9 949 MAD / Illimité
+# Updated Tue Jun  2 09:11:08 UTC 2026
