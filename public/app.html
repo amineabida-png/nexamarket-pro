@@ -574,7 +574,6 @@ input[type="password"], input[type="email"], input[type="text"] {
       <div class="ni" onclick="showPage('crm',this)">👥 CRM</div>
       <div class="ni" onclick="showPage('ads',this)">📣 Ads IA</div>
       <div class="ni" onclick="showPage('content',this)">✍️ Contenu IA</div>
-      <div class="ni" onclick="showPage('visuals',this)">🎨 Visuels IA</div>
     </div>
 
     <div class="s-sect">
@@ -945,6 +944,124 @@ input[type="password"], input[type="email"], input[type="text"] {
           </table>
         </div>
       </div>
+    </div>
+
+
+    <!-- ── YOUCAN ── -->
+    <div class="page hidden" id="page-youcan">
+
+      <!-- STATUS CARD -->
+      <div class="card" id="yc-status-card" style="border-color:rgba(99,102,241,.15)">
+        <div class="ch">
+          <div>
+            <div class="ct">🔗 Intégration YouCan</div>
+            <div class="cs" id="yc-status-text">Vérification du statut...</div>
+          </div>
+          <div id="yc-status-badge" class="tag tag-s">Chargement...</div>
+        </div>
+
+        <!-- NOT CONNECTED -->
+        <div id="yc-not-connected">
+          <div style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:var(--r-md);padding:18px;margin-bottom:16px">
+            <div class="fw7 c-a mb8">📋 Comment connecter YouCan en 3 étapes</div>
+            <div class="fs13" style="line-height:2;color:var(--t2)">
+              <div><strong style="color:var(--t1)">1.</strong> Allez sur votre admin YouCan → <strong style="color:var(--violet2)">Paramètres → API</strong></div>
+              <div><strong style="color:var(--t1)">2.</strong> Copiez votre <strong style="color:var(--violet2)">clé API</strong> (commence par yk_...)</div>
+              <div><strong style="color:var(--t1)">3.</strong> Collez-la ci-dessous et cliquez Sauvegarder</div>
+            </div>
+          </div>
+          <div class="form-g2 mb12">
+            <div class="fg"><label class="fl">Clé API YouCan *</label><input class="fi" id="yc-apikey" placeholder="yk_live_xxxx..."></div>
+            <div class="fg"><label class="fl">URL boutique *</label><input class="fi" id="yc-store" placeholder="ma-boutique.youcan.shop"></div>
+            <div class="fg"><label class="fl">Webhook Secret (optionnel)</label><input class="fi" id="yc-secret" placeholder="Pour sécuriser les webhooks"></div>
+          </div>
+          <div id="yc-config-alert" class="alert"></div>
+          <div class="flex gap8">
+            <button class="btn btn-p" onclick="saveYouCanConfig()">💾 Sauvegarder et connecter</button>
+            <button class="btn btn-g" onclick="loadYouCanStatus()">🔄 Tester la connexion</button>
+          </div>
+          <div class="sep"></div>
+          <div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--r-md);padding:14px">
+            <div class="fw7 mb8 fs13">📌 Configurer le Webhook YouCan (pour sync temps réel)</div>
+            <div class="fs12 t2 mb8">Dans YouCan Admin → Paramètres → Webhooks → Ajouter cette URL :</div>
+            <div style="background:var(--input);border-radius:var(--r-sm);padding:10px 14px;font-family:monospace;font-size:12px;color:var(--violet2);word-break:break-all" id="yc-webhook-url">
+              Chargement...
+            </div>
+            <div class="fs11 t2 mt8">Événements à activer : <strong>order.created · order.confirmed · order.cancelled · product.updated</strong></div>
+          </div>
+        </div>
+
+        <!-- CONNECTED -->
+        <div id="yc-connected" style="display:none">
+          <div style="background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);border-radius:var(--r-md);padding:14px;margin-bottom:16px;display:flex;align-items:center;gap:12px">
+            <span style="font-size:28px">✅</span>
+            <div>
+              <div class="fw7 c-g">YouCan connecté et actif</div>
+              <div class="fs12 t2 mt4">Boutique : <span id="yc-store-name" class="c-v fw6">—</span></div>
+            </div>
+          </div>
+
+          <!-- SYNC BUTTONS -->
+          <div class="g3 mb16">
+            <div class="card" style="text-align:center;cursor:pointer;transition:all var(--tr)" onclick="syncOrders()" onmouseover="this.style.borderColor='rgba(99,102,241,.3)'" onmouseout="this.style.borderColor='var(--border)'">
+              <div style="font-size:28px;margin-bottom:8px">📦</div>
+              <div class="fw7 mb4">Sync Commandes</div>
+              <div class="fs12 t2 mb10">Importer toutes les commandes YouCan</div>
+              <button class="btn btn-p btn-sm w100" style="justify-content:center">🔄 Synchroniser</button>
+            </div>
+            <div class="card" style="text-align:center;cursor:pointer;transition:all var(--tr)" onclick="syncProducts()" onmouseover="this.style.borderColor='rgba(99,102,241,.3)'" onmouseout="this.style.borderColor='var(--border)'">
+              <div style="font-size:28px;margin-bottom:8px">🛒</div>
+              <div class="fw7 mb4">Sync Produits</div>
+              <div class="fs12 t2 mb10">Importer catalogue + stocks YouCan</div>
+              <button class="btn btn-p btn-sm w100" style="justify-content:center">🔄 Synchroniser</button>
+            </div>
+            <div class="card" style="text-align:center;cursor:pointer;transition:all var(--tr)" onclick="syncAll()" onmouseover="this.style.borderColor='rgba(34,197,94,.3)'" onmouseout="this.style.borderColor='var(--border)'">
+              <div style="font-size:28px;margin-bottom:8px">⚡</div>
+              <div class="fw7 mb4">Tout synchroniser</div>
+              <div class="fs12 t2 mb10">Commandes + Produits + Clients</div>
+              <button class="btn btn-success btn-sm w100" style="justify-content:center">⚡ Sync tout</button>
+            </div>
+          </div>
+
+          <div id="yc-sync-result" class="alert" style="margin-bottom:12px"></div>
+
+          <!-- YOUCAN ORDERS PREVIEW -->
+          <div class="ch mt8"><div class="ct fs13">📦 Dernières commandes YouCan</div><button class="btn btn-g btn-sm" onclick="loadYCOrders()">🔄 Actualiser</button></div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>N° Commande</th><th>Client</th><th>Total</th><th>Paiement</th><th>Statut</th><th>Date</th></tr></thead>
+              <tbody id="yc-orders-tbody"><tr><td colspan="6" style="text-align:center;color:var(--t3);padding:18px">Cliquez "Sync Commandes" pour charger</td></tr></tbody>
+            </table>
+          </div>
+
+          <div class="sep"></div>
+          <div class="fw7 mb8 fs13">⚙️ Reconfigurer</div>
+          <button class="btn btn-danger btn-sm" onclick="disconnectYouCan()">🔌 Déconnecter YouCan</button>
+        </div>
+      </div>
+
+      <!-- HOW IT WORKS -->
+      <div class="card">
+        <div class="ct mb16">🔄 Comment fonctionne la synchronisation</div>
+        <div class="g3">
+          <div style="text-align:center;padding:16px;background:var(--card2);border-radius:var(--r-md)">
+            <div style="font-size:32px;margin-bottom:10px">🛍</div>
+            <div class="fw7 mb6">Client commande sur YouCan</div>
+            <div class="fs12 t2">Un client passe commande sur votre boutique YouCan</div>
+          </div>
+          <div style="text-align:center;padding:16px;background:var(--card2);border-radius:var(--r-md)">
+            <div style="font-size:32px;margin-bottom:10px">⚡</div>
+            <div class="fw7 mb6">NexaMarket reçoit en temps réel</div>
+            <div class="fs12 t2">Via Webhook : commande + client ajoutés automatiquement</div>
+          </div>
+          <div style="text-align:center;padding:16px;background:var(--card2);border-radius:var(--r-md)">
+            <div style="font-size:32px;margin-bottom:10px">🤖</div>
+            <div class="fw7 mb6">Actions automatiques</div>
+            <div class="fs12 t2">Stock déduit · Contact CRM créé · Alerte notification</div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
 
@@ -1776,7 +1893,6 @@ const PAGE_META = {
   ads:       { t:'Campagnes Publicitaires', s:'Meta · Google · TikTok Ads' },
   content:   { t:'Générateur de Contenu IA', s:'Posts, SMS, emails en Darija / FR / AR' },
   finance:   { t:'IA Financière', s:'Analyse et prévisions en temps réel' },
-  visuals:   { t:'🎨 Créateur de Visuels IA', s:'Générez des images pub pour Facebook · Instagram · TikTok · LinkedIn — 100% gratuit' },
   settings:  { t:'Paramètres', s:'Votre compte et préférences' },
   admin:     { t:'👑 Gestion des comptes', s:'Super Admin — Créer et gérer les utilisateurs' },
 };
@@ -1804,7 +1920,6 @@ function showPage(id, navEl) {
   if (id === 'whatsapp')   loadWA();
   if (id === 'ads')        loadAds();
   if (id === 'finance')    loadFinance();
-  if (id === 'visuals')    initVisuals();
   if (id === 'admin')      loadAdminUsers();
   if (id === 'settings')   loadSettings();
   if (id === 'youcan')     loadYouCanStatus();
@@ -2485,592 +2600,6 @@ function disconnectYouCan() {
 const _origShowPage = showPage;
 
 
-/* ═══════════════════════════════════════════════
-   VISUELS IA — Canvas 100% fonctionnel
-═══════════════════════════════════════════════ */
-let visPhoto = null;
-let visTheme = 'dark';
-let visFmtW  = 1080;
-let visFmtH  = 1080;
-
-// Themes
-const VIS_THEMES = {
-  dark:   { bg1:'#0a0a0a', bg2:'#1a1a1a', accent:'#c9a84c', textC:'#ffffff', subC:'rgba(255,255,255,0.6)' },
-  gold:   { bg1:'#1a1200', bg2:'#2d2000', accent:'#c9a84c', textC:'#ffffff', subC:'rgba(201,168,76,0.8)' },
-  white:  { bg1:'#ffffff', bg2:'#f0ede8', accent:'#1a1a1a', textC:'#111111', subC:'rgba(0,0,0,0.5)' },
-  red:    { bg1:'#1a0000', bg2:'#2d0808', accent:'#c0392b', textC:'#ffffff', subC:'rgba(255,120,120,0.7)' },
-  blue:   { bg1:'#00051a', bg2:'#000d2d', accent:'#2979ff', textC:'#ffffff', subC:'rgba(100,160,255,0.7)' },
-  pink:   { bg1:'#1a0010', bg2:'#2d0020', accent:'#e91e8c', textC:'#ffffff', subC:'rgba(255,100,180,0.7)' },
-  green:  { bg1:'#001a08', bg2:'#002d10', accent:'#00c853', textC:'#ffffff', subC:'rgba(100,255,150,0.7)' },
-  purple: { bg1:'#0d001a', bg2:'#1a0030', accent:'#9c27b0', textC:'#ffffff', subC:'rgba(180,100,255,0.7)' },
-};
-
-function initVisuals() {}
-
-function visDrop(e) {
-  e.preventDefault();
-  const f = e.dataTransfer.files[0];
-  if (f && f.type.startsWith('image/')) loadVisPhoto(f);
-}
-function visFileSelected(inp) {
-  if (inp.files[0]) loadVisPhoto(inp.files[0]);
-}
-function loadVisPhoto(file) {
-  if (file.size > 10*1024*1024) { setAlert('vis-gen-alert','Max 10MB','err'); return; }
-  const reader = new FileReader();
-  reader.onload = e => {
-    visPhoto = e.target.result;
-    document.getElementById('vis-drop-content').style.display = 'none';
-    document.getElementById('vis-thumb').style.display = 'block';
-    document.getElementById('vis-thumb-img').src = visPhoto;
-    document.getElementById('vis-thumb-name').textContent = file.name + ' (' + Math.round(file.size/1024) + 'KB)';
-  };
-  reader.readAsDataURL(file);
-}
-function visRemove() {
-  visPhoto = null;
-  document.getElementById('vis-drop-content').style.display = 'block';
-  document.getElementById('vis-thumb').style.display = 'none';
-  document.getElementById('vis-file').value = '';
-  document.getElementById('vis-canvas').style.display = 'none';
-  document.getElementById('vis-empty').style.display = 'flex';
-  document.getElementById('vis-actions').style.display = 'none';
-  document.getElementById('vis-caption-box').style.display = 'none';
-}
-function selTheme(el, theme) {
-  document.querySelectorAll('.vis-theme').forEach(t => {
-    t.style.borderColor = 'var(--border)';
-    t.classList.remove('sel');
-  });
-  el.style.borderColor = 'var(--violet)';
-  el.classList.add('sel');
-  visTheme = theme;
-}
-function selFmt(el, name, w, h) {
-  document.querySelectorAll('.vis-fmt').forEach(t => {
-    t.style.borderColor = 'var(--border)';
-    t.style.background  = 'transparent';
-  });
-  el.style.borderColor = 'var(--violet)';
-  el.style.background  = 'rgba(99,102,241,.1)';
-  visFmtW = w; visFmtH = h;
-}
-
-async function visGenerate() {
-  if (!visPhoto) { setAlert("vis-gen-alert","Uploadez une photo produit d'abord","err"); return; }
-  const nameEl = document.getElementById('vis-name');
-  const rawName = nameEl ? nameEl.value.trim() : '';
-  if (!rawName) {
-    setAlert("vis-gen-alert","Entrez le nom du produit", "err");
-    if (nameEl) nameEl.focus();
-    return;
-  }
-  const name = rawName;
-  const promo = document.getElementById('vis-promo').value.trim();
-  document.getElementById('vis-gen-alert').textContent = '';
-
-  const canvas = document.getElementById('vis-canvas');
-  canvas.width  = visFmtW;
-  canvas.height = visFmtH;
-  canvas.style.display = 'block';
-  document.getElementById('vis-empty').style.display = 'none';
-
-  const ctx = canvas.getContext('2d');
-  const T   = VIS_THEMES[visTheme] || VIS_THEMES.dark;
-  const W   = visFmtW, H = visFmtH;
-  const isStory = H > W;
-
-  // Background
-  const bgGrad = ctx.createLinearGradient(0, 0, isStory ? 0 : W, isStory ? H : 0);
-  bgGrad.addColorStop(0, T.bg1);
-  bgGrad.addColorStop(1, T.bg2);
-  ctx.fillStyle = bgGrad;
-  ctx.fillRect(0, 0, W, H);
-
-  // Diagonal shine
-  ctx.save();
-  const shine = ctx.createLinearGradient(0, 0, W, H);
-  shine.addColorStop(0, 'rgba(255,255,255,0.04)');
-  shine.addColorStop(0.5, 'rgba(255,255,255,0.01)');
-  shine.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.fillStyle = shine;
-  ctx.fillRect(0, 0, W, H);
-  ctx.restore();
-
-  // Accent vertical bar (left)
-  ctx.fillStyle = T.accent;
-  ctx.fillRect(0, 0, Math.round(W * 0.013), H);
-
-  // Circle decoration (top right)
-  ctx.save();
-  ctx.globalAlpha = 0.08;
-  ctx.fillStyle = T.accent;
-  ctx.beginPath();
-  ctx.arc(W, 0, W * 0.38, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.globalAlpha = 0.04;
-  ctx.beginPath();
-  ctx.arc(W, 0, W * 0.55, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.restore();
-
-  // Load product image
-  await new Promise(resolve => {
-    const img = new Image();
-    img.onload = () => {
-      // Image zone
-      const imgPad  = W * 0.08;
-      const imgX    = isStory ? imgPad : W * 0.45;
-      const imgY    = isStory ? H * 0.22 : H * 0.12;
-      const imgMaxW = isStory ? W - imgPad*2 : W * 0.50;
-      const imgMaxH = isStory ? H * 0.50     : H * (promo ? 0.60 : 0.72);
-
-      const scale = Math.min(imgMaxW / img.width, imgMaxH / img.height);
-      const iw = img.width * scale, ih = img.height * scale;
-      const ix = imgX + (imgMaxW - iw) / 2;
-      const iy = imgY + (imgMaxH - ih) / 2;
-
-      // Shadow
-      ctx.save();
-      ctx.shadowColor   = 'rgba(0,0,0,0.45)';
-      ctx.shadowBlur    = W * 0.07;
-      ctx.shadowOffsetX = W * 0.015;
-      ctx.shadowOffsetY = H * 0.02;
-      ctx.drawImage(img, ix, iy, iw, ih);
-      ctx.restore();
-
-      resolve();
-    };
-    img.onerror = resolve;
-    img.src = visPhoto;
-  });
-
-  // Text area
-  const tX = isStory ? W * 0.07 : W * 0.055;
-  const tY = isStory ? H * 0.76  : H * 0.10;
-  const tW = isStory ? W * 0.86   : W * 0.36;
-
-  // Accent line
-  ctx.fillStyle = T.accent;
-  ctx.fillRect(tX, tY - H*0.012, W*0.05, H*0.003);
-
-  // "COLLECTION" subtitle
-  const subSz = Math.round(Math.min(W,H) * 0.032);
-  ctx.font = '300 ' + subSz + 'px Arial';
-  ctx.fillStyle = T.subC;
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'top';
-  ctx.fillText('COLLECTION', tX, tY);
-
-  // Product name (big, bold)
-  const nameSz = Math.round(Math.min(W,H) * (isStory ? 0.062 : 0.052));
-  ctx.font = '800 ' + nameSz + 'px Arial';
-  ctx.fillStyle = T.textC;
-
-  let lineY = tY + subSz * 1.5;
-  const words = name.toUpperCase().split(' ');
-  let line = '';
-  words.forEach((w2, i) => {
-    const test = line + (line ? ' ' : '') + w2;
-    if (ctx.measureText(test).width > tW && line) {
-      ctx.fillText(line, tX, lineY);
-      lineY += nameSz * 1.18;
-      line = w2;
-    } else line = test;
-    if (i === words.length-1) { ctx.fillText(line, tX, lineY); lineY += nameSz * 1.3; }
-  });
-
-  // Promo text box
-  if (promo) {
-    lineY += nameSz * 0.2;
-    const promoSz = Math.round(Math.min(W,H) * (isStory ? 0.048 : 0.038));
-    ctx.font = '700 ' + promoSz + 'px Arial';
-
-    // Measure lines
-    const pWords = promo.toUpperCase().split(' ');
-    const pLines = [];
-    let pLine = '';
-    pWords.forEach((w2, i) => {
-      const t2 = pLine + (pLine?' ':'' ) + w2;
-      if (ctx.measureText(t2).width > tW && pLine) { pLines.push(pLine); pLine=w2; }
-      else pLine = t2;
-      if (i===pWords.length-1) pLines.push(pLine);
-    });
-
-    const boxH = pLines.length * promoSz * 1.45 + promoSz * 0.7;
-    // Accent box
-    ctx.fillStyle = T.accent;
-    ctx.beginPath();
-    const bx = tX - W*0.018, by = lineY - promoSz*0.35;
-    const bw2 = tW + W*0.036;
-    const r2 = W * 0.018;
-    ctx.moveTo(bx+r2, by);
-    ctx.lineTo(bx+bw2-r2, by);
-    ctx.quadraticCurveTo(bx+bw2, by, bx+bw2, by+r2);
-    ctx.lineTo(bx+bw2, by+boxH-r2);
-    ctx.quadraticCurveTo(bx+bw2, by+boxH, bx+bw2-r2, by+boxH);
-    ctx.lineTo(bx+r2, by+boxH);
-    ctx.quadraticCurveTo(bx, by+boxH, bx, by+boxH-r2);
-    ctx.lineTo(bx, by+r2);
-    ctx.quadraticCurveTo(bx, by, bx+r2, by);
-    ctx.closePath();
-    ctx.fill();
-
-    ctx.fillStyle = '#ffffff';
-    pLines.forEach((pl, i) => ctx.fillText(pl, tX, lineY + i * promoSz * 1.45));
-    lineY += boxH + promoSz * 0.6;
-  }
-
-  // Bottom tagline
-  const tagSz = Math.round(Math.min(W,H) * 0.026);
-  ctx.font = '400 ' + tagSz + 'px Arial';
-  ctx.fillStyle = T.subC;
-  ctx.fillText('Livraison partout au Maroc', tX, lineY + tagSz * 0.3);
-
-  // Bottom accent line
-  ctx.fillStyle = T.accent;
-  ctx.fillRect(0, H - Math.round(H*0.007), W, Math.round(H*0.007));
-
-  // Show actions
-  document.getElementById('vis-actions').style.display = 'flex';
-
-  // Generate caption
-  await visCaption();
-}
-
-function visDownload() {
-  const canvas = document.getElementById('vis-canvas');
-  const a = document.createElement('a');
-  a.download = 'nexamarket-pub-' + visTheme + '-' + visFmtW + 'x' + visFmtH + '.jpg';
-  a.href = canvas.toDataURL('image/jpeg', 0.95);
-  a.click();
-}
-
-
-
-// ── SUPPRESSION FOND NAVIGATEUR (sans API) ────────────
-async function removeBackground(base64) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width  = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0);
-
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const data = imageData.data;
-      const w2 = canvas.width, h2 = canvas.height;
-
-      // Sample background color from corners (average of 4 corners)
-      function getPixel(x, y) {
-        const i = (y * w2 + x) * 4;
-        return [data[i], data[i+1], data[i+2], data[i+3]];
-      }
-      const corners = [
-        getPixel(0,0), getPixel(w2-1,0),
-        getPixel(0,h2-1), getPixel(w2-1,h2-1),
-        getPixel(Math.floor(w2/2),0), getPixel(0,Math.floor(h2/2))
-      ];
-      const bgR = Math.round(corners.reduce((s,c)=>s+c[0],0)/corners.length);
-      const bgG = Math.round(corners.reduce((s,c)=>s+c[1],0)/corners.length);
-      const bgB = Math.round(corners.reduce((s,c)=>s+c[2],0)/corners.length);
-
-      // Tolerance for color matching
-      const tolerance = 42;
-      function colorDist(r,g,b) {
-        return Math.sqrt((r-bgR)**2 + (g-bgG)**2 + (b-bgB)**2);
-      }
-
-      // Remove background pixels
-      for (let i = 0; i < data.length; i += 4) {
-        const r = data[i], g = data[i+1], b = data[i+2];
-        const dist = colorDist(r, g, b);
-        if (dist < tolerance) {
-          // Smooth edge: partial transparency
-          data[i+3] = Math.min(data[i+3], Math.round((dist / tolerance) * 80));
-        }
-      }
-
-      // Feather edges - second pass for cleaner look
-      for (let y2 = 0; y2 < h2; y2++) {
-        for (let x = 0; x < w2; x++) {
-          const idx = (y2 * w2 + x) * 4;
-          if (data[idx+3] < 128) {
-            // Check neighbors and average
-            let neighborAlpha = 0, count = 0;
-            for (let dy = -1; dy <= 1; dy++) {
-              for (let dx = -1; dx <= 1; dx++) {
-                const nx = x+dx, ny = y2+dy;
-                if (nx>=0 && nx<w2 && ny>=0 && ny<h2) {
-                  neighborAlpha += data[(ny*w2+nx)*4+3];
-                  count++;
-                }
-              }
-            }
-            if (neighborAlpha/count > 180) data[idx+3] = Math.min(data[idx+3] * 1.5, 255);
-          }
-        }
-      }
-
-      ctx.putImageData(imageData, 0, 0);
-      resolve(canvas.toDataURL('image/png'));
-    };
-    img.onerror = () => resolve(base64);
-    img.src = base64;
-  });
-}
-
-// ── CANVAS PREMIUM: Design pub magazine haut de gamme ───────
-function buildCanvasAd(base64, w, h) {
-  return new Promise((resolve, reject) => {
-    const canvas = document.createElement('canvas');
-    canvas.width = w; canvas.height = h;
-    const ctx = canvas.getContext('2d');
-    const T = VIS_THEMES[visTheme] || VIS_THEMES.dark;
-    const W = w, H = h;
-    const isStory = H > W * 1.2;
-    const isWide  = W > H * 1.2;
-
-    // Background gradient premium
-    const bgGrad = ctx.createLinearGradient(0, 0, W, H);
-    bgGrad.addColorStop(0, T.bg1);
-    bgGrad.addColorStop(0.6, T.bg2);
-    bgGrad.addColorStop(1, T.bg1);
-    ctx.fillStyle = bgGrad;
-    ctx.fillRect(0, 0, W, H);
-
-    // Subtle dot texture
-    ctx.save();
-    ctx.globalAlpha = 0.022;
-    for (let x = 0; x < W; x += 28) {
-      for (let y2 = 0; y2 < H; y2 += 28) {
-        ctx.beginPath();
-        ctx.arc(x, y2, 1, 0, Math.PI * 2);
-        ctx.fillStyle = '#fff';
-        ctx.fill();
-      }
-    }
-    ctx.restore();
-
-    // Glow top-right
-    ctx.save();
-    ctx.globalAlpha = 0.12;
-    const gr1 = ctx.createRadialGradient(W, 0, 0, W, 0, W * 0.65);
-    gr1.addColorStop(0, T.accent);
-    gr1.addColorStop(1, 'transparent');
-    ctx.fillStyle = gr1;
-    ctx.fillRect(0, 0, W, H);
-    ctx.restore();
-
-    // Glow bottom-left
-    ctx.save();
-    ctx.globalAlpha = 0.07;
-    const gr2 = ctx.createRadialGradient(0, H, 0, 0, H, W * 0.5);
-    gr2.addColorStop(0, T.accent);
-    gr2.addColorStop(1, 'transparent');
-    ctx.fillStyle = gr2;
-    ctx.fillRect(0, 0, W, H);
-    ctx.restore();
-
-    // Diagonal lines luxury
-    ctx.save();
-    ctx.globalAlpha = 0.04;
-    ctx.strokeStyle = T.accent;
-    ctx.lineWidth = W * 0.0015;
-    for (let i = -3; i < 5; i++) {
-      ctx.beginPath();
-      ctx.moveTo(W * (0.25 + i * 0.14), 0);
-      ctx.lineTo(W * (0.25 + i * 0.14) + H * 0.28, H);
-      ctx.stroke();
-    }
-    ctx.restore();
-
-    // Left accent bar gradient
-    const barGrad = ctx.createLinearGradient(0, 0, 0, H);
-    barGrad.addColorStop(0, T.accent + 'ff');
-    barGrad.addColorStop(0.5, T.accent + 'dd');
-    barGrad.addColorStop(1, T.accent + '44');
-    ctx.fillStyle = barGrad;
-    ctx.fillRect(0, 0, Math.round(W * 0.013), H);
-
-    // Load product
-    const pImg = new Image();
-    pImg.onload = () => {
-      // Image zone
-      let imgZX, imgZY, imgZW, imgZH;
-      if (isStory) {
-        imgZX = W * 0.06; imgZY = H * 0.20; imgZW = W * 0.88; imgZH = H * 0.47;
-      } else if (isWide) {
-        imgZX = W * 0.48; imgZY = H * 0.06; imgZW = W * 0.48; imgZH = H * 0.88;
-      } else {
-        imgZX = W * 0.38; imgZY = H * 0.08; imgZW = W * 0.58; imgZH = H * 0.82;
-      }
-
-      const sc = Math.min(imgZW / pImg.width, imgZH / pImg.height) * 0.90;
-      const iw = pImg.width * sc, ih = pImg.height * sc;
-      const ix = imgZX + (imgZW - iw) / 2;
-      const iy = imgZY + (imgZH - ih) / 2;
-
-      // Spotlight behind product
-      const spR = Math.max(iw, ih) * 0.72;
-      const sp = ctx.createRadialGradient(ix+iw/2, iy+ih/2, 0, ix+iw/2, iy+ih/2, spR);
-      sp.addColorStop(0, 'rgba(255,255,255,0.09)');
-      sp.addColorStop(0.5, 'rgba(255,255,255,0.03)');
-      sp.addColorStop(1, 'transparent');
-      ctx.fillStyle = sp;
-      ctx.beginPath();
-      ctx.arc(ix+iw/2, iy+ih/2, spR, 0, Math.PI*2);
-      ctx.fill();
-
-      // Product shadow
-      ctx.save();
-      ctx.shadowColor = 'rgba(0,0,0,0.55)';
-      ctx.shadowBlur  = W * 0.09;
-      ctx.shadowOffsetX = W * 0.01;
-      ctx.shadowOffsetY = H * 0.02;
-      ctx.drawImage(pImg, ix, iy, iw, ih);
-      ctx.restore();
-      ctx.drawImage(pImg, ix, iy, iw, ih);
-
-      // ── TEXT ──
-      const name  = (document.getElementById('vis-name') ? document.getElementById('vis-name').value : 'Produit Premium').toUpperCase();
-      const promo = document.getElementById('vis-promo') ? document.getElementById('vis-promo').value : '';
-
-      let tX = isStory ? W*0.07 : W*0.05;
-      let tY = isStory ? H*0.72  : H*0.10;
-      let tW = isStory ? W*0.86   : W*0.34;
-
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'top';
-
-      // "COLLECTION" in accent
-      const lblSz = Math.round(Math.min(W,H) * 0.025);
-      ctx.font = '300 ' + lblSz + 'px Arial, sans-serif';
-      ctx.fillStyle = T.accent;
-      ctx.letterSpacing = '3px';
-      ctx.fillText('C O L L E C T I O N', tX, tY);
-
-      // Thin line
-      ctx.fillStyle = T.accent;
-      ctx.globalAlpha = 0.7;
-      ctx.fillRect(tX, tY + lblSz * 1.4, tW * 0.32, 1.5);
-      ctx.globalAlpha = 1;
-
-      // Product name bold
-      const nameSz = Math.round(Math.min(W,H) * (isStory ? 0.065 : 0.052));
-      ctx.font = '900 ' + nameSz + 'px Arial, sans-serif';
-      ctx.fillStyle = T.textC;
-
-      let lineY = tY + lblSz * 1.9;
-      const nWords = name.split(' ');
-      let nLine = '';
-      nWords.forEach((wd, i) => {
-        const test = nLine + (nLine ? ' ' : '') + wd;
-        if (ctx.measureText(test).width > tW && nLine) {
-          ctx.fillText(nLine, tX, lineY);
-          lineY += nameSz * 1.15;
-          nLine = wd;
-        } else nLine = test;
-        if (i === nWords.length-1) { ctx.fillText(nLine, tX, lineY); lineY += nameSz*1.3; }
-      });
-
-      // Promo box
-      if (promo) {
-        lineY += nameSz * 0.1;
-        const pSz = Math.round(Math.min(W,H) * (isStory ? 0.042 : 0.034));
-        ctx.font = '800 ' + pSz + 'px Arial, sans-serif';
-        const pWds = promo.toUpperCase().split(' ');
-        const pLns = [];
-        let pLn = '';
-        pWds.forEach((wd, i) => {
-          const t2 = pLn + (pLn ? ' ' : '') + wd;
-          if (ctx.measureText(t2).width > tW + W*0.03 && pLn) { pLns.push(pLn); pLn = wd; }
-          else pLn = t2;
-          if (i === pWds.length-1) pLns.push(pLn);
-        });
-
-        const pad = pSz * 0.55;
-        const bxH = pLns.length * pSz * 1.5 + pad * 1.2;
-        const bx  = tX - pad * 0.4;
-        const bww = tW + pad * 0.8;
-        const br  = pSz * 0.3;
-
-        // Box gradient
-        const bGrd = ctx.createLinearGradient(bx, lineY, bx + bww, lineY + bxH);
-        bGrd.addColorStop(0, T.accent);
-        bGrd.addColorStop(1, T.accent + 'cc');
-        ctx.fillStyle = bGrd;
-        ctx.beginPath();
-        ctx.moveTo(bx+br, lineY);
-        ctx.lineTo(bx+bww-br, lineY); ctx.quadraticCurveTo(bx+bww, lineY, bx+bww, lineY+br);
-        ctx.lineTo(bx+bww, lineY+bxH-br); ctx.quadraticCurveTo(bx+bww, lineY+bxH, bx+bww-br, lineY+bxH);
-        ctx.lineTo(bx+br, lineY+bxH); ctx.quadraticCurveTo(bx, lineY+bxH, bx, lineY+bxH-br);
-        ctx.lineTo(bx, lineY+br); ctx.quadraticCurveTo(bx, lineY, bx+br, lineY);
-        ctx.closePath();
-        ctx.fill();
-
-        ctx.fillStyle = '#ffffff';
-        ctx.font = '800 ' + pSz + 'px Arial, sans-serif';
-        pLns.forEach((pl, i) => ctx.fillText(pl, tX, lineY + pad*0.35 + i * pSz * 1.5));
-        lineY += bxH + pSz * 0.6;
-      }
-
-      // Tagline
-      const tgSz = Math.round(Math.min(W,H) * 0.023);
-      ctx.font = '300 ' + tgSz + 'px Arial, sans-serif';
-      ctx.fillStyle = T.subC;
-      ctx.globalAlpha = 0.8;
-      ctx.fillText('Livraison partout au Maroc', tX, lineY + tgSz * 0.5);
-      ctx.globalAlpha = 1;
-
-      // Bottom line gradient
-      const btGrd = ctx.createLinearGradient(0, 0, W, 0);
-      btGrd.addColorStop(0, T.accent);
-      btGrd.addColorStop(0.6, T.accent + '88');
-      btGrd.addColorStop(1, 'transparent');
-      ctx.fillStyle = btGrd;
-      ctx.fillRect(0, H - Math.round(H*0.005), W, Math.round(H*0.005));
-
-      resolve(canvas.toDataURL('image/jpeg', 0.95));
-    };
-    pImg.onerror = () => reject(new Error('Impossible de charger la photo'));
-    pImg.src = base64;
-  });
-}
-
-
-async function visCaption() {
-  const name = document.getElementById('vis-name').value || 'produit';
-  const langEl = document.getElementById('vis-cap-lang');
-  const lang = langEl ? langEl.value : 'dar';
-  const box  = document.getElementById('vis-caption-box');
-  const txt  = document.getElementById('vis-caption-txt');
-  if (!box || !txt) return;
-  box.style.display = 'block';
-  txt.textContent = 'Generation en cours...';
-  try {
-    // Try public endpoint first
-    const r = await fetch('/api/ai/caption-public', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ product: name, lang: lang })
-    });
-    if (r.ok) {
-      const data = await r.json();
-      txt.textContent = data.reply || 'Aucune legende generee';
-    } else {
-      // Fallback: use authenticated endpoint
-      const r2 = await API('POST', '/api/ai/chat', {
-        message: 'Cree une legende pub en ' + (lang==='dar'?'darija':'francais') + ' pour: "' + name + '". 2 phrases max avec hashtags Maroc.'
-      });
-      txt.textContent = r2.ok ? r2.data.reply : 'Ajoutez votre texte de legende ici';
-    }
-  } catch(e) {
-    txt.textContent = 'Ajoutez votre texte de legende ici';
-  }
-}
 
 </script>
 </body>
