@@ -508,6 +508,48 @@ input[type="password"], input[type="email"], input[type="text"] {
   /* Already dark by default — no changes needed */
 }
 
+
+/* ═══════════════════════════════════════════
+   IMPRESSION A4 + TICKET CAISSE
+═══════════════════════════════════════════ */
+@media print {
+  .sidebar, .hdr, .modal-bg, .btn, select, .no-print { display: none !important; }
+  .main { margin-left: 0 !important; }
+  body { background: #fff !important; color: #000 !important; font-size: 12px !important; }
+  .print-doc { display: block !important; }
+  @page { margin: 15mm; }
+}
+
+/* A4 document */
+.print-doc {
+  display: none;
+  max-width: 210mm;
+  margin: 0 auto;
+  background: #fff;
+  color: #000;
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* Ticket caisse 80mm */
+@page ticket { size: 80mm auto; margin: 3mm; }
+.ticket-doc {
+  display: none;
+  width: 72mm;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  color: #000;
+  background: #fff;
+}
+.ticket-sep { border-top: 1px dashed #000; margin: 4px 0; }
+.ticket-center { text-align: center; }
+.ticket-bold { font-weight: 700; }
+.ticket-row { display: flex; justify-content: space-between; }
+
+/* View modal */
+.view-modal { max-width: 700px !important; }
+
 </style>
 </head>
 <body>
@@ -2185,7 +2227,12 @@ async function loadCRM() {
       <td><span class="tag tag-s">${esc(c.source||'—')}</span></td>
       <td><span style="font-weight:700;color:${scoreColor(c.aiScore)}">${c.aiScore||50}/100</span></td>
       <td class="fw6">${fmt(c.value||0)} MAD</td>
-      <td><button class="btn btn-danger btn-sm" onclick="deleteContact('${c.id}')">🗑</button></td>
+      <td>
+  <div class="flex gap4">
+    <button class="btn btn-g btn-sm" onclick="viewContact('${c.id}','${esc(c.name)}','${esc(c.phone||'')}','${esc(c.email||'')}','${c.aiScore||50}','${esc(c.notes||'')}')">👁</button>
+    <button class="btn btn-danger btn-sm" onclick="deleteContact('${c.id}')">🗑</button>
+  </div>
+</td>
     </tr>`).join('');
 }
 function scoreColor(s) { return s >= 75 ? 'var(--rose)' : s >= 50 ? 'var(--amber)' : 'var(--sky)'; }
@@ -2228,7 +2275,12 @@ async function loadProducts() {
       <td class="fw7 c-v">${fmt(p.price)} MAD</td>
       <td><span style="color:${p.stock<=p.stockAlert?'var(--rose)':'var(--green)'}">📦 ${p.stock}</span></td>
       <td class="t2">${esc(p.category)}</td>
-      <td><button class="btn btn-danger btn-sm" onclick="deleteProd('${p.id}')">🗑</button></td>
+      <td>
+  <div class="flex gap4">
+    <button class="btn btn-g btn-sm" onclick="editProduct('${p.id}','${esc(p.name)}',${p.price},${p.stock},'${esc(p.category||'')}')">✏️</button>
+    <button class="btn btn-danger btn-sm" onclick="deleteProd('${p.id}')">🗑</button>
+  </div>
+</td>
     </tr>`).join('');
 }
 async function saveProduct() {
@@ -2266,12 +2318,18 @@ async function loadOrders() {
       <td><span class="tag ${o.status==='delivered'?'tag-g':o.status==='cancelled'?'tag-r':'tag-a'}">${o.status}</span></td>
       <td class="t2 fs12">${o.createdAt?.substring(0,10)}</td>
       <td>
-        <select class="fi" style="font-size:11px;padding:4px 6px;width:110px" onchange="updateOrderStatus('${o.id}',this.value)">
-          <option ${o.status==='pending'?'selected':''} value="pending">En attente</option>
-          <option ${o.status==='confirmed'?'selected':''} value="confirmed">Confirmée</option>
-          <option ${o.status==='delivered'?'selected':''} value="delivered">Livrée</option>
-          <option ${o.status==='cancelled'?'selected':''} value="cancelled">Annulée</option>
-        </select>
+        <div class="flex gap4" style="flex-wrap:wrap">
+          <select class="fi" style="font-size:11px;padding:4px 6px;width:100px" onchange="updateOrderStatus('${o.id}',this.value)">
+            <option ${o.status==='pending'?'selected':''} value="pending">⏳ Attente</option>
+            <option ${o.status==='confirmed'?'selected':''} value="confirmed">✅ Confirmée</option>
+            <option ${o.status==='delivered'?'selected':''} value="delivered">📦 Livrée</option>
+            <option ${o.status==='cancelled'?'selected':''} value="cancelled">✕ Annulée</option>
+          </select>
+          <button class="btn btn-g btn-sm" onclick="viewOrder('${o.id}')">👁</button>
+          <button class="btn btn-p btn-sm" onclick="printOrderA4('${o.id}')">🖨️</button>
+          <button class="btn btn-g btn-sm" onclick="printOrderTicket('${o.id}')">🧾</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteOrder('${o.id}')">🗑</button>
+        </div>
       </td>
     </tr>`).join('');
 }
@@ -2313,13 +2371,15 @@ async function loadBilling() {
       <td class="fw6">${esc(i.contactName)}</td>
       <td class="fw7">${fmt(i.totalTTC)} MAD</td>
       <td><span class="tag ${i.status==='paid'?'tag-g':i.status==='overdue'?'tag-r':'tag-a'}">${i.status==='paid'?'✓ Payée':i.status==='overdue'?'⚠ Impayée':'⏳ En attente'}</span></td>
-      <td class="t2 fs12">${i.createdAt?.substring(0,10)}</td>
+      <td class="t2 fs12">${(i.createdAt||'').substring(0,10)}</td>
       <td>
-        <select class="fi" style="font-size:11px;padding:4px 6px;width:110px" onchange="updateInvStatus('${i.id}',this.value)">
-          <option ${i.status==='pending'?'selected':''} value="pending">En attente</option>
-          <option ${i.status==='paid'?'selected':''} value="paid">Payée</option>
-          <option ${i.status==='overdue'?'selected':''} value="overdue">Impayée</option>
-        </select>
+        <div class="flex gap4" style="flex-wrap:wrap">
+          <button class="btn btn-g btn-sm" onclick="viewInvoice('${i.id}')">👁 Voir</button>
+          <button class="btn btn-p btn-sm" onclick="printInvoiceA4('${i.id}')">🖨️ A4</button>
+          <button class="btn btn-g btn-sm" onclick="printInvoiceTicket('${i.id}')">🧾</button>
+          <button class="btn btn-amber btn-sm" onclick="editInvoice('${i.id}','${i.status}','${esc(i.notes||'')}')">✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteInvoice('${i.id}')">🗑</button>
+        </div>
       </td>
     </tr>`).join('');
 }
@@ -2950,6 +3010,9 @@ async function loadLogistics() {
           <option value="delivered" ${s.status==='delivered'?'selected':''}>✅ Livrée</option>
           <option value="returned" ${s.status==='returned'?'selected':''}>↩ Retournée</option>
         </select>
+          <button class="btn btn-p btn-sm" onclick="printShipmentTicket('${s.id}','${esc(s.trackingNumber)}','${esc(s.contactName)}','${esc(s.address||'')}','${esc(s.city||'')}','${esc(s.phone||'')}','${esc(s.carrier)}')">🧾</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteShipment('${s.id}')">🗑</button>
+        </div>
       </td>
     </tr>`).join('');
 }
@@ -3176,6 +3239,298 @@ async function saveStoreSettings() {
   const slogan = document.getElementById('store-slogan').value;
   const r = await API('PUT', '/api/settings/profile', { company: name });
   if (r.ok) { alert('✅ Paramètres boutique sauvegardés!'); loadStore(); }
+}
+
+
+/* ═══════════════════════════════════════════════
+   IMPRESSION A4 + TICKET CAISSE + VIEW/EDIT/DELETE
+═══════════════════════════════════════════════ */
+
+let currentPrintData = null;
+let editInvId = null;
+
+// ── FACTURES ──────────────────────────────────
+async function viewInvoice(id) {
+  const r = await API('GET', '/api/billing/invoices/' + id);
+  if (!r.ok) return;
+  const inv = r.data;
+  currentPrintData = { type: 'invoice', data: inv };
+  document.getElementById('view-modal-title').textContent = inv.invoiceNo + ' — ' + inv.contactName;
+  document.getElementById('view-modal-content').innerHTML = buildInvoiceHTML(inv);
+  openModal('modal-view');
+}
+
+function buildInvoiceHTML(inv) {
+  const items = (inv.items||[]).map(it => `
+    <tr style="border-bottom:1px solid #eee">
+      <td style="padding:8px 4px">${esc(it.name||'')}</td>
+      <td style="padding:8px 4px;text-align:right">${it.qty||1}</td>
+      <td style="padding:8px 4px;text-align:right">${fmt(it.price||0)}</td>
+      <td style="padding:8px 4px;text-align:right;font-weight:600">${fmt((it.price||0)*(it.qty||1))}</td>
+    </tr>`).join('');
+
+  const typeLabel = inv.type==='devis'?'DEVIS':inv.type==='avoir'?'AVOIR':'FACTURE';
+  return `
+    <div style="font-family:Arial,sans-serif;color:#111;padding:8px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #6366f1">
+        <div>
+          <div style="font-size:22px;font-weight:800;color:#6366f1">${esc(inv.company||'Ma Boutique')}</div>
+          <div style="font-size:12px;color:#666">${esc(inv.phone||'')} · ${esc(inv.city||'Maroc')}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:20px;font-weight:800">${typeLabel}</div>
+          <div style="font-size:14px;font-weight:700;color:#6366f1">${esc(inv.invoiceNo||'')}</div>
+          <div style="font-size:12px;color:#666">${(inv.createdAt||'').substring(0,10)}</div>
+        </div>
+      </div>
+      <div style="margin-bottom:20px">
+        <div style="font-size:11px;color:#999;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Facturé à</div>
+        <div style="font-weight:700;font-size:15px">${esc(inv.contactName||'')}</div>
+        <div style="font-size:12px;color:#666">${esc(inv.contactAddress||'')}</div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:16px">
+        <thead>
+          <tr style="background:#f5f5f5">
+            <th style="padding:10px 4px;text-align:left;font-size:11px;text-transform:uppercase">Désignation</th>
+            <th style="padding:10px 4px;text-align:right;font-size:11px;text-transform:uppercase">Qté</th>
+            <th style="padding:10px 4px;text-align:right;font-size:11px;text-transform:uppercase">Prix HT</th>
+            <th style="padding:10px 4px;text-align:right;font-size:11px;text-transform:uppercase">Total HT</th>
+          </tr>
+        </thead>
+        <tbody>${items}</tbody>
+      </table>
+      <div style="display:flex;justify-content:flex-end">
+        <div style="width:260px">
+          <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px"><span style="color:#666">Sous-total HT</span><span>${fmt(inv.subtotalHT||0)} MAD</span></div>
+          ${(inv.discount||0)>0?`<div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px"><span style="color:#666">Remise (${inv.discount}%)</span><span style="color:#e53e3e">- ${fmt(inv.discountAmt||0)} MAD</span></div>`:''}
+          <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px"><span style="color:#666">TVA (20%)</span><span>${fmt(inv.tva||0)} MAD</span></div>
+          <div style="display:flex;justify-content:space-between;padding:10px 0;font-size:16px;font-weight:800;border-top:2px solid #6366f1;margin-top:6px"><span>Total TTC</span><span style="color:#6366f1">${fmt(inv.totalTTC||0)} MAD</span></div>
+        </div>
+      </div>
+      ${inv.notes?`<div style="margin-top:20px;padding:12px;background:#f9f9f9;border-radius:8px;font-size:12px;color:#666">${esc(inv.notes)}</div>`:''}
+      <div style="margin-top:24px;text-align:center;font-size:11px;color:#999;border-top:1px solid #eee;padding-top:12px">Merci pour votre confiance · NexaMarket Pro · Maroc</div>
+    </div>`;
+}
+
+async function printInvoiceA4(id) {
+  const r = await API('GET', '/api/billing/invoices/' + id);
+  if (!r.ok) return;
+  openPrintWindow(buildInvoiceHTML(r.data), 'a4');
+}
+
+async function printInvoiceTicket(id) {
+  const r = await API('GET', '/api/billing/invoices/' + id);
+  if (!r.ok) return;
+  openPrintWindow(buildTicketHTML(r.data), 'ticket');
+}
+
+function buildTicketHTML(inv) {
+  const items = (inv.items||[]).map(it =>
+    `<div style="display:flex;justify-content:space-between;margin:3px 0">
+      <span style="max-width:140px;overflow:hidden">${esc(it.name||'').slice(0,18)}</span>
+      <span>${it.qty||1}x${fmt(it.price||0)}</span>
+     </div>`).join('');
+  return `
+    <div style="font-family:'Courier New',monospace;font-size:11px;width:72mm;color:#000;margin:0 auto">
+      <div style="text-align:center;font-weight:700;font-size:14px;margin-bottom:4px">${esc(inv.company||'Boutique')}</div>
+      <div style="text-align:center;font-size:10px;margin-bottom:8px">${esc(inv.phone||'')} | ${esc(inv.city||'Maroc')}</div>
+      <div style="border-top:1px dashed #000;margin:4px 0"></div>
+      <div style="display:flex;justify-content:space-between;margin:4px 0">
+        <span style="font-weight:700">${inv.invoiceNo}</span>
+        <span>${(inv.createdAt||'').substring(0,10)}</span>
+      </div>
+      <div style="margin-bottom:4px">Client: ${esc(inv.contactName||'')}</div>
+      <div style="border-top:1px dashed #000;margin:4px 0"></div>
+      <div style="font-weight:700;margin-bottom:3px">ARTICLES:</div>
+      ${items}
+      <div style="border-top:1px dashed #000;margin:4px 0"></div>
+      <div style="display:flex;justify-content:space-between;margin:2px 0"><span>HT:</span><span>${fmt(inv.netHT||0)} MAD</span></div>
+      <div style="display:flex;justify-content:space-between;margin:2px 0"><span>TVA(20%):</span><span>${fmt(inv.tva||0)} MAD</span></div>
+      <div style="border-top:1px solid #000;margin:4px 0"></div>
+      <div style="display:flex;justify-content:space-between;font-weight:700;font-size:14px;margin:4px 0"><span>TOTAL TTC:</span><span>${fmt(inv.totalTTC||0)} MAD</span></div>
+      <div style="border-top:1px dashed #000;margin:6px 0"></div>
+      <div style="text-align:center;font-size:10px">Merci pour votre achat!</div>
+      <div style="text-align:center;font-size:9px;margin-top:2px">NexaMarket Pro</div>
+    </div>`;
+}
+
+function printA4() {
+  if (!currentPrintData) return;
+  openPrintWindow(document.getElementById('view-modal-content').innerHTML, 'a4');
+}
+function printTicket() {
+  if (!currentPrintData) return;
+  const inv = currentPrintData.data;
+  openPrintWindow(buildTicketHTML(inv), 'ticket');
+}
+
+function openPrintWindow(html, mode) {
+  const w = window.open('', '_blank', 'width=800,height=600');
+  const isTicket = mode === 'ticket';
+  w.document.write(`<!DOCTYPE html><html><head><title>Impression</title>
+    <style>
+      * { box-sizing:border-box; margin:0; padding:0; }
+      body { background:#fff; color:#000; }
+      ${isTicket ? '@page { size: 80mm auto; margin: 3mm; } body { width:80mm; font-family:Courier New,monospace; }' : '@page { size: A4; margin: 15mm; } body { font-family:Arial,sans-serif; }'}
+      @media print { .no-print { display:none; } }
+    </style></head><body>
+    <div class="no-print" style="padding:12px;background:#f0f0f0;margin-bottom:16px;display:flex;gap:8px">
+      <button onclick="window.print()" style="padding:8px 20px;background:#6366f1;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px">🖨️ Imprimer</button>
+      <button onclick="window.close()" style="padding:8px 16px;background:#eee;border:none;border-radius:6px;cursor:pointer">Fermer</button>
+    </div>
+    ${html}
+    </body></html>`);
+  w.document.close();
+}
+
+// ── COMMANDES ──────────────────────────────────
+async function viewOrder(id) {
+  const r = await API('GET', '/api/ecom/orders/' + id);
+  if (!r.ok) return;
+  const o = r.data;
+  currentPrintData = { type: 'order', data: o };
+  const items = (o.items||[]).map(it =>
+    `<tr><td style="padding:6px 4px">${esc(it.name||'')}</td><td style="text-align:right;padding:6px 4px">${it.qty||1}</td><td style="text-align:right;padding:6px 4px">${fmt(it.price||0)}</td><td style="text-align:right;font-weight:600;padding:6px 4px">${fmt((it.price||0)*(it.qty||1))}</td></tr>`).join('');
+  document.getElementById('view-modal-title').textContent = o.orderNumber + ' — ' + o.contactName;
+  document.getElementById('view-modal-content').innerHTML = `
+    <div style="font-family:Arial,sans-serif;color:#111">
+      <div style="display:flex;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #6366f1">
+        <div><div style="font-size:18px;font-weight:800;color:#6366f1">${esc(o.company||'Boutique')}</div><div style="font-size:12px;color:#666">${esc(o.phone||'')}</div></div>
+        <div style="text-align:right"><div style="font-size:18px;font-weight:800">BON DE COMMANDE</div><div style="font-weight:700;color:#6366f1">${esc(o.orderNumber||'')}</div><div style="font-size:12px;color:#666">${(o.createdAt||'').substring(0,10)}</div></div>
+      </div>
+      <div style="margin-bottom:16px"><div style="font-weight:700">${esc(o.contactName||'')}</div><div style="font-size:12px;color:#666">${esc(o.address||'')}</div><div style="font-size:12px;color:#666">Paiement: ${esc(o.paymentMethod||'')}</div></div>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:16px">
+        <thead><tr style="background:#f5f5f5"><th style="padding:8px 4px;text-align:left">Article</th><th style="padding:8px 4px;text-align:right">Qté</th><th style="padding:8px 4px;text-align:right">Prix</th><th style="padding:8px 4px;text-align:right">Total</th></tr></thead>
+        <tbody>${items}</tbody>
+      </table>
+      <div style="display:flex;justify-content:flex-end">
+        <div style="width:220px">
+          <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:13px"><span style="color:#666">Sous-total HT</span><span>${fmt(o.subtotal||0)} MAD</span></div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:13px"><span style="color:#666">TVA (20%)</span><span>${fmt(o.tva||0)} MAD</span></div>
+          <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:16px;font-weight:800;border-top:2px solid #6366f1;margin-top:4px"><span>Total TTC</span><span style="color:#6366f1">${fmt(o.total||0)} MAD</span></div>
+        </div>
+      </div>
+      ${o.notes?`<div style="margin-top:16px;padding:10px;background:#f9f9f9;border-radius:6px;font-size:12px">${esc(o.notes)}</div>`:''}
+    </div>`;
+  openModal('modal-view');
+}
+
+async function printOrderA4(id) {
+  const r = await API('GET', '/api/ecom/orders/' + id);
+  if (!r.ok) return;
+  await viewOrder(id);
+  setTimeout(() => openPrintWindow(document.getElementById('view-modal-content').innerHTML, 'a4'), 300);
+}
+
+async function printOrderTicket(id) {
+  const r = await API('GET', '/api/ecom/orders/' + id);
+  if (!r.ok) return;
+  const o = r.data;
+  const items = (o.items||[]).map(it =>
+    `<div style="display:flex;justify-content:space-between;margin:2px 0"><span>${esc((it.name||'').slice(0,16))}</span><span>${it.qty}x${fmt(it.price||0)}</span></div>`).join('');
+  const ticketHtml = `
+    <div style="font-family:'Courier New',monospace;font-size:11px;width:72mm">
+      <div style="text-align:center;font-weight:700;font-size:13px">${esc(o.company||'Boutique')}</div>
+      <div style="text-align:center;font-size:10px">${esc(o.phone||'')}</div>
+      <div style="border-top:1px dashed #000;margin:4px 0"></div>
+      <div style="display:flex;justify-content:space-between"><span style="font-weight:700">${esc(o.orderNumber)}</span><span>${(o.createdAt||'').substring(0,10)}</span></div>
+      <div>Client: ${esc(o.contactName)}</div>
+      <div>Paiement: ${esc(o.paymentMethod||'')}</div>
+      <div style="border-top:1px dashed #000;margin:4px 0"></div>
+      ${items}
+      <div style="border-top:1px dashed #000;margin:4px 0"></div>
+      <div style="display:flex;justify-content:space-between"><span>TVA(20%):</span><span>${fmt(o.tva||0)} MAD</span></div>
+      <div style="border-top:1px solid #000;margin:3px 0"></div>
+      <div style="display:flex;justify-content:space-between;font-weight:700;font-size:13px"><span>TOTAL:</span><span>${fmt(o.total||0)} MAD</span></div>
+      <div style="border-top:1px dashed #000;margin:6px 0"></div>
+      <div style="text-align:center;font-size:10px">Merci! NexaMarket Pro</div>
+    </div>`;
+  openPrintWindow(ticketHtml, 'ticket');
+}
+
+async function deleteOrder(id) {
+  if (!confirm('Supprimer cette commande ?')) return;
+  const r = await API('DELETE', '/api/ecom/orders/' + id);
+  if (r.ok) { loadOrders(); loadDashboard(); }
+}
+
+// ── LOGISTIQUE ─────────────────────────────────
+function printShipmentTicket(id, tracking, name, addr, city, phone, carrier) {
+  const ticketHtml = `
+    <div style="font-family:'Courier New',monospace;font-size:11px;width:72mm">
+      <div style="text-align:center;font-weight:700;font-size:13px">BORDEREAU D'EXPEDITION</div>
+      <div style="text-align:center;font-size:10px">${esc(carrier.toUpperCase())}</div>
+      <div style="border-top:1px dashed #000;margin:4px 0"></div>
+      <div style="text-align:center;font-weight:700;font-size:14px;margin:6px 0">${esc(tracking)}</div>
+      <div style="border-top:1px dashed #000;margin:4px 0"></div>
+      <div style="font-weight:700">EXPEDITEUR:</div>
+      <div style="font-size:10px">NexaMarket Pro - Maroc</div>
+      <div style="border-top:1px dashed #000;margin:4px 0"></div>
+      <div style="font-weight:700">DESTINATAIRE:</div>
+      <div style="font-size:12px;font-weight:700">${esc(name)}</div>
+      <div style="font-size:11px">${esc(addr)}</div>
+      <div style="font-size:11px">${esc(city)}</div>
+      <div style="font-size:11px">Tel: ${esc(phone)}</div>
+      <div style="border-top:1px dashed #000;margin:6px 0"></div>
+      <div style="text-align:center;font-size:10px">Date: ${new Date().toLocaleDateString('fr-MA')}</div>
+    </div>`;
+  openPrintWindow(ticketHtml, 'ticket');
+}
+
+async function deleteShipment(id) {
+  if (!confirm('Supprimer ce bordereau ?')) return;
+  const r = await API('DELETE', '/api/logistics/shipments/' + id);
+  if (r.ok) loadLogistics();
+}
+
+// ── FACTURES Edit/Delete ────────────────────────
+function editInvoice(id, status, notes) {
+  editInvId = id;
+  document.getElementById('edit-inv-status').value = status;
+  document.getElementById('edit-inv-notes').value  = notes;
+  openModal('modal-edit-inv');
+}
+async function saveEditInv() {
+  const r = await API('PUT', '/api/billing/invoices/' + editInvId, {
+    status: document.getElementById('edit-inv-status').value,
+    notes:  document.getElementById('edit-inv-notes').value
+  });
+  if (r.ok) { closeModal('modal-edit-inv'); loadBilling(); }
+}
+async function deleteInvoice(id) {
+  if (!confirm('Supprimer cette facture/devis ?')) return;
+  const r = await API('DELETE', '/api/billing/invoices/' + id);
+  if (r.ok) loadBilling();
+}
+
+// ── PRODUITS Edit ───────────────────────────────
+let editProdId = null;
+function editProduct(id, name, price, stock, cat) {
+  editProdId = id;
+  // Quick inline edit via prompt
+  const newPrice = prompt('Nouveau prix MAD (actuel: ' + price + ')', price);
+  if (newPrice === null) return;
+  const newStock = prompt('Nouveau stock (actuel: ' + stock + ')', stock);
+  if (newStock === null) return;
+  API('PUT', '/api/ecom/products/' + id, { price: parseFloat(newPrice)||price, stock: parseInt(newStock)||stock })
+    .then(r => { if (r.ok) loadProducts(); });
+}
+
+// ── CRM View ────────────────────────────────────
+function viewContact(id, name, phone, email, score, notes) {
+  currentPrintData = { type: 'contact', data: { name, phone, email, score, notes } };
+  document.getElementById('view-modal-title').textContent = name;
+  document.getElementById('view-modal-content').innerHTML = `
+    <div style="font-family:Arial,sans-serif">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+        <div><div style="font-size:11px;color:#999;text-transform:uppercase;margin-bottom:4px">Nom</div><div style="font-weight:700;font-size:15px">${esc(name)}</div></div>
+        <div><div style="font-size:11px;color:#999;text-transform:uppercase;margin-bottom:4px">Score IA</div><div style="font-weight:700;font-size:15px;color:#6366f1">${score}/100</div></div>
+        <div><div style="font-size:11px;color:#999;text-transform:uppercase;margin-bottom:4px">Téléphone</div><div style="font-weight:600">${esc(phone||'—')}</div></div>
+        <div><div style="font-size:11px;color:#999;text-transform:uppercase;margin-bottom:4px">Email</div><div style="font-weight:600">${esc(email||'—')}</div></div>
+      </div>
+      ${notes?`<div style="background:#f5f5f5;border-radius:8px;padding:12px"><div style="font-size:11px;color:#999;margin-bottom:4px">NOTES</div><div style="font-size:13px">${esc(notes)}</div></div>`:''}
+    </div>`;
+  openModal('modal-view');
 }
 
 </script>

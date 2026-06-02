@@ -1811,6 +1811,94 @@ ${user.phone ? '<a class="wa-float" href="https://wa.me/' + user.phone.replace(/
 </body>
 </html>`;
 }
+
+// ════════════════════════════════════════════════════════
+//  DELETE ROUTES - Suppression de tous les modules
+// ════════════════════════════════════════════════════════
+
+// Supprimer facture/devis
+app.delete('/api/billing/invoices/:id', auth, (req, res) => {
+  const db = loadDB();
+  const idx = db.invoices.findIndex(i => i.id === req.params.id && i.userId === req.user.id);
+  if (idx === -1) return res.status(404).json({ error: 'Introuvable' });
+  db.invoices.splice(idx, 1);
+  saveDB(db);
+  res.json({ ok: true });
+});
+
+// Supprimer commande
+app.delete('/api/ecom/orders/:id', auth, (req, res) => {
+  const db = loadDB();
+  const idx = db.orders.findIndex(o => o.id === req.params.id && o.userId === req.user.id);
+  if (idx === -1) return res.status(404).json({ error: 'Introuvable' });
+  db.orders.splice(idx, 1);
+  saveDB(db);
+  res.json({ ok: true });
+});
+
+// Supprimer campagne
+app.delete('/api/ads/campaigns/:id', auth, (req, res) => {
+  const db = loadDB();
+  db.campaigns = db.campaigns.filter(c => !(c.id === req.params.id && c.userId === req.user.id));
+  saveDB(db);
+  res.json({ ok: true });
+});
+
+// Supprimer dépense
+app.delete('/api/finance/expenses/:id', auth, (req, res) => {
+  const db = loadDB();
+  db.expenses = db.expenses.filter(e => !(e.id === req.params.id && e.userId === req.user.id));
+  saveDB(db);
+  res.json({ ok: true });
+});
+
+// Supprimer expédition
+app.delete('/api/logistics/shipments/:id', auth, (req, res) => {
+  const db = loadDB();
+  if (!db.shipments) return res.json({ ok: true });
+  db.shipments = db.shipments.filter(s => !(s.id === req.params.id && s.userId === req.user.id));
+  saveDB(db);
+  res.json({ ok: true });
+});
+
+// Modifier facture
+app.put('/api/billing/invoices/:id', auth, (req, res) => {
+  const db = loadDB();
+  const idx = db.invoices.findIndex(i => i.id === req.params.id && i.userId === req.user.id);
+  if (idx === -1) return res.status(404).json({ error: 'Introuvable' });
+  db.invoices[idx] = { ...db.invoices[idx], ...req.body, updatedAt: new Date().toISOString() };
+  saveDB(db);
+  res.json(db.invoices[idx]);
+});
+
+// Modifier commande
+app.put('/api/ecom/orders/:id', auth, (req, res) => {
+  const db = loadDB();
+  const idx = db.orders.findIndex(o => o.id === req.params.id && o.userId === req.user.id);
+  if (idx === -1) return res.status(404).json({ error: 'Introuvable' });
+  db.orders[idx] = { ...db.orders[idx], ...req.body, updatedAt: new Date().toISOString() };
+  saveDB(db);
+  res.json(db.orders[idx]);
+});
+
+// Obtenir détail facture (pour impression)
+app.get('/api/billing/invoices/:id', auth, (req, res) => {
+  const db = loadDB();
+  const inv = db.invoices.find(i => i.id === req.params.id && i.userId === req.user.id);
+  if (!inv) return res.status(404).json({ error: 'Introuvable' });
+  const user = db.users.find(u => u.id === req.user.id) || {};
+  res.json({ ...inv, company: user.company, phone: user.phone, city: user.city, email: user.email });
+});
+
+// Obtenir détail commande (pour impression)
+app.get('/api/ecom/orders/:id', auth, (req, res) => {
+  const db = loadDB();
+  const order = db.orders.find(o => o.id === req.params.id && o.userId === req.user.id);
+  if (!order) return res.status(404).json({ error: 'Introuvable' });
+  const user = db.users.find(u => u.id === req.user.id) || {};
+  res.json({ ...order, company: user.company, phone: user.phone });
+});
+
 app.get('/health', (req, res) => {
   const db = loadDB();
   res.json({
