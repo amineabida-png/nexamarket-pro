@@ -3816,7 +3816,7 @@ async function refreshQR() {
 }
 
 async function disconnectWA() {
-  if (!confirm('Déconnecter WhatsApp? Le bot s'arrêtera.')) return;
+  if (!confirm("Deconnecter WhatsApp? Le bot s'arretera.")) return;
   await API('POST', '/api/wa/disconnect');
   waIsConnected = false;
   loadWAStatus();
