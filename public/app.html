@@ -801,6 +801,80 @@ input[type="password"], input[type="email"], input[type="text"] {
 
     <!-- ── WHATSAPP ── -->
     <div class="page hidden" id="page-whatsapp">
+
+      <!-- QR CONNECTION SECTION -->
+      <div class="card card-glow" id="wa-connect-card">
+        <div class="ch">
+          <div>
+            <div class="ct">💬 Connexion WhatsApp Business</div>
+            <div class="cs">Scannez le QR code avec votre téléphone pour connecter votre vrai WhatsApp</div>
+          </div>
+          <div id="wa-status-badge" class="tag tag-a">⏳ Initialisation...</div>
+        </div>
+
+        <div class="g2">
+          <!-- QR Code Display -->
+          <div id="wa-qr-section" style="text-align:center;padding:20px">
+            <div id="wa-qr-placeholder" style="background:var(--card2);border:2px dashed var(--border);border-radius:var(--r-md);padding:40px;margin-bottom:16px">
+              <div style="font-size:48px;margin-bottom:12px">📱</div>
+              <div class="fw6 fs13 mb4">QR Code en génération...</div>
+              <div class="fs12 t2">Attendez quelques secondes</div>
+              <div style="margin-top:16px">
+                <div style="width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--violet);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto"></div>
+              </div>
+            </div>
+            <canvas id="wa-qr-canvas" style="display:none;border-radius:var(--r-md);max-width:220px"></canvas>
+            <div id="wa-connected-banner" style="display:none;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:var(--r-md);padding:20px">
+              <div style="font-size:48px;margin-bottom:8px">✅</div>
+              <div class="fw7 c-g fs15">WhatsApp Connecté!</div>
+              <div class="fs13 t2 mt4" id="wa-connected-phone">Votre numéro</div>
+            </div>
+          </div>
+
+          <!-- Instructions -->
+          <div>
+            <div id="wa-instructions-scan" style="">
+              <div class="fw7 mb12">📋 Comment connecter en 3 étapes</div>
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;gap:12px;align-items:flex-start">
+                  <div style="background:var(--violet);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0">1</div>
+                  <div><div class="fw6 fs13">Ouvrez WhatsApp sur votre téléphone</div><div class="fs12 t2 mt2">iPhone: Paramètres → Appareils connectés<br>Android: Menu → Appareils connectés</div></div>
+                </div>
+                <div style="display:flex;gap:12px;align-items:flex-start">
+                  <div style="background:var(--violet);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0">2</div>
+                  <div><div class="fw6 fs13">Cliquez "Connecter un appareil"</div><div class="fs12 t2 mt2">Puis "Scanner le QR code"</div></div>
+                </div>
+                <div style="display:flex;gap:12px;align-items:flex-start">
+                  <div style="background:var(--violet);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0">3</div>
+                  <div><div class="fw6 fs13">Scannez le QR code à gauche</div><div class="fs12 t2 mt2">Votre WhatsApp se connecte automatiquement</div></div>
+                </div>
+              </div>
+              <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:var(--r-sm);padding:12px;margin-top:16px">
+                <div class="fs12" style="color:#f59e0b">⚠️ Le QR expire après 20 secondes. Actualisez si expiré.</div>
+              </div>
+            </div>
+
+            <div id="wa-instructions-connected" style="display:none">
+              <div class="fw7 mb12 c-g">✅ WhatsApp actif — Fonctionnalités</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div class="flex aic gap8"><span class="tag tag-g">✓</span><span class="fs13">Messages entrants reçus en temps réel</span></div>
+                <div class="flex aic gap8"><span class="tag tag-g">✓</span><span class="fs13">Bot IA répond automatiquement en Darija</span></div>
+                <div class="flex aic gap8"><span class="tag tag-g">✓</span><span class="fs13">Broadcasts envoyés via votre vrai numéro</span></div>
+                <div class="flex aic gap8"><span class="tag tag-g">✓</span><span class="fs13">Historique complet des conversations</span></div>
+              </div>
+              <div class="flex gap8 mt16">
+                <button class="btn btn-danger btn-sm" onclick="disconnectWA()">🔌 Déconnecter</button>
+                <button class="btn btn-g btn-sm" onclick="loadWAStatus()">🔄 Actualiser</button>
+              </div>
+            </div>
+
+            <div class="flex gap8 mt12">
+              <button class="btn btn-g btn-sm" onclick="refreshQR()">🔄 Actualiser QR</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="g2">
         <div class="card card-glow">
           <div class="ch">
@@ -2173,6 +2247,7 @@ function showPage(id, navEl) {
   if (id === 'admin')      loadAdminUsers();
   if (id === 'settings')   loadSettings();
   if (id === 'youcan')     loadYouCanStatus();
+  if (id === 'whatsapp')   loadWhatsApp();
   if (id === 'logistics')  loadLogistics();
   if (id === 'broadcasts') loadBroadcasts();
   if (id === 'reports')    loadReports();
@@ -3640,6 +3715,123 @@ function testWhatsApp() {
   if (!num) return alert('Entrez votre numéro WhatsApp');
   window.open('https://wa.me/' + num + '?text=Test NexaMarket Pro - Configuration WhatsApp', '_blank');
 }
+
+
+/* ═══════════════════════════════════════════════
+   WHATSAPP QR CODE CONNEXION RÉELLE
+═══════════════════════════════════════════════ */
+let waQRInterval = null;
+let waIsConnected = false;
+
+async function loadWhatsApp() {
+  await loadWAStatus();
+  // Poll QR every 15 seconds
+  if (waQRInterval) clearInterval(waQRInterval);
+  waQRInterval = setInterval(loadWAStatus, 8000);
+}
+
+async function loadWAStatus() {
+  const r = await API('GET', '/api/wa/qr');
+  if (!r.ok) return;
+  const d = r.data;
+
+  const badge        = document.getElementById('wa-status-badge');
+  const qrPlaceholder= document.getElementById('wa-qr-placeholder');
+  const qrCanvas     = document.getElementById('wa-qr-canvas');
+  const connBanner   = document.getElementById('wa-connected-banner');
+  const instrScan    = document.getElementById('wa-instructions-scan');
+  const instrConn    = document.getElementById('wa-instructions-connected');
+
+  if (d.connected) {
+    // ✅ Connected
+    waIsConnected = true;
+    if (badge)        { badge.className = 'tag tag-g'; badge.textContent = '✅ Connecté'; }
+    if (qrPlaceholder) qrPlaceholder.style.display = 'none';
+    if (qrCanvas)      qrCanvas.style.display = 'none';
+    if (connBanner)    connBanner.style.display = 'block';
+    if (instrScan)     instrScan.style.display  = 'none';
+    if (instrConn)     instrConn.style.display  = 'block';
+    const phoneEl = document.getElementById('wa-connected-phone');
+    if (phoneEl) phoneEl.textContent = 'Numéro: +' + (d.phone || '');
+    // Stop polling once connected
+    if (waQRInterval) { clearInterval(waQRInterval); waQRInterval = null; }
+    // Load messages
+    loadWAMessages();
+
+  } else if (d.qr) {
+    // QR Ready - render it
+    waIsConnected = false;
+    if (badge) { badge.className = 'tag tag-a'; badge.textContent = '📱 Scannez le QR'; }
+    if (qrPlaceholder) qrPlaceholder.style.display = 'none';
+    if (connBanner)    connBanner.style.display = 'none';
+    if (instrScan)     instrScan.style.display  = 'block';
+    if (instrConn)     instrConn.style.display  = 'none';
+
+    // Draw QR code using canvas
+    if (qrCanvas) {
+      qrCanvas.style.display = 'block';
+      await drawQRCode(d.qr, qrCanvas);
+    }
+
+  } else {
+    // Initializing
+    if (badge) { badge.className = 'tag tag-s'; badge.textContent = '⏳ Initialisation...'; }
+    if (qrPlaceholder) qrPlaceholder.style.display = 'block';
+    if (qrCanvas)      qrCanvas.style.display = 'none';
+    if (connBanner)    connBanner.style.display = 'none';
+  }
+}
+
+// Draw QR code using a simple canvas-based library
+async function drawQRCode(qrData, canvas) {
+  // Load QRious library dynamically
+  if (!window.QRious) {
+    await new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js';
+      script.onload  = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  }
+  new window.QRious({
+    element: canvas,
+    value:   qrData,
+    size:    220,
+    backgroundAlpha: 1,
+    background: '#ffffff',
+    foreground: '#000000',
+    level: 'M'
+  });
+}
+
+async function refreshQR() {
+  const r = await API('POST', '/api/wa/restart');
+  if (r.ok) {
+    const badge = document.getElementById('wa-status-badge');
+    if (badge) { badge.className = 'tag tag-s'; badge.textContent = '⏳ Redémarrage...'; }
+    setTimeout(loadWAStatus, 3000);
+    if (!waQRInterval) waQRInterval = setInterval(loadWAStatus, 8000);
+  }
+}
+
+async function disconnectWA() {
+  if (!confirm('Déconnecter WhatsApp? Le bot s'arrêtera.')) return;
+  await API('POST', '/api/wa/disconnect');
+  waIsConnected = false;
+  loadWAStatus();
+  if (!waQRInterval) waQRInterval = setInterval(loadWAStatus, 8000);
+}
+
+// Override showPage to stop QR polling when leaving WA page
+const _origShowPageWA = showPage;
+window.showPage = function(id, el) {
+  if (id !== 'whatsapp' && waQRInterval && !waIsConnected) {
+    clearInterval(waQRInterval);
+    waQRInterval = null;
+  }
+  _origShowPageWA(id, el);
+};
 
 </script>
 </body>

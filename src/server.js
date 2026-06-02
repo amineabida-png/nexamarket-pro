@@ -1940,6 +1940,170 @@ app.put('/api/settings/company', auth, (req, res) => {
   res.json({ ok: true, user: db.users[idx] });
 });
 
+
+// ════════════════════════════════════════════════════════
+//  WHATSAPP RÉEL — Baileys QR Code
+// ════════════════════════════════════════════════════════
+let waSocket    = null;
+let waQRCode    = null;
+let waConnected = false;
+let waPhone     = null;
+let waMessages  = [];
+
+async function initWhatsApp() {
+  try {
+    const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, fetchLatestBaileysVersion } = await import('@whiskeysockets/baileys');
+    const { Boom } = await import('@hapi/boom');
+    const { makeInMemoryStore } = await import('@whiskeysockets/baileys');
+
+    const { state, saveCreds } = await useMultiFileAuthState('./data/wa_auth');
+    const { version } = await fetchLatestBaileysVersion();
+
+    waSocket = makeWASocket({
+      version,
+      auth: state,
+      printQRInTerminal: true,
+      browser: ['NexaMarket Pro', 'Chrome', '120.0.0'],
+      connectTimeoutMs: 60000,
+      logger: { level: 'silent', child: () => ({ level: 'silent', info:()=>{}, warn:()=>{}, error:()=>{}, debug:()=>{}, trace:()=>{} }) }
+    });
+
+    waSocket.ev.on('connection.update', async (update) => {
+      const { connection, lastDisconnect, qr } = update;
+      if (qr) {
+        waQRCode = qr;
+        waConnected = false;
+        console.log('[WhatsApp] QR Code généré - scannez avec votre téléphone');
+      }
+      if (connection === 'close') {
+        waConnected = false;
+        waQRCode    = null;
+        const code = lastDisconnect?.error?.output?.statusCode;
+        const shouldReconnect = code !== DisconnectReason.loggedOut;
+        console.log('[WhatsApp] Déconnecté. Code:', code, 'Reconnexion:', shouldReconnect);
+        if (shouldReconnect) setTimeout(initWhatsApp, 5000);
+      }
+      if (connection === 'open') {
+        waConnected = true;
+        waQRCode    = null;
+        waPhone     = waSocket.user?.id?.split(':')[0] || 'Connecté';
+        console.log('[WhatsApp] ✅ Connecté!', waPhone);
+      }
+    });
+
+    waSocket.ev.on('creds.update', saveCreds);
+
+    waSocket.ev.on('messages.upsert', async ({ messages: msgs, type }) => {
+      if (type !== 'notify') return;
+      for (const msg of msgs) {
+        if (msg.key.fromMe) continue;
+        const body    = msg.message?.conversation || msg.message?.extendedTextMessage?.text || '';
+        const from    = msg.key.remoteJid;
+        const phone   = from.replace('@s.whatsapp.net','').replace('@g.us','');
+        const name    = msg.pushName || phone;
+        if (!body) continue;
+
+        console.log('[WhatsApp] Message reçu:', name, ':', body);
+
+        // Save to DB
+        const db = loadDB();
+        if (!db.waMessages) db.waMessages = [];
+        const msgEntry = {
+          id: uuid(), waId: msg.key.id,
+          contactName: name, contactPhone: phone,
+          body, direction: 'in',
+          createdAt: new Date().toISOString()
+        };
+        db.waMessages.push(msgEntry);
+
+        // Auto-reply with Groq IA if bot enabled
+        const botUser = db.users.find(u => u.waBot !== false);
+        if (botUser) {
+          try {
+            const products = db.products.filter(p => p.userId === botUser.id && p.stock > 0).slice(0,5).map(p => p.name + ' ' + p.price + ' MAD').join(', ');
+            const reply = await callGroq([
+              { role: 'system', content: 'Tu es un assistant commercial marocain. Tu reponds en darija marocain (langue arabe dialectal marocaine ecrite en lettres latines). Sois bref, chaleureux et commercial. Boutique: ' + (botUser.company||'Notre boutique') + '. Produits: ' + products },
+              { role: 'user', content: body }
+            ], 200);
+
+            // Send reply
+            if (waSocket && waConnected) {
+              await waSocket.sendMessage(from, { text: reply });
+              db.waMessages.push({
+                id: uuid(), waId: 'bot_' + Date.now(),
+                contactName: 'Bot IA', contactPhone: phone,
+                body: reply, direction: 'out', aiResponse: true,
+                createdAt: new Date().toISOString()
+              });
+            }
+          } catch(e) {
+            console.error('[WhatsApp Bot]', e.message);
+          }
+        }
+        saveDB(db);
+      }
+    });
+  } catch(e) {
+    console.error('[WhatsApp Init Error]', e.message);
+    setTimeout(initWhatsApp, 10000);
+  }
+}
+
+// ── WhatsApp API Routes ────────────────────────────────
+app.get('/api/wa/qr', auth, (req, res) => {
+  res.json({
+    connected: waConnected,
+    phone:     waPhone,
+    qr:        waQRCode,
+    status:    waConnected ? 'connected' : waQRCode ? 'qr_ready' : 'initializing'
+  });
+});
+
+app.post('/api/wa/send', auth, async (req, res) => {
+  const { phone, message } = req.body;
+  if (!waSocket || !waConnected) return res.status(400).json({ error: 'WhatsApp non connecté' });
+  if (!phone || !message) return res.status(400).json({ error: 'Numéro et message requis' });
+  try {
+    const jid = phone.replace(/\D/g,'') + '@s.whatsapp.net';
+    await waSocket.sendMessage(jid, { text: message });
+    const db = loadDB();
+    if (!db.waMessages) db.waMessages = [];
+    db.waMessages.push({
+      id: uuid(), contactPhone: phone,
+      contactName: 'Envoyé',
+      body: message, direction: 'out',
+      createdAt: new Date().toISOString()
+    });
+    saveDB(db);
+    res.json({ ok: true });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.post('/api/wa/disconnect', auth, async (req, res) => {
+  if (waSocket) {
+    await waSocket.logout().catch(()=>{});
+    waSocket    = null;
+    waConnected = false;
+    waQRCode    = null;
+    waPhone     = null;
+  }
+  res.json({ ok: true });
+});
+
+app.post('/api/wa/restart', auth, async (req, res) => {
+  if (waSocket) { await waSocket.logout().catch(()=>{}); waSocket = null; }
+  waConnected = false; waQRCode = null; waPhone = null;
+  initWhatsApp();
+  res.json({ ok: true, message: 'WhatsApp redémarré' });
+});
+
+// Init WhatsApp on server start
+setTimeout(() => {
+  initWhatsApp().catch(e => console.error('[WA Init]', e.message));
+}, 3000);
+
 app.get('/health', (req, res) => {
   const db = loadDB();
   res.json({
