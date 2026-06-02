@@ -587,6 +587,10 @@ input[type="password"], input[type="email"], input[type="text"] {
       <div class="s-lbl">Finance & IA</div>
       <div class="ni" onclick="showPage('finance',this)">💰 IA Financière</div>
       <div class="ni" id="ni-youcan" onclick="showPage('youcan',this)">🔗 YouCan <span class="nb g" id="nb-youcan" style="display:none">✓</span></div>
+      <div class="ni" onclick="showPage('logistics',this)">🚚 Logistique</div>
+      <div class="ni" onclick="showPage('broadcasts',this)">📣 Broadcasts WA</div>
+      <div class="ni" onclick="showPage('reports',this)">📊 Rapports</div>
+      <div class="ni" onclick="showPage('store',this)">🏪 Ma Boutique</div>
     </div>
 
     <!-- Super Admin only -->
@@ -660,6 +664,26 @@ input[type="password"], input[type="email"], input[type="text"] {
             <div><div class="flex jcsb fs12 mb8"><span class="t2">Contacts</span><span class="fw7 c-v" id="f-contacts">0</span></div><div class="funnel-bar"><div class="funnel-fill" id="ff-contacts" style="width:100%;background:linear-gradient(90deg,var(--violet),var(--violet2))">Tous</div></div></div>
             <div><div class="flex jcsb fs12 mb8"><span class="t2">Leads chauds</span><span class="fw7 c-a" id="f-hot">0</span></div><div class="funnel-bar"><div class="funnel-fill" id="ff-hot" style="width:0%;background:linear-gradient(90deg,var(--amber),var(--orange))">Chauds</div></div></div>
             <div><div class="flex jcsb fs12 mb8"><span class="t2">Commandes</span><span class="fw7 c-g" id="f-orders">0</span></div><div class="funnel-bar"><div class="funnel-fill" id="ff-orders" style="width:0%;background:linear-gradient(90deg,var(--green),var(--teal))">Clients</div></div></div>
+          </div>
+        </div>
+      </div>
+      <!-- Dashboard Charts Row -->
+      <div class="g2">
+        <div class="card">
+          <div class="ch">
+            <div><div class="ct">📈 Revenus (12 mois)</div></div>
+            <div id="k-week-growth" class="tag tag-g fs12">+0%</div>
+          </div>
+          <div id="monthly-spark" style="margin:8px 0"></div>
+          <div class="flex jcsb mt8 fs12 t2">
+            <span>Cette semaine: <strong id="k-this-week" class="c-v">0 MAD</strong></span>
+            <span>Semaine dernière: <strong id="k-last-week" class="t2">0 MAD</strong></span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ct mb12">🏆 Top produits vendus</div>
+          <div id="top-products-chart">
+            <div class="t3 fs12" style="text-align:center;padding:16px">Ajoutez des commandes pour voir vos top produits</div>
           </div>
         </div>
       </div>
@@ -1627,6 +1651,135 @@ input[type="password"], input[type="email"], input[type="text"] {
 
     </div>
 
+
+    <!-- ── LOGISTIQUE ── -->
+    <div class="page hidden" id="page-logistics">
+      <div class="g4" id="log-stats">
+        <div class="kpi v"><div class="kpi-lbl">📦 Total expéditions</div><div class="kpi-val" id="ls-total">0</div></div>
+        <div class="kpi a"><div class="kpi-lbl">⏳ En attente</div><div class="kpi-val" id="ls-pending">0</div></div>
+        <div class="kpi s"><div class="kpi-lbl">🚚 En transit</div><div class="kpi-val" id="ls-transit">0</div></div>
+        <div class="kpi g"><div class="kpi-lbl">✅ Livrées</div><div class="kpi-val" id="ls-delivered">0</div></div>
+      </div>
+      <div class="card card-glow">
+        <div class="ch"><div><div class="ct">🚚 Créer un bordereau</div></div><button class="btn btn-g btn-sm" onclick="loadLogistics()">🔄 Actualiser</button></div>
+        <div class="form-g2 mb12">
+          <div class="fg"><label class="fl">Nom client *</label><input class="fi" id="log-name" placeholder="Hassan Amrani"></div>
+          <div class="fg"><label class="fl">Téléphone</label><input class="fi" id="log-phone" placeholder="+212..."></div>
+          <div class="fg"><label class="fl">Adresse *</label><input class="fi" id="log-addr" placeholder="Boulevard Anfa, Casa..."></div>
+          <div class="fg"><label class="fl">Ville</label><input class="fi" id="log-city" placeholder="Casablanca"></div>
+          <div class="fg"><label class="fl">Transporteur</label>
+            <select class="fi" id="log-carrier">
+              <option value="amana">🏃 Amana (24-48h)</option>
+              <option value="ozone">⚡ Ozone Express (J+1)</option>
+              <option value="cathedis">🚛 Cathedis (National)</option>
+              <option value="chronodiali">⏱ Chronodiali (Premium)</option>
+            </select>
+          </div>
+          <div class="fg"><label class="fl">Poids (kg)</label><input class="fi" type="number" id="log-weight" placeholder="0.5" step="0.1" min="0.1"></div>
+        </div>
+        <div class="fg mb12"><label class="fl">Notes</label><input class="fi" id="log-notes" placeholder="Fragile, appeler avant livraison..."></div>
+        <div id="log-alert" class="alert"></div>
+        <button class="btn btn-p" onclick="createShipment()">📦 Créer le bordereau</button>
+      </div>
+      <div class="card">
+        <div class="ct mb16">📋 Expéditions récentes</div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>N° Tracking</th><th>Client</th><th>Ville</th><th>Transporteur</th><th>Statut</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody id="log-tbody"><tr><td colspan="7" style="text-align:center;color:var(--t3);padding:24px">Aucune expédition</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BROADCASTS ── -->
+    <div class="page hidden" id="page-broadcasts">
+      <div class="g2">
+        <div class="card card-glow">
+          <div class="ct mb16">📣 Nouveau Broadcast WhatsApp</div>
+          <div class="fg"><label class="fl">Message *</label><textarea class="fi" id="bc-msg" rows="4" placeholder="Ex: Salam! Nous avons une promo exclusive -20% sur tout ce weekend..."></textarea></div>
+          <div class="fg">
+            <label class="fl">Langue</label>
+            <div class="chips" id="bc-lang-chips">
+              <div class="chip on" onclick="toggleChip(this)" data-val="dar">🇲🇦 Darija</div>
+              <div class="chip" onclick="toggleChip(this)" data-val="fr">🇫🇷 Français</div>
+              <div class="chip" onclick="toggleChip(this)" data-val="ar">🇸🇦 Arabe</div>
+            </div>
+          </div>
+          <div class="fg">
+            <label class="fl">Envoyer à</label>
+            <div class="flex gap8 mb8">
+              <button class="btn btn-g btn-sm" onclick="selectAllContacts()">✅ Tous les contacts</button>
+              <button class="btn btn-g btn-sm" onclick="selectHotLeads()">🔥 Leads chauds</button>
+              <button class="btn btn-danger btn-sm" onclick="clearSelection()">✕ Vider</button>
+            </div>
+            <div id="bc-selected-count" class="tag tag-v" style="margin-bottom:8px">0 contact sélectionné</div>
+            <div id="bc-contacts-list" style="max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:4px"></div>
+          </div>
+          <div id="bc-alert" class="alert mt8"></div>
+          <button class="btn btn-p w100 mt12" style="justify-content:center" onclick="sendBroadcast()">
+            📤 Envoyer le broadcast
+          </button>
+        </div>
+        <div class="card">
+          <div class="ct mb16">📋 Historique broadcasts</div>
+          <div id="bc-history" style="display:flex;flex-direction:column;gap:10px">
+            <div style="text-align:center;color:var(--t3);padding:24px">Aucun broadcast envoyé</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RAPPORTS ── -->
+    <div class="page hidden" id="page-reports">
+      <div class="card card-glow">
+        <div class="ch">
+          <div><div class="ct">📊 Rapport Mensuel</div><div class="cs">Analyse complète + IA Groq + Export PDF</div></div>
+          <div class="flex gap8 aic">
+            <input type="month" class="fi" id="report-month" style="width:160px">
+            <button class="btn btn-p btn-sm" onclick="generateReport()">🤖 Générer</button>
+            <button class="btn btn-g btn-sm" onclick="printReport()">🖨️ Imprimer / PDF</button>
+          </div>
+        </div>
+        <div id="report-content">
+          <div style="text-align:center;color:var(--t3);padding:40px">
+            <div style="font-size:48px;margin-bottom:12px">📊</div>
+            <div class="fs13">Sélectionnez un mois et cliquez Générer</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BOUTIQUE ── -->
+    <div class="page hidden" id="page-store">
+      <div class="card card-glow">
+        <div class="ch">
+          <div><div class="ct">🏪 Ma Boutique en Ligne</div><div class="cs">Page publique — vos clients peuvent commander directement</div></div>
+          <button class="btn btn-g btn-sm" onclick="loadStore()">🔄 Actualiser</button>
+        </div>
+        <div id="store-link-section" style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:var(--r-md);padding:18px;margin-bottom:18px">
+          <div class="fw7 mb8">🔗 Lien de votre boutique</div>
+          <div class="flex gap8 aic mb10">
+            <div class="fi" id="store-url" style="flex:1;font-family:monospace;font-size:12px;color:var(--violet2);padding:8px 12px;cursor:text">Chargement...</div>
+            <button class="btn btn-p btn-sm" onclick="copyStoreLink()">📋 Copier</button>
+            <button class="btn btn-g btn-sm" onclick="openStore()">🌐 Ouvrir</button>
+          </div>
+          <button class="btn btn-success btn-sm" onclick="shareStoreWA()">💬 Partager sur WhatsApp</button>
+        </div>
+        <div class="ct mb12">📦 Produits dans votre boutique</div>
+        <div id="store-products-preview" class="g3">
+          <div style="text-align:center;color:var(--t3);padding:24px;grid-column:1/-1">Chargement...</div>
+        </div>
+        <div class="sep"></div>
+        <div class="ct mb8">⚙️ Paramètres boutique</div>
+        <div class="form-g2">
+          <div class="fg"><label class="fl">Nom affiché</label><input class="fi" id="store-name" placeholder="Ma Boutique Mode"></div>
+          <div class="fg"><label class="fl">Slogan</label><input class="fi" id="store-slogan" placeholder="Qualité premium · Livraison Maroc"></div>
+        </div>
+        <button class="btn btn-p btn-sm" onclick="saveStoreSettings()">💾 Sauvegarder</button>
+      </div>
+    </div>
+
   </div><!-- end .main -->
 </div><!-- end #screen-app -->
 
@@ -1923,12 +2076,18 @@ function showPage(id, navEl) {
   if (id === 'admin')      loadAdminUsers();
   if (id === 'settings')   loadSettings();
   if (id === 'youcan')     loadYouCanStatus();
+  if (id === 'logistics')  loadLogistics();
+  if (id === 'broadcasts') loadBroadcasts();
+  if (id === 'reports')    loadReports();
+  if (id === 'store')      loadStore();
 }
 
 /* ═══════════════════════════════════════════════
    DASHBOARD
 ═══════════════════════════════════════════════ */
 async function loadDashboard() {
+  // Load charts in parallel
+  loadDashboardCharts().catch(()=>{});
   const r = await API('GET', '/api/dashboard');
   if (!r.ok) return;
   const d = r.data;
@@ -2600,6 +2759,327 @@ function disconnectYouCan() {
 const _origShowPage = showPage;
 
 
+
+
+/* ═══════════════════════════════════════════════
+   A - DASHBOARD CHARTS (Recharts via DOM)
+═══════════════════════════════════════════════ */
+async function loadDashboardCharts() {
+  const r = await API('GET', '/api/dashboard/charts');
+  if (!r.ok) return;
+  const d = r.data;
+  // Update week comparison
+  const wg = d.weekGrowth || 0;
+  const thisW = document.getElementById('k-this-week');
+  const lastW = document.getElementById('k-last-week');
+  if (thisW) thisW.textContent = fmt(d.thisWeek||0) + ' MAD';
+  if (lastW) lastW.textContent = fmt(d.lastWeek||0) + ' MAD';
+  const growthEl = document.getElementById('k-week-growth');
+  if (growthEl) {
+    growthEl.textContent = (wg >= 0 ? '+' : '') + wg + '%';
+    growthEl.style.color = wg >= 0 ? 'var(--green)' : 'var(--rose)';
+  }
+  // Draw mini bar chart for top products
+  const chart = document.getElementById('top-products-chart');
+  if (chart && d.topProducts?.length) {
+    const max = Math.max(...d.topProducts.map(p => p.qty));
+    chart.innerHTML = d.topProducts.map(p => `
+      <div class="flex aic gap8 mb8">
+        <div class="fs12 t2 ellipsis" style="width:120px">${esc(p.name)}</div>
+        <div style="flex:1;background:var(--border);border-radius:3px;height:8px;overflow:hidden">
+          <div style="width:${Math.round(p.qty/max*100)}%;background:var(--violet);height:100%;border-radius:3px;transition:width 1s ease"></div>
+        </div>
+        <div class="fs12 fw7" style="width:30px;text-align:right">${p.qty}</div>
+      </div>`).join('');
+  }
+  // Monthly revenue sparkline
+  const spark = document.getElementById('monthly-spark');
+  if (spark && d.monthly) {
+    const vals = Object.values(d.monthly);
+    const maxV = Math.max(...vals, 1);
+    const svgW = 200, svgH = 50;
+    const pts = vals.map((v,i) => {
+      const x = (i / (vals.length-1)) * svgW;
+      const y = svgH - (v / maxV) * svgH * 0.85;
+      return x + ',' + y;
+    }).join(' ');
+    spark.innerHTML = `<svg width="${svgW}" height="${svgH}" style="overflow:visible">
+      <polyline points="${pts}" fill="none" stroke="var(--violet2)" stroke-width="2.5" stroke-linejoin="round"/>
+      ${vals.map((v,i)=>{
+        const x=(i/(vals.length-1))*svgW;
+        const y=svgH-(v/maxV)*svgH*0.85;
+        return i===vals.length-1?`<circle cx="${x}" cy="${y}" r="4" fill="var(--violet2)"/>`:'';
+      }).join('')}
+    </svg>`;
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   B - LOGISTIQUE
+═══════════════════════════════════════════════ */
+async function loadLogistics() {
+  const [r1, r2] = await Promise.all([
+    API('GET', '/api/logistics/shipments'),
+    API('GET', '/api/logistics/stats')
+  ]);
+  if (r2.ok) {
+    const s = r2.data;
+    document.getElementById('ls-total').textContent     = s.total || 0;
+    document.getElementById('ls-pending').textContent   = s.pending || 0;
+    document.getElementById('ls-transit').textContent   = s.transit || 0;
+    document.getElementById('ls-delivered').textContent = s.delivered || 0;
+  }
+  if (!r1.ok) return;
+  const ships = r1.data.shipments || [];
+  const tbody = document.getElementById('log-tbody');
+  if (!ships.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--t3);padding:24px">Aucune expédition — Créez votre premier bordereau</td></tr>';
+    return;
+  }
+  const statusMap = { pending:'⏳ En attente', transit:'🚚 En transit', delivered:'✅ Livrée', returned:'↩ Retournée' };
+  const statusTag = { pending:'tag-a', transit:'tag-s', delivered:'tag-g', returned:'tag-r' };
+  tbody.innerHTML = ships.map(s => `
+    <tr>
+      <td class="fw7 c-v fm">${esc(s.trackingNumber)}</td>
+      <td><div class="fw6">${esc(s.contactName)}</div><div class="fs11 t2">${esc(s.phone||'')}</div></td>
+      <td class="t2">${esc(s.city||'—')}</td>
+      <td><span class="tag tag-v">${esc(s.carrier)}</span></td>
+      <td><span class="tag ${statusTag[s.status]||'tag-s'}">${statusMap[s.status]||s.status}</span></td>
+      <td class="t2 fs12">${(s.createdAt||'').substring(0,10)}</td>
+      <td>
+        <select class="fi" style="font-size:11px;padding:4px 8px;width:130px" onchange="updateShipment('${s.id}',this.value)">
+          <option value="pending" ${s.status==='pending'?'selected':''}>⏳ En attente</option>
+          <option value="transit" ${s.status==='transit'?'selected':''}>🚚 En transit</option>
+          <option value="delivered" ${s.status==='delivered'?'selected':''}>✅ Livrée</option>
+          <option value="returned" ${s.status==='returned'?'selected':''}>↩ Retournée</option>
+        </select>
+      </td>
+    </tr>`).join('');
+}
+
+async function createShipment() {
+  const name    = document.getElementById('log-name').value.trim();
+  const phone   = document.getElementById('log-phone').value.trim();
+  const addr    = document.getElementById('log-addr').value.trim();
+  const city    = document.getElementById('log-city').value.trim();
+  const carrier = document.getElementById('log-carrier').value;
+  const weight  = document.getElementById('log-weight').value;
+  const notes   = document.getElementById('log-notes').value;
+  if (!name || !addr) return setAlert('log-alert','Nom et adresse requis','err');
+
+  const r = await API('POST', '/api/logistics/shipments', { contactName:name, phone, address:addr, city, carrier, weight, notes });
+  if (!r.ok) return setAlert('log-alert', r.data.error||'Erreur','err');
+  setAlert('log-alert', '✅ Bordereau créé — N° ' + r.data.trackingNumber, 'ok');
+  ['log-name','log-phone','log-addr','log-city','log-weight','log-notes'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  loadLogistics();
+}
+
+async function updateShipment(id, status) {
+  const events = { transit:'Pris en charge par transporteur', delivered:'Livré au destinataire', returned:'Retourné à expéditeur' };
+  await API('PATCH', '/api/logistics/shipments/' + id + '/status', { status, event: events[status]||'' });
+  loadLogistics();
+}
+
+/* ═══════════════════════════════════════════════
+   D - BROADCASTS WHATSAPP
+═══════════════════════════════════════════════ */
+let selectedContacts = [];
+
+function toggleChip(el) { el.classList.toggle('on'); }
+
+async function loadBroadcasts() {
+  // Load contacts for selection
+  const r = await API('GET', '/api/crm/contacts');
+  if (r.ok) {
+    const contacts = r.data.contacts || [];
+    const list = document.getElementById('bc-contacts-list');
+    if (list) {
+      list.innerHTML = contacts.map(c => `
+        <label class="flex aic gap8" style="padding:8px;background:var(--card2);border-radius:8px;cursor:pointer">
+          <input type="checkbox" value="${c.id}" onchange="updateSelection()" style="accent-color:var(--violet)">
+          <span class="fs13 fw6">${esc(c.name)}</span>
+          <span class="fs12 t2">${esc(c.phone||'')}</span>
+          <span class="tag tag-v fs11 ml-auto">${c.aiScore||50}/100</span>
+        </label>`).join('');
+    }
+  }
+  // Load broadcast history
+  const r2 = await API('GET', '/api/wa/broadcasts');
+  if (r2.ok) {
+    const history = document.getElementById('bc-history');
+    const broadcasts = r2.data.broadcasts || [];
+    if (history) {
+      history.innerHTML = broadcasts.length ? broadcasts.map(b => `
+        <div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--r-md);padding:14px">
+          <div class="flex jcsb aic mb6">
+            <span class="tag tag-g">✅ Envoyé</span>
+            <span class="fs12 t2">${(b.createdAt||'').substring(0,10)}</span>
+          </div>
+          <div class="fs13 mb4">${esc(b.message?.slice(0,100))}${b.message?.length>100?'...':''}</div>
+          <div class="fs12 t2">📤 ${b.totalContacts} contacts · ${esc(b.language)}</div>
+        </div>`).join('') : '<div style="text-align:center;color:var(--t3);padding:24px">Aucun broadcast envoyé</div>';
+    }
+  }
+}
+
+function updateSelection() {
+  selectedContacts = Array.from(document.querySelectorAll('#bc-contacts-list input:checked')).map(cb => cb.value);
+  const el = document.getElementById('bc-selected-count');
+  if (el) el.textContent = selectedContacts.length + ' contact' + (selectedContacts.length>1?'s':'') + ' sélectionné' + (selectedContacts.length>1?'s':'');
+}
+
+async function selectAllContacts() {
+  const r = await API('GET', '/api/crm/contacts');
+  if (!r.ok) return;
+  selectedContacts = r.data.contacts.map(c => c.id);
+  document.querySelectorAll('#bc-contacts-list input').forEach(cb => cb.checked = true);
+  updateSelection();
+}
+
+function selectHotLeads() {
+  document.querySelectorAll('#bc-contacts-list input').forEach(cb => {
+    const score = parseInt(cb.closest('label').querySelector('.tag-v').textContent) || 0;
+    cb.checked = score >= 75;
+  });
+  updateSelection();
+}
+
+function clearSelection() {
+  selectedContacts = [];
+  document.querySelectorAll('#bc-contacts-list input').forEach(cb => cb.checked = false);
+  updateSelection();
+}
+
+async function sendBroadcast() {
+  const msg = document.getElementById('bc-msg').value.trim();
+  if (!msg) return setAlert('bc-alert','Entrez un message','err');
+  if (!selectedContacts.length) return setAlert('bc-alert','Sélectionnez au moins un contact','err');
+  const lang = document.querySelector('#bc-lang-chips .chip.on')?.dataset?.val || 'fr';
+  const r = await API('POST', '/api/wa/broadcast', { message: msg, contactIds: selectedContacts, language: lang });
+  if (!r.ok) return setAlert('bc-alert', r.data.error||'Erreur','err');
+  setAlert('bc-alert', '✅ Broadcast envoyé à ' + r.data.messagesSent + ' contacts!', 'ok');
+  document.getElementById('bc-msg').value = '';
+  clearSelection();
+  loadBroadcasts();
+}
+
+/* ═══════════════════════════════════════════════
+   C - RAPPORTS
+═══════════════════════════════════════════════ */
+async function loadReports() {
+  const monthEl = document.getElementById('report-month');
+  if (monthEl && !monthEl.value) {
+    monthEl.value = new Date().toISOString().substring(0,7);
+  }
+}
+
+async function generateReport() {
+  const month = document.getElementById('report-month').value;
+  if (!month) return alert('Sélectionnez un mois');
+  document.getElementById('report-content').innerHTML = '<div style="text-align:center;padding:32px;color:var(--t2)">⏳ Génération du rapport IA en cours...</div>';
+  const r = await API('GET', '/api/reports/monthly?month=' + month);
+  if (!r.ok) return;
+  const d = r.data;
+  const monthName = new Date(month + '-01').toLocaleDateString('fr-MA', { month:'long', year:'numeric' });
+  document.getElementById('report-content').innerHTML = `
+    <div id="printable-report">
+      <div class="flex jcsb aic mb16">
+        <div>
+          <div class="ct" style="font-size:18px">${esc(d.company)}</div>
+          <div class="t2 fs13">Rapport mensuel — ${monthName}</div>
+        </div>
+        <div class="tag tag-v">NexaMarket Pro</div>
+      </div>
+      <div class="g4 mb16">
+        <div class="kpi v"><div class="kpi-lbl">💰 Chiffre d'affaires</div><div class="kpi-val">${fmt(d.revenue)} MAD</div></div>
+        <div class="kpi r"><div class="kpi-lbl">📤 Dépenses</div><div class="kpi-val">${fmt(d.expenses)} MAD</div></div>
+        <div class="kpi g"><div class="kpi-lbl">📈 Bénéfice net</div><div class="kpi-val">${fmt(d.profit)} MAD</div></div>
+        <div class="kpi a"><div class="kpi-lbl">📊 Marge</div><div class="kpi-val">${d.margin}%</div></div>
+      </div>
+      <div class="g4 mb16">
+        <div class="kpi s"><div class="kpi-lbl">📦 Commandes</div><div class="kpi-val">${d.orders}</div></div>
+        <div class="kpi s"><div class="kpi-lbl">🧾 Factures</div><div class="kpi-val">${d.invoices}</div></div>
+        <div class="kpi s"><div class="kpi-lbl">👥 Nouveaux contacts</div><div class="kpi-val">${d.contacts}</div></div>
+        <div class="kpi s"><div class="kpi-lbl">🚚 Expéditions</div><div class="kpi-val">${d.shipments}</div></div>
+      </div>
+      ${Object.keys(d.expensesByCategory||{}).length ? `
+      <div class="card mb16">
+        <div class="ct mb12">📤 Dépenses par catégorie</div>
+        ${Object.entries(d.expensesByCategory).map(([cat,amt]) => `
+          <div class="flex jcsb aic mb8">
+            <span class="fs13">${esc(cat)}</span>
+            <span class="fw7">${fmt(amt)} MAD</span>
+          </div>`).join('')}
+      </div>` : ''}
+      <div class="card" style="border-color:rgba(99,102,241,.2);background:rgba(99,102,241,.05)">
+        <div class="ct mb10">🤖 Analyse IA Groq</div>
+        <div class="fs13" style="line-height:1.8;white-space:pre-wrap">${esc(d.aiAnalysis)}</div>
+      </div>
+    </div>`;
+}
+
+function printReport() {
+  const content = document.getElementById('printable-report');
+  if (!content) { alert("Generez d'abord un rapport"); return; }
+  const w = window.open('', '_blank');
+  w.document.write('<html><head><title>Rapport NexaMarket</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#111}h1{font-size:22px;margin-bottom:8px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}.kpi{background:#f5f5f5;border-radius:8px;padding:14px}.kpi-lbl{font-size:11px;color:#666;margin-bottom:4px}.kpi-val{font-size:22px;font-weight:800}.card{background:#f9f9f9;border-radius:8px;padding:16px;margin-bottom:12px}@media print{button{display:none}}</style></head><body>');
+  w.document.write(content.innerHTML);
+  w.document.write('</body></html>');
+  w.document.close();
+  w.print();
+}
+
+/* ═══════════════════════════════════════════════
+   E - BOUTIQUE EN LIGNE
+═══════════════════════════════════════════════ */
+let storeData = null;
+
+async function loadStore() {
+  const r = await API('GET', '/api/store/link');
+  if (r.ok) {
+    storeData = r.data;
+    const el = document.getElementById('store-url');
+    if (el) el.textContent = r.data.url;
+  }
+  const r2 = await API('GET', '/api/ecom/products');
+  if (r2.ok) {
+    const products = r2.data.products || [];
+    const grid = document.getElementById('store-products-preview');
+    if (grid) {
+      grid.innerHTML = products.length ? products.map(p => `
+        <div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--r-md);padding:14px;text-align:center">
+          <div style="font-size:32px;margin-bottom:8px">🛍️</div>
+          <div class="fw6 fs13 mb4 ellipsis">${esc(p.name)}</div>
+          <div class="c-v fw7">${fmt(p.price)} MAD</div>
+          <div class="fs12 t2 mt4">Stock: ${p.stock}</div>
+          <span class="tag ${p.active&&p.stock>0?'tag-g':'tag-r'} mt6">${p.active&&p.stock>0?'✓ En ligne':'Hors ligne'}</span>
+        </div>`).join('') : '<div style="text-align:center;color:var(--t3);padding:24px;grid-column:1/-1">Ajoutez des produits pour qu'ils apparaissent dans votre boutique</div>';
+    }
+  }
+}
+
+function copyStoreLink() {
+  if (!storeData) return;
+  navigator.clipboard.writeText(storeData.url).then(() => alert('✅ Lien copié!')).catch(()=>{});
+}
+
+function openStore() {
+  if (!storeData) return;
+  window.open(storeData.url, '_blank');
+}
+
+function shareStoreWA() {
+  if (!storeData) return;
+  const txt = encodeURIComponent('Visitez notre boutique en ligne: ' + storeData.url);
+  window.open('https://wa.me/?text=' + txt, '_blank');
+}
+
+async function saveStoreSettings() {
+  const name   = document.getElementById('store-name').value;
+  const slogan = document.getElementById('store-slogan').value;
+  const r = await API('PUT', '/api/settings/profile', { company: name });
+  if (r.ok) { alert('✅ Paramètres boutique sauvegardés!'); loadStore(); }
+}
 
 </script>
 </body>

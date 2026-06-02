@@ -1502,6 +1502,315 @@ app.post('/api/ai/remove-bg', auth, async (req, res) => {
   }
 });
 
+
+// ════════════════════════════════════════════════════════
+//  A - DASHBOARD: Graphiques + Stats avancées
+// ════════════════════════════════════════════════════════
+app.get('/api/dashboard/charts', auth, (req, res) => {
+  const db  = loadDB();
+  const uid = req.user.id;
+  const orders   = db.orders.filter(o => o.userId === uid && o.status !== 'cancelled');
+  const expenses = db.expenses.filter(e => e.userId === uid);
+
+  // Revenus par mois (12 derniers mois)
+  const monthly = {};
+  const expMonthly = {};
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date();
+    d.setMonth(d.getMonth() - i);
+    const key = d.toISOString().substring(0,7);
+    monthly[key]    = 0;
+    expMonthly[key] = 0;
+  }
+  orders.forEach(o => {
+    const m = (o.createdAt||'').substring(0,7);
+    if (monthly[m] !== undefined) monthly[m] += (o.total||0);
+  });
+  expenses.forEach(e => {
+    const m = (e.date||'').substring(0,7);
+    if (expMonthly[m] !== undefined) expMonthly[m] += (e.amount||0);
+  });
+
+  // Top produits
+  const prodSales = {};
+  orders.forEach(o => (o.items||[]).forEach(item => {
+    prodSales[item.name] = (prodSales[item.name]||0) + (item.qty||1);
+  }));
+  const topProducts = Object.entries(prodSales)
+    .sort((a,b) => b[1]-a[1]).slice(0,5)
+    .map(([name,qty]) => ({ name, qty }));
+
+  // Comparison: this week vs last week
+  const now    = new Date();
+  const weekAgo = new Date(now - 7*86400000);
+  const twoWeeksAgo = new Date(now - 14*86400000);
+  const thisWeek = orders.filter(o => new Date(o.createdAt) >= weekAgo).reduce((s,o)=>s+(o.total||0),0);
+  const lastWeek = orders.filter(o => new Date(o.createdAt) >= twoWeeksAgo && new Date(o.createdAt) < weekAgo).reduce((s,o)=>s+(o.total||0),0);
+  const weekGrowth = lastWeek > 0 ? Math.round(((thisWeek-lastWeek)/lastWeek)*100) : 0;
+
+  res.json({ monthly, expMonthly, topProducts, thisWeek, lastWeek, weekGrowth });
+});
+
+// ════════════════════════════════════════════════════════
+//  B - LOGISTIQUE: Amana + Ozone + Tracking
+// ════════════════════════════════════════════════════════
+app.get('/api/logistics/shipments', auth, (req, res) => {
+  const db = loadDB();
+  const shipments = (db.shipments||[]).filter(s => s.userId === req.user.id)
+    .sort((a,b) => new Date(b.createdAt)-new Date(a.createdAt));
+  res.json({ total: shipments.length, shipments });
+});
+
+app.post('/api/logistics/shipments', auth, (req, res) => {
+  const { orderId, orderNumber, contactName, address, city, phone, carrier, weight, notes } = req.body;
+  if (!contactName || !address) return res.status(400).json({ error: 'Nom et adresse requis' });
+
+  const db = loadDB();
+  if (!db.shipments) db.shipments = [];
+
+  const carriers = { amana:'AMN', ozone:'OZN', cathedis:'CTH', chronodiali:'CHR' };
+  const prefix   = carriers[carrier] || 'LIV';
+  const trackNum = prefix + '-' + Date.now().toString().slice(-8);
+
+  const shipment = {
+    id: uuid(), userId: req.user.id,
+    orderId: orderId||null, orderNumber: orderNumber||'',
+    contactName, address, city: city||'', phone: phone||'',
+    carrier: carrier||'amana', weight: parseFloat(weight)||0.5,
+    trackingNumber: trackNum, notes: notes||'',
+    status: 'pending',
+    timeline: [{ event: 'Bordereau créé', date: new Date().toISOString(), done: true }],
+    createdAt: new Date().toISOString()
+  };
+  db.shipments.push(shipment);
+  saveDB(db);
+  res.status(201).json(shipment);
+});
+
+app.patch('/api/logistics/shipments/:id/status', auth, (req, res) => {
+  const { status, event } = req.body;
+  const db  = loadDB();
+  if (!db.shipments) db.shipments = [];
+  const idx = db.shipments.findIndex(s => s.id === req.params.id && s.userId === req.user.id);
+  if (idx === -1) return res.status(404).json({ error: 'Expédition introuvable' });
+  db.shipments[idx].status = status;
+  if (event) db.shipments[idx].timeline.push({ event, date: new Date().toISOString(), done: true });
+  saveDB(db);
+  res.json(db.shipments[idx]);
+});
+
+app.get('/api/logistics/stats', auth, (req, res) => {
+  const db = loadDB();
+  const shipments = (db.shipments||[]).filter(s => s.userId === req.user.id);
+  const byCarrier = {};
+  shipments.forEach(s => { byCarrier[s.carrier] = (byCarrier[s.carrier]||0)+1; });
+  res.json({
+    total:     shipments.length,
+    pending:   shipments.filter(s=>s.status==='pending').length,
+    transit:   shipments.filter(s=>s.status==='transit').length,
+    delivered: shipments.filter(s=>s.status==='delivered').length,
+    returned:  shipments.filter(s=>s.status==='returned').length,
+    byCarrier
+  });
+});
+
+// ════════════════════════════════════════════════════════
+//  C - RAPPORTS PDF (génération HTML→PDF via print)
+// ════════════════════════════════════════════════════════
+app.get('/api/reports/monthly', auth, async (req, res) => {
+  const db  = loadDB();
+  const uid = req.user.id;
+  const user = db.users.find(u => u.id === uid) || {};
+  const month = req.query.month || new Date().toISOString().substring(0,7);
+
+  const orders   = db.orders.filter(o => o.userId===uid && (o.createdAt||'').startsWith(month));
+  const invoices = db.invoices.filter(i => i.userId===uid && (i.createdAt||'').startsWith(month));
+  const expenses = db.expenses.filter(e => e.userId===uid && (e.date||'').startsWith(month));
+  const contacts = db.contacts.filter(c => c.userId===uid && (c.createdAt||'').startsWith(month));
+  const shipments= (db.shipments||[]).filter(s => s.userId===uid && (s.createdAt||'').startsWith(month));
+
+  const revenue  = orders.filter(o=>o.status!=='cancelled').reduce((s,o)=>s+(o.total||0),0);
+  const totalExp = expenses.reduce((s,e)=>s+(e.amount||0),0);
+  const profit   = revenue - totalExp;
+
+  // AI analysis of the month
+  let aiAnalysis = '';
+  try {
+    aiAnalysis = await callGroq([{
+      role: 'user',
+      content: `Analyse ce mois (${month}) pour ${user.company||'PME Maroc'}:
+- CA: ${revenue.toFixed(0)} MAD (${orders.length} commandes)
+- Dépenses: ${totalExp.toFixed(0)} MAD
+- Bénéfice: ${profit.toFixed(0)} MAD
+- Nouveaux contacts: ${contacts.length}
+- Expéditions: ${shipments.length}
+Donne un résumé professionnel en 3 points: performance, points positifs, recommandations.`
+    }], 500);
+  } catch(e) { aiAnalysis = 'Analyse IA non disponible'; }
+
+  res.json({
+    month, company: user.company||'Ma Boutique', owner: user.name||'',
+    revenue, expenses: totalExp, profit,
+    margin: revenue>0 ? ((profit/revenue)*100).toFixed(1) : 0,
+    orders: orders.length, invoices: invoices.length,
+    contacts: contacts.length, shipments: shipments.length,
+    topOrders: orders.slice(0,5),
+    expensesByCategory: expenses.reduce((acc,e)=>{ acc[e.category]=(acc[e.category]||0)+e.amount; return acc; }, {}),
+    aiAnalysis
+  });
+});
+
+// ════════════════════════════════════════════════════════
+//  D - WHATSAPP BUSINESS: Templates + Broadcasts
+// ════════════════════════════════════════════════════════
+app.get('/api/wa/templates', auth, (req, res) => {
+  const db = loadDB();
+  const templates = (db.waTemplates||[]).filter(t => t.userId === req.user.id);
+  res.json({ total: templates.length, templates });
+});
+
+app.post('/api/wa/templates', auth, (req, res) => {
+  const { name, content, category, language } = req.body;
+  if (!name || !content) return res.status(400).json({ error: 'Nom et contenu requis' });
+  const db = loadDB();
+  if (!db.waTemplates) db.waTemplates = [];
+  const tmpl = {
+    id: uuid(), userId: req.user.id,
+    name, content, category: category||'general',
+    language: language||'fr', usageCount: 0,
+    createdAt: new Date().toISOString()
+  };
+  db.waTemplates.push(tmpl);
+  saveDB(db);
+  res.status(201).json(tmpl);
+});
+
+app.post('/api/wa/broadcast', auth, async (req, res) => {
+  const { message, contactIds, language } = req.body;
+  if (!message || !contactIds?.length) return res.status(400).json({ error: 'Message et contacts requis' });
+  const db = loadDB();
+  if (!db.waBroadcasts) db.waBroadcasts = [];
+  let aiMessage = message;
+  try {
+    const lang = language==='dar'?'darija':'français';
+    aiMessage = await callGroq([{
+      role: 'user',
+      content: `Améliore ce message WhatsApp marketing en ${lang} pour le rendre plus accrocheur: "${message}". Garde le sens et la longueur similaire.`
+    }], 200);
+  } catch(e) { aiMessage = message; }
+
+  const broadcast = {
+    id: uuid(), userId: req.user.id,
+    message: aiMessage, originalMessage: message,
+    contactIds, totalContacts: contactIds.length,
+    language: language||'fr', status: 'sent',
+    createdAt: new Date().toISOString()
+  };
+  db.waBroadcasts.push(broadcast);
+  // Log messages for each contact
+  contactIds.forEach(cid => {
+    const contact = db.contacts.find(c => c.id === cid);
+    if (contact) {
+      if (!db.waMessages) db.waMessages = [];
+      db.waMessages.push({
+        id: uuid(), userId: req.user.id,
+        contactName: contact.name, contactPhone: contact.phone||'',
+        body: aiMessage, direction: 'out',
+        aiResponse: false, broadcastId: broadcast.id,
+        createdAt: new Date().toISOString()
+      });
+    }
+  });
+  saveDB(db);
+  res.json({ ok: true, broadcast, messagesSent: contactIds.length });
+});
+
+app.get('/api/wa/broadcasts', auth, (req, res) => {
+  const db = loadDB();
+  const broadcasts = (db.waBroadcasts||[]).filter(b => b.userId === req.user.id)
+    .sort((a,b) => new Date(b.createdAt)-new Date(a.createdAt));
+  res.json({ total: broadcasts.length, broadcasts });
+});
+
+// ════════════════════════════════════════════════════════
+//  E - BOUTIQUE EN LIGNE PUBLIQUE
+// ════════════════════════════════════════════════════════
+app.get('/boutique/:storeSlug', async (req, res) => {
+  const db = loadDB();
+  const user = db.users.find(u =>
+    (u.company||'').toLowerCase().replace(/\s+/g,'-') === req.params.storeSlug ||
+    u.id === req.params.storeSlug
+  );
+  if (!user) return res.status(404).send('<h1>Boutique introuvable</h1>');
+  const products = db.products.filter(p => p.userId === user.id && p.active && p.stock > 0);
+  res.send(generateStorePage(user, products));
+});
+
+app.get('/api/store/link', auth, (req, res) => {
+  const db   = loadDB();
+  const user = db.users.find(u => u.id === req.user.id);
+  const slug = (user?.company||user?.name||'boutique').toLowerCase()
+    .replace(/[^a-z0-9]/g,'-').replace(/-+/g,'-').slice(0,30);
+  res.json({
+    slug,
+    url: req.protocol + '://' + req.get('host') + '/boutique/' + slug,
+    whatsappText: 'Visitez notre boutique en ligne: ' + req.protocol + '://' + req.get('host') + '/boutique/' + slug
+  });
+});
+
+function generateStorePage(user, products) {
+  const companyName = user.company || user.name || 'Notre Boutique';
+  const productCards = products.map(p => `
+    <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);transition:transform .2s" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+      <div style="background:linear-gradient(135deg,#f5f5f5,#e8e8e8);height:200px;display:flex;align-items:center;justify-content:center;font-size:60px">🛍️</div>
+      <div style="padding:16px">
+        <div style="font-weight:700;font-size:15px;margin-bottom:4px">${p.name}</div>
+        <div style="color:#666;font-size:13px;margin-bottom:10px">${p.category||''}</div>
+        <div style="font-size:20px;font-weight:800;color:#6366f1;margin-bottom:12px">${p.price} MAD</div>
+        <div style="font-size:12px;color:#999;margin-bottom:12px">Stock: ${p.stock} disponibles</div>
+        <a href="https://wa.me/${user.phone||''}?text=Bonjour, je veux commander: ${encodeURIComponent(p.name)} - ${p.price} MAD"
+          style="display:block;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;text-align:center;padding:10px;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px">
+          💬 Commander via WhatsApp
+        </a>
+      </div>
+    </div>`).join('');
+
+  return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${companyName} — Boutique en ligne</title>
+<meta name="description" content="Découvrez les produits de ${companyName}. Livraison partout au Maroc.">
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Segoe UI',sans-serif; background:#f8f9fa; color:#111; }
+.hero { background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; padding:48px 20px; text-align:center; }
+.hero h1 { font-size:clamp(28px,5vw,48px); font-weight:800; margin-bottom:8px; }
+.hero p { font-size:16px; opacity:0.85; margin-bottom:20px; }
+.hero-badge { display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,0.15); padding:8px 16px; border-radius:20px; font-size:14px; }
+.container { max-width:1100px; margin:0 auto; padding:32px 16px; }
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:20px; }
+.empty { text-align:center; padding:60px; color:#999; font-size:16px; }
+.footer { text-align:center; padding:32px; color:#999; font-size:13px; border-top:1px solid #eee; margin-top:32px; }
+.wa-float { position:fixed; bottom:24px; right:24px; background:#25d366; color:#fff; width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:28px; text-decoration:none; box-shadow:0 4px 20px rgba(37,211,102,0.4); z-index:100; }
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-badge">🇲🇦 Livraison partout au Maroc</div>
+  <h1 style="margin-top:16px">${companyName}</h1>
+  <p>${user.sector||'Boutique en ligne'} · ${user.city||'Maroc'}</p>
+</div>
+<div class="container">
+  <h2 style="font-size:22px;font-weight:700;margin-bottom:20px">Nos produits (${products.length})</h2>
+  ${products.length ? '<div class="grid">' + productCards + '</div>' : '<div class="empty">🛍️<br>Catalogue en cours de mise à jour</div>'}
+</div>
+<div class="footer">Boutique propulsée par NexaMarket Pro · Paiement à la livraison disponible</div>
+${user.phone ? '<a class="wa-float" href="https://wa.me/' + user.phone.replace(/\D/g,'') + '?text=Bonjour, je visite votre boutique en ligne" target="_blank">💬</a>' : ''}
+</body>
+</html>`;
+}
 app.get('/health', (req, res) => {
   const db = loadDB();
   res.json({
