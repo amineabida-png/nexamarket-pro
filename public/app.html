@@ -1837,14 +1837,42 @@ input[type="password"], input[type="email"], input[type="text"] {
 </div></div>
 
 <!-- Invoice -->
-<div class="modal-bg" id="modal-invoice"><div class="modal" onclick="event.stopPropagation()">
+<div class="modal-bg" id="modal-invoice"><div class="modal" onclick="event.stopPropagation()" style="max-width:620px">
   <div class="modal-title" id="inv-modal-title">🧾 Nouvelle facture</div>
-  <div class="form-g2">
+  <div class="form-g2 mb12">
     <div class="fg"><label class="fl">Client *</label><input class="fi" id="m-iname" placeholder="Hassan Amrani"></div>
-    <div class="fg"><label class="fl">Remise (%)</label><input class="fi" type="number" id="m-idiscount" placeholder="0" min="0" max="100"></div>
+    <div class="fg"><label class="fl">Remise globale (%)</label><input class="fi" type="number" id="m-idiscount" placeholder="0" min="0" max="100" value="0"></div>
   </div>
-  <div class="fg"><label class="fl">Articles (Nom;Prix HT;Qté, un par ligne)</label><textarea class="fi" id="m-iitems" placeholder="Hijab Premium;154.17;3&#10;Livraison;0;1" rows="4"></textarea></div>
-  <div class="fg"><label class="fl">Notes</label><input class="fi" id="m-inotes" placeholder="Paiement sous 15 jours. Merci pour votre confiance."></div>
+
+  <!-- Articles avec colonnes -->
+  <label class="fl mb6">Articles *</label>
+  <div style="display:grid;grid-template-columns:1fr 110px 70px 36px;gap:6px;margin-bottom:6px">
+    <div class="fs11 fw6 t2">Désignation</div>
+    <div class="fs11 fw6 t2">Prix HT (MAD)</div>
+    <div class="fs11 fw6 t2">Qté</div>
+    <div></div>
+  </div>
+  <div id="inv-lines" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px">
+    <div class="inv-line" style="display:grid;grid-template-columns:1fr 110px 70px 36px;gap:6px;align-items:center">
+      <input class="fi" placeholder="Nom du produit / service" style="font-size:13px;padding:8px 10px">
+      <input class="fi" type="number" placeholder="0.00" min="0" step="0.01" style="font-size:13px;padding:8px 10px" oninput="updateInvTotal()">
+      <input class="fi" type="number" placeholder="1" min="1" value="1" style="font-size:13px;padding:8px 10px" oninput="updateInvTotal()">
+      <button class="btn btn-danger btn-sm" style="padding:6px 8px;justify-content:center" onclick="removeInvLine(this)">✕</button>
+    </div>
+  </div>
+  <button class="btn btn-g btn-sm mb12" onclick="addInvLine()" style="width:100%;justify-content:center">+ Ajouter une ligne</button>
+
+  <!-- Totaux -->
+  <div style="background:var(--input);border-radius:var(--r-md);padding:14px;margin-bottom:12px">
+    <div class="flex jcsb fs13 mb6"><span class="t2">Sous-total HT</span><span class="fw6" id="inv-subtotal">0.00 MAD</span></div>
+    <div class="flex jcsb fs13 mb6"><span class="t2">Remise</span><span class="fw6 c-r" id="inv-discount-amt">- 0.00 MAD</span></div>
+    <div class="flex jcsb fs13 mb6"><span class="t2">Net HT</span><span class="fw6" id="inv-net-ht">0.00 MAD</span></div>
+    <div class="flex jcsb fs13 mb6"><span class="t2">TVA (20%)</span><span class="fw6" id="inv-tva">0.00 MAD</span></div>
+    <div class="sep"></div>
+    <div class="flex jcsb fs13"><span class="fw7">Total TTC</span><span class="fw7 c-v" id="inv-total-ttc" style="font-size:16px">0.00 MAD</span></div>
+  </div>
+
+  <div class="fg"><label class="fl">Notes / Conditions</label><input class="fi" id="m-inotes" placeholder="Paiement sous 15 jours. Merci pour votre confiance."></div>
   <div class="modal-footer">
     <button class="btn btn-g" onclick="closeModal('modal-invoice')">Annuler</button>
     <button class="btn btn-p" onclick="saveInvoice()">✅ Créer</button>
@@ -2295,19 +2323,88 @@ async function loadBilling() {
       </td>
     </tr>`).join('');
 }
+function addInvLine() {
+  const container = document.getElementById('inv-lines');
+  const div = document.createElement('div');
+  div.className = 'inv-line';
+  div.style.cssText = 'display:grid;grid-template-columns:1fr 110px 70px 36px;gap:6px;align-items:center';
+  div.innerHTML = `
+    <input class="fi" placeholder="Nom du produit / service" style="font-size:13px;padding:8px 10px">
+    <input class="fi" type="number" placeholder="0.00" min="0" step="0.01" style="font-size:13px;padding:8px 10px" oninput="updateInvTotal()">
+    <input class="fi" type="number" placeholder="1" min="1" value="1" style="font-size:13px;padding:8px 10px" oninput="updateInvTotal()">
+    <button class="btn btn-danger btn-sm" style="padding:6px 8px;justify-content:center" onclick="removeInvLine(this)">✕</button>`;
+  container.appendChild(div);
+}
+
+function removeInvLine(btn) {
+  const lines = document.querySelectorAll('#inv-lines .inv-line');
+  if (lines.length <= 1) return;
+  btn.closest('.inv-line').remove();
+  updateInvTotal();
+}
+
+function updateInvTotal() {
+  const discount = parseFloat(document.getElementById('m-idiscount')?.value)||0;
+  let subtotal = 0;
+  document.querySelectorAll('#inv-lines .inv-line').forEach(line => {
+    const inputs = line.querySelectorAll('input');
+    const price  = parseFloat(inputs[1]?.value)||0;
+    const qty    = parseInt(inputs[2]?.value)||1;
+    subtotal += price * qty;
+  });
+  const discAmt = subtotal * discount / 100;
+  const netHT   = subtotal - discAmt;
+  const tva     = netHT * 0.20;
+  const ttc     = netHT + tva;
+  const set = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
+  set('inv-subtotal',   fmt(subtotal)    + ' MAD');
+  set('inv-discount-amt','- ' + fmt(discAmt)  + ' MAD');
+  set('inv-net-ht',     fmt(netHT)       + ' MAD');
+  set('inv-tva',        fmt(tva)         + ' MAD');
+  set('inv-total-ttc',  fmt(ttc)         + ' MAD');
+}
+
+function openInvoiceModal(type) {
+  invType = type;
+  document.getElementById('inv-modal-title').textContent = type==='devis' ? '📋 Nouveau devis' : '🧾 Nouvelle facture';
+  // Reset lines
+  document.getElementById('inv-lines').innerHTML = `
+    <div class="inv-line" style="display:grid;grid-template-columns:1fr 110px 70px 36px;gap:6px;align-items:center">
+      <input class="fi" placeholder="Nom du produit / service" style="font-size:13px;padding:8px 10px">
+      <input class="fi" type="number" placeholder="0.00" min="0" step="0.01" style="font-size:13px;padding:8px 10px" oninput="updateInvTotal()">
+      <input class="fi" type="number" placeholder="1" min="1" value="1" style="font-size:13px;padding:8px 10px" oninput="updateInvTotal()">
+      <button class="btn btn-danger btn-sm" style="padding:6px 8px;justify-content:center" onclick="removeInvLine(this)">✕</button>
+    </div>`;
+  document.getElementById('m-iname').value    = '';
+  document.getElementById('m-idiscount').value = '0';
+  document.getElementById('m-inotes').value   = '';
+  updateInvTotal();
+  openModal('modal-invoice');
+}
+
 async function saveInvoice() {
-  const itemsRaw = document.getElementById('m-iitems').value.trim().split('\n').filter(l=>l);
-  const items = itemsRaw.map(line => {
-    const [name, price, qty] = line.split(';');
-    return { name: name?.trim(), price: parseFloat(price)||0, qty: parseInt(qty)||1 };
+  const name = document.getElementById('m-iname').value.trim();
+  if (!name) return alert('Entrez le nom du client');
+  const items = [];
+  let valid = true;
+  document.querySelectorAll('#inv-lines .inv-line').forEach(line => {
+    const inputs = line.querySelectorAll('input');
+    const n = inputs[0]?.value.trim();
+    const p = parseFloat(inputs[1]?.value)||0;
+    const q = parseInt(inputs[2]?.value)||1;
+    if (n) items.push({ name: n, price: p, qty: q });
+    else valid = false;
   });
+  if (!items.length) return alert('Ajoutez au moins un article avec un nom');
   const r = await API('POST', '/api/billing/invoices', {
-    type: invType, contactName: document.getElementById('m-iname').value,
+    type: invType, contactName: name,
     discount: parseFloat(document.getElementById('m-idiscount').value)||0,
-    notes: document.getElementById('m-inotes').value, items
+    notes: document.getElementById('m-inotes').value || 'Paiement sous 15 jours. Merci pour votre confiance.',
+    items
   });
-  if (!r.ok) return alert(r.data.error);
-  closeModal('modal-invoice'); loadBilling();
+  if (!r.ok) return alert(r.data.error || 'Erreur creation');
+  closeModal('modal-invoice');
+  loadBilling();
 }
 async function updateInvStatus(id, status) { await API('PATCH', '/api/billing/invoices/' + id + '/status', { status }); loadBilling(); }
 
