@@ -2464,6 +2464,99 @@ async function generateAllFormats() {
   btn.textContent = '⚡ Régénérer tous les formats';
   btn.disabled    = false;
 }
+
+/* ═══════════════════════════════════════════════
+   PHOTO UPLOAD & ANALYSE IA
+═══════════════════════════════════════════════ */
+
+let uploadedPhotoBase64 = null;
+let uploadedPhotoDesc   = null;
+
+function handlePhotoDrop(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  document.getElementById('photo-upload-zone').style.borderColor = 'var(--border)';
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) processPhotoFile(file);
+}
+
+function handlePhotoUpload(input) {
+  const file = input.files[0];
+  if (file) processPhotoFile(file);
+}
+
+function processPhotoFile(file) {
+  if (file.size > 10 * 1024 * 1024) {
+    setAlert('vis-alert', 'Photo trop grande — maximum 10MB', 'err');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    const base64 = e.target.result;
+    uploadedPhotoBase64 = base64;
+
+    // Show preview
+    document.getElementById('photo-placeholder').style.display = 'none';
+    document.getElementById('photo-preview-wrap').style.display = 'block';
+    document.getElementById('photo-preview-img').src = base64;
+    document.getElementById('photo-preview-name').textContent = 
+      file.name + ' (' + Math.round(file.size/1024) + ' KB)';
+
+    // Analyze with AI
+    await analyzePhotoWithAI(base64);
+  };
+  reader.readAsDataURL(file);
+}
+
+function removePhoto() {
+  uploadedPhotoBase64 = null;
+  uploadedPhotoDesc   = null;
+  document.getElementById('photo-placeholder').style.display = 'block';
+  document.getElementById('photo-preview-wrap').style.display = 'none';
+  document.getElementById('photo-analyzing').style.display = 'none';
+  document.getElementById('photo-analyzed').style.display = 'none';
+  document.getElementById('photo-file-inp').value = '';
+}
+
+async function analyzePhotoWithAI(base64) {
+  document.getElementById('photo-analyzing').style.display = 'block';
+  document.getElementById('photo-analyzed').style.display = 'none';
+  document.getElementById('photo-analyze-txt').textContent = 'Analyse IA de votre photo...';
+
+  try {
+    const r = await fetch('/api/ai/analyze-image', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + TOKEN
+      },
+      body: JSON.stringify({ imageBase64: base64 })
+    });
+    const data = await r.json();
+
+    if (r.ok && data.description) {
+      uploadedPhotoDesc = data.description;
+      const prodInp = document.getElementById('vis-product');
+      if (!prodInp.value.trim()) {
+        prodInp.value = data.productName || data.description.slice(0, 80);
+      }
+      // Auto-fill colors if suggested
+      if (data.suggestedColors) {
+        const colorsInp = document.getElementById('vis-colors');
+        if (!colorsInp.value.trim()) colorsInp.value = data.suggestedColors;
+      }
+      document.getElementById('photo-analyzing').style.display = 'none';
+      document.getElementById('photo-analyzed').style.display = 'block';
+    } else {
+      document.getElementById('photo-analyze-txt').textContent = 'Entrez la description manuellement';
+    }
+  } catch(err) {
+    console.error('Analyze error:', err);
+    document.getElementById('photo-analyze-txt').textContent = 'Entrez la description manuellement';
+  }
+}
+
 </script>
 </body>
 </html>
