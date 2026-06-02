@@ -2304,59 +2304,185 @@ function buildPrompt() {
 
 async function generateVisual() {
   const product = document.getElementById('vis-product').value.trim();
-  if (!product) {
-    setAlert('vis-alert', 'Entrez le produit / sujet de la pub', 'err');
+  if (!product && !uploadedPhotoBase64) {
+    setAlert('vis-alert', 'Entrez le produit ou uploadez une photo', 'err');
     return;
   }
   document.getElementById('vis-alert').textContent = '';
 
-  // Show loading
-  const loading = document.getElementById('vis-loading');
-  const img     = document.getElementById('vis-img');
+  const loading     = document.getElementById('vis-loading');
+  const img         = document.getElementById('vis-img');
   const placeholder = document.getElementById('vis-placeholder');
-
   placeholder.style.display = 'none';
-  img.style.display = 'none';
-  loading.style.display = 'flex';
-  document.getElementById('vis-progress').textContent = "Construction du prompt...";
+  img.style.display         = 'none';
+  loading.style.display     = 'flex';
 
-  // Build prompt
-  const prompt = buildPrompt();
   const { w, h } = PLAT_SIZES[visCurrPlat];
 
-  // Pollinations.ai URL (100% free, no API key)
-  const seed    = Math.floor(Math.random() * 999999);
-  const imgUrl  = `https://image.pollinations.ai/prompt/${prompt}?width=${w}&height=${h}&seed=${seed}&nologo=true&enhance=true`;
+  if (uploadedPhotoBase64) {
+    // ── MODE PHOTO RÉELLE → Canvas professionnel ──
+    document.getElementById('vis-progress').textContent = 'Création du visuel professionnel...';
+    try {
+      const dataUrl = await buildCanvasAd(uploadedPhotoBase64, w, h);
+      loading.style.display = 'none';
+      img.src = dataUrl; img.style.display = 'block';
+      visCurrImg = dataUrl;
+      visGenerated[visCurrPlat] = dataUrl;
+      document.getElementById('vis-info').style.display = 'block';
+      document.getElementById('vis-plat-name').textContent = PLAT_NAMES[visCurrPlat];
+      document.getElementById('vis-size-info').textContent = w + '×' + h + 'px';
+      const card = document.getElementById('fmt-' + visCurrPlat);
+      if (card) {
+        const prev = card.querySelector('.format-preview');
+        if (prev) prev.innerHTML = '<img src="' + dataUrl + '" style="width:100%;height:100%;object-fit:cover;border-radius:8px">';
+        const dl = document.getElementById('dl-' + visCurrPlat);
+        if (dl) dl.style.display = 'flex';
+      }
+    } catch(e) {
+      loading.style.display = 'none';
+      setAlert('vis-alert', 'Erreur: ' + e.message, 'err');
+    }
+  } else {
+    // ── MODE SANS PHOTO → Pollinations ──
+    document.getElementById('vis-progress').textContent = 'Génération IA en cours...';
+    const prompt = buildPrompt();
+    const seed   = Math.floor(Math.random() * 999999);
+    const imgUrl = 'https://image.pollinations.ai/prompt/' + prompt + '?width=' + w + '&height=' + h + '&seed=' + seed + '&nologo=true&enhance=true';
+    const newImg = new Image();
+    newImg.crossOrigin = 'anonymous';
+    newImg.onload = async () => {
+      loading.style.display = 'none';
+      img.src = imgUrl; img.style.display = 'block';
+      visCurrImg = imgUrl; visGenerated[visCurrPlat] = imgUrl;
+      document.getElementById('vis-info').style.display = 'block';
+      document.getElementById('vis-plat-name').textContent = PLAT_NAMES[visCurrPlat];
+      document.getElementById('vis-size-info').textContent = w + '×' + h + 'px';
+      updateFormatCard(visCurrPlat, imgUrl);
+      await generateCaptionAI();
+    };
+    newImg.onerror = () => {
+      loading.style.display = 'none';
+      placeholder.style.display = 'block';
+      setAlert('vis-alert', 'Erreur connexion internet', 'err');
+    };
+    newImg.src = imgUrl;
+    return;
+  }
+  await generateCaptionAI();
+}
 
-  document.getElementById('vis-progress').textContent = "Génération en cours...";
+// ── CANVAS: Crée une pub pro avec la vraie photo ──────────────────
+function buildCanvasAd(base64, w, h) {
+  return new Promise((resolve, reject) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d');
 
-  // Load image
-  const newImg = new Image();
-  newImg.crossOrigin = 'anonymous';
-  newImg.onload = async () => {
-    loading.style.display = 'none';
-    img.src = imgUrl;
-    img.style.display = 'block';
-    visCurrImg = imgUrl;
-    visGenerated[visCurrPlat] = imgUrl;
+    const colorStr = (document.getElementById('vis-colors').value || '').toLowerCase();
+    const promoText = document.getElementById('vis-text').value || '';
+    const prodName  = (document.getElementById('vis-product').value || 'Produit Premium').toUpperCase();
 
-    // Update info
-    document.getElementById('vis-info').style.display = 'block';
-    document.getElementById('vis-plat-name').textContent = PLAT_NAMES[visCurrPlat];
-    document.getElementById('vis-size-info').textContent = `${w}×${h}px`;
+    // Pick background color
+    let bg1 = '#ffffff', bg2 = '#f0ede8', accent = '#1a1a1a';
+    if (colorStr.includes('noir') || colorStr.includes('black'))         { bg1='#111'; bg2='#222'; accent='#c9a84c'; }
+    else if (colorStr.includes('or') || colorStr.includes('gold'))       { bg1='#fffbf0'; bg2='#f5e6b8'; accent='#b8860b'; }
+    else if (colorStr.includes('bordeaux') || colorStr.includes('rouge')){ bg1='#fff5f5'; bg2='#fde8e8'; accent='#8b1a1a'; }
+    else if (colorStr.includes('rose') || colorStr.includes('pink'))     { bg1='#fff0f5'; bg2='#ffd6e7'; accent='#c2185b'; }
+    else if (colorStr.includes('bleu') || colorStr.includes('blue'))     { bg1='#f0f4ff'; bg2='#dce6ff'; accent='#1a237e'; }
+    else if (colorStr.includes('vert') || colorStr.includes('green'))    { bg1='#f0fff4'; bg2='#c8f5d8'; accent='#1b5e20'; }
 
-    // Update format card
-    updateFormatCard(visCurrPlat, imgUrl);
+    // Draw background gradient
+    const grad = ctx.createLinearGradient(0, 0, w, h);
+    grad.addColorStop(0, bg1);
+    grad.addColorStop(1, bg2);
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
 
-    // Generate caption with Groq
-    await generateCaptionAI();
-  };
-  newImg.onerror = () => {
-    loading.style.display = 'none';
-    placeholder.style.display = 'block';
-    setAlert('vis-alert', '❌ Erreur génération — Vérifiez votre connexion internet', 'err');
-  };
-  newImg.src = imgUrl;
+    // Load product image
+    const pImg = new Image();
+    pImg.onload = () => {
+      // Compute product size (70% of canvas)
+      const maxW = w * 0.70;
+      const maxH = h * (promoText ? 0.58 : 0.70);
+      const scale = Math.min(maxW / pImg.width, maxH / pImg.height);
+      const pw = pImg.width * scale;
+      const ph = pImg.height * scale;
+      const px = (w - pw) / 2;
+      const headerH = h * 0.12;
+      const py = headerH + (maxH - ph) / 2 + h * 0.03;
+
+      // Drop shadow
+      ctx.save();
+      ctx.shadowColor = 'rgba(0,0,0,0.22)';
+      ctx.shadowBlur  = Math.round(w * 0.04);
+      ctx.shadowOffsetY = Math.round(h * 0.02);
+      ctx.drawImage(pImg, px, py, pw, ph);
+      ctx.restore();
+
+      // Top header bar
+      ctx.fillStyle = accent;
+      ctx.fillRect(0, 0, w, h * 0.10);
+
+      // Product name in header
+      const nameSize = Math.round(w * 0.042);
+      ctx.font = '700 ' + nameSize + 'px Arial, sans-serif';
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const maxName = Math.floor(w / (nameSize * 0.55));
+      ctx.fillText(prodName.slice(0, maxName), w/2, h * 0.05);
+
+      // Accent line under header
+      ctx.fillStyle = bg2;
+      ctx.fillRect(0, h * 0.10, w, h * 0.004);
+
+      // Bottom promo section
+      if (promoText) {
+        const botH = h * 0.17;
+        const botY = h - botH;
+        ctx.fillStyle = accent;
+        ctx.fillRect(0, botY, w, botH);
+
+        const promoSize = Math.round(w * 0.052);
+        ctx.font = '800 ' + promoSize + 'px Arial, sans-serif';
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        // Wrap text
+        const maxChars = Math.floor(w / (promoSize * 0.58));
+        if (promoText.length > maxChars) {
+          const mid = Math.ceil(promoText.length / 2);
+          const breakAt = promoText.lastIndexOf(' ', mid) || mid;
+          const line1 = promoText.slice(0, breakAt);
+          const line2 = promoText.slice(breakAt + 1);
+          const s2 = Math.round(promoSize * 0.78);
+          ctx.font = '800 ' + promoSize + 'px Arial, sans-serif';
+          ctx.fillText(line1, w/2, botY + botH * 0.38);
+          ctx.font = '700 ' + s2 + 'px Arial, sans-serif';
+          ctx.fillText(line2, w/2, botY + botH * 0.72);
+        } else {
+          ctx.fillText(promoText, w/2, botY + botH/2);
+        }
+      } else {
+        // Simple bottom bar
+        ctx.fillStyle = accent;
+        ctx.globalAlpha = 0.85;
+        ctx.fillRect(0, h * 0.88, w, h * 0.12);
+        ctx.globalAlpha = 1;
+        const s = Math.round(w * 0.036);
+        ctx.font = '600 ' + s + 'px Arial, sans-serif';
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('QUALITÉ PREMIUM · MAROC', w/2, h * 0.94);
+      }
+
+      resolve(canvas.toDataURL('image/jpeg', 0.95));
+    };
+    pImg.onerror = () => reject(new Error('Impossible de charger la photo'));
+    pImg.src = base64;
+  });
 }
 
 async function generateCaptionAI() {
