@@ -23,7 +23,7 @@ const PORT = process.env.PORT || 3000;
 const JWT_SECRET  = process.env.JWT_SECRET  || 'nexamarket2026secret';
 const GROQ_KEY    = process.env.GROQ_API_KEY || '';
 const GROQ_URL    = 'https://api.groq.com/openai/v1/chat/completions';
-const GROQ_MODEL  = 'llama3-70b-8192';
+const GROQ_MODEL  = 'llama-3.3-70b-versatile';
 
 // ── DATA PATH — Résolution robuste pour Railway ──────────
 function resolveDataDir() {
@@ -1375,7 +1375,7 @@ app.post('/api/ai/analyze-image', auth, async (req, res) => {
         'Authorization': 'Bearer ' + GROQ_KEY
       },
       body: JSON.stringify({
-        model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+        model: 'llama-3.3-70b-versatile',
         max_tokens: 500,
         messages: [{
           role: 'user',
@@ -1897,6 +1897,47 @@ app.get('/api/ecom/orders/:id', auth, (req, res) => {
   if (!order) return res.status(404).json({ error: 'Introuvable' });
   const user = db.users.find(u => u.id === req.user.id) || {};
   res.json({ ...order, company: user.company, phone: user.phone });
+});
+
+
+// ════════════════════════════════════════════════════════
+//  PARAMÈTRES ENTREPRISE COMPLETS
+// ════════════════════════════════════════════════════════
+app.get('/api/settings/company', auth, (req, res) => {
+  const db   = loadDB();
+  const user = db.users.find(u => u.id === req.user.id) || {};
+  res.json({
+    company:      user.company      || '',
+    name:         user.name         || '',
+    email:        user.email        || '',
+    phone:        user.phone        || '',
+    whatsapp:     user.whatsapp     || user.phone || '',
+    address:      user.address      || '',
+    city:         user.city         || '',
+    country:      user.country      || 'Maroc',
+    sector:       user.sector       || '',
+    ice:          user.ice          || '',
+    rc:           user.rc           || '',
+    tva:          user.tva          || '',
+    rib:          user.rib          || '',
+    logo:         user.logo         || '',
+    website:      user.website      || '',
+    description:  user.description  || '',
+    currency:     user.currency     || 'MAD',
+    invoicePrefix: user.invoicePrefix || 'FAC',
+    invoiceFooter: user.invoiceFooter || 'Merci pour votre confiance. Paiement sous 15 jours.',
+  });
+});
+
+app.put('/api/settings/company', auth, (req, res) => {
+  const db  = loadDB();
+  const idx = db.users.findIndex(u => u.id === req.user.id);
+  if (idx === -1) return res.status(404).json({ error: 'Utilisateur introuvable' });
+  const fields = ['company','name','phone','whatsapp','address','city','country','sector','ice','rc','tva','rib','logo','website','description','currency','invoicePrefix','invoiceFooter'];
+  fields.forEach(f => { if (req.body[f] !== undefined) db.users[idx][f] = req.body[f]; });
+  db.users[idx].updatedAt = new Date().toISOString();
+  saveDB(db);
+  res.json({ ok: true, user: db.users[idx] });
 });
 
 app.get('/health', (req, res) => {

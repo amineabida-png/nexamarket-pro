@@ -939,75 +939,101 @@ input[type="password"], input[type="email"], input[type="text"] {
 
     <!-- ── SETTINGS ── -->
     <div class="page hidden" id="page-settings">
-      <div class="card card-glow">
-        <div class="ct mb16">⚙️ Paramètres du compte</div>
-        <div class="form-g2 mb12">
-          <div class="fg"><label class="fl">Nom complet</label><input class="fi" id="set-name" placeholder="Votre nom"></div>
-          <div class="fg"><label class="fl">Entreprise</label><input class="fi" id="set-company" placeholder="Nom boutique"></div>
-          <div class="fg"><label class="fl">Téléphone</label><input class="fi" id="set-phone" placeholder="+212..."></div>
-          <div class="fg"><label class="fl">Ville</label><input class="fi" id="set-city" placeholder="Casablanca"></div>
-          <div class="fg"><label class="fl">Secteur</label><input class="fi" id="set-sector" placeholder="Mode & Vêtements"></div>
-        </div>
-        <button class="btn btn-p btn-sm" onclick="saveSettings()">💾 Sauvegarder</button>
-        <div class="sep"></div>
-        <div class="ct mb12">🔑 Changer mot de passe</div>
-        <div class="form-g2">
-          <div class="fg"><label class="fl">Mot de passe actuel</label><input class="fi" type="password" id="pw-old" placeholder="••••••••"></div>
-          <div class="fg"><label class="fl">Nouveau mot de passe</label><input class="fi" type="password" id="pw-new" placeholder="••••••••"></div>
-        </div>
-        <button class="btn btn-g btn-sm" onclick="changePW()">Changer le mot de passe</button>
-        <div id="settings-alert" class="alert mt8"></div>
-      </div>
-    </div>
-
-    <!-- ── SUPER ADMIN PANEL ── -->
-    <div class="page hidden" id="page-admin">
-      <div class="g4" id="admin-stats">
-        <div class="kpi v"><div class="kpi-lbl">👥 Comptes total</div><div class="kpi-val" id="adm-total">0</div></div>
-        <div class="kpi g"><div class="kpi-lbl">✅ Actifs</div><div class="kpi-val" id="adm-actif">0</div></div>
-        <div class="kpi a"><div class="kpi-lbl">⏰ Expire bientôt</div><div class="kpi-val" id="adm-expire">0</div></div>
-        <div class="kpi r"><div class="kpi-lbl">⛔ Désactivés</div><div class="kpi-val" id="adm-inactif">0</div></div>
-      </div>
-
-      <!-- CREATE ACCOUNT -->
-      <div class="card card-glow">
-        <div class="ct mb16">➕ Créer un compte utilisateur</div>
-        <div id="adm-create-alert" class="alert"></div>
-        <div class="form-g2 mb12">
-          <div class="fg"><label class="fl">Nom complet *</label><input class="fi" id="adm-name" placeholder="Hassan Amrani"></div>
-          <div class="fg"><label class="fl">Email *</label><input class="fi" type="email" id="adm-email" placeholder="hassan@boutique.ma"></div>
-          <div class="fg"><label class="fl">Mot de passe *</label><input class="fi" type="password" id="adm-pass" placeholder="Min. 6 caractères"></div>
-          <div class="fg"><label class="fl">Téléphone</label><input class="fi" id="adm-phone" placeholder="+212 6XX XXX XXX"></div>
-          <div class="fg"><label class="fl">Entreprise</label><input class="fi" id="adm-company" placeholder="Boutique Mode Casa"></div>
-          <div class="fg"><label class="fl">Ville</label><input class="fi" id="adm-city" placeholder="Casablanca"></div>
+      <div class="g2">
+        <!-- LEFT: Infos entreprise -->
+        <div class="card card-glow">
+          <div class="ct mb16">🏢 Informations de l'entreprise</div>
+          <div class="form-g2 mb12">
+            <div class="fg"><label class="fl">Nom de l'entreprise *</label><input class="fi" id="s-company" placeholder="Ma Boutique Mode"></div>
+            <div class="fg"><label class="fl">Votre nom *</label><input class="fi" id="s-name" placeholder="Mohamed Amrani"></div>
+            <div class="fg"><label class="fl">Email *</label><input class="fi" id="s-email" placeholder="contact@maboutique.ma"></div>
+            <div class="fg"><label class="fl">Téléphone</label><input class="fi" id="s-phone" placeholder="+212 6XX XXX XXX"></div>
+            <div class="fg"><label class="fl">📱 WhatsApp Business</label><input class="fi" id="s-whatsapp" placeholder="+212 6XX XXX XXX (avec indicatif)"></div>
+            <div class="fg"><label class="fl">Ville</label><input class="fi" id="s-city" placeholder="Casablanca"></div>
+            <div class="fg"><label class="fl">Adresse</label><input class="fi" id="s-address" placeholder="Boulevard Anfa, Maarif..."></div>
+            <div class="fg"><label class="fl">Secteur d'activité</label>
+              <select class="fi" id="s-sector">
+                <option value="">Sélectionnez...</option>
+                <option value="Mode & Vêtements">Mode & Vêtements</option>
+                <option value="Cosmétiques & Beauté">Cosmétiques & Beauté</option>
+                <option value="Alimentation & Bio">Alimentation & Bio</option>
+                <option value="Électronique">Électronique</option>
+                <option value="Artisanat & Déco">Artisanat & Déco</option>
+                <option value="Bijoux & Accessoires">Bijoux & Accessoires</option>
+                <option value="Services">Services</option>
+                <option value="Autre">Autre</option>
+              </select>
+            </div>
+            <div class="fg"><label class="fl">Site web</label><input class="fi" id="s-website" placeholder="www.maboutique.ma"></div>
+          </div>
+          <div class="fg mb12"><label class="fl">Description boutique</label><textarea class="fi" id="s-description" rows="2" placeholder="Boutique spécialisée en mode marocaine contemporaine..."></textarea></div>
+          <div id="s-company-alert" class="alert"></div>
+          <button class="btn btn-p" onclick="saveCompany()">💾 Sauvegarder les infos</button>
         </div>
 
-        <label class="fl mb8">Abonnement *</label>
-        <div class="plans-grid" id="adm-plans">
-          <div class="plan-opt" onclick="selPlan(this,'demo')" id="ap-demo"><div class="plan-name">🎁 Démo</div><div class="plan-price">Gratuit</div><div class="plan-dur">24 heures</div></div>
-          <div class="plan-opt sel" onclick="selPlan(this,'30j')" id="ap-30j"><div class="plan-name">📅 Mensuel</div><div class="plan-price">299 MAD</div><div class="plan-dur">30 jours</div></div>
-          <div class="plan-opt" onclick="selPlan(this,'1an')" id="ap-1an"><div class="plan-name">📆 Annuel</div><div class="plan-price">2 699 MAD</div><div class="plan-dur">365 jours</div></div>
-          <div class="plan-opt" onclick="selPlan(this,'avie')" id="ap-avie"><div class="plan-name">♾️ À vie</div><div class="plan-price">9 949 MAD</div><div class="plan-dur">Illimité</div></div>
-        </div>
+        <!-- RIGHT: Infos légales + Factures + WA -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <!-- Infos légales -->
+          <div class="card">
+            <div class="ct mb12">📄 Informations légales</div>
+            <div class="form-g2 mb8">
+              <div class="fg"><label class="fl">ICE</label><input class="fi" id="s-ice" placeholder="000000000000000"></div>
+              <div class="fg"><label class="fl">RC</label><input class="fi" id="s-rc" placeholder="12345 Casa"></div>
+              <div class="fg"><label class="fl">N° TVA</label><input class="fi" id="s-tva" placeholder="12345678"></div>
+              <div class="fg"><label class="fl">RIB / IBAN</label><input class="fi" id="s-rib" placeholder="MA64011519000001205000534921"></div>
+            </div>
+            <button class="btn btn-g btn-sm" onclick="saveCompany()">💾 Sauvegarder</button>
+          </div>
 
-        <div class="fg" style="max-width:220px">
-          <label class="fl">Rôle</label>
-          <select class="fi" id="adm-role"><option value="user">Utilisateur</option><option value="admin">Admin</option></select>
-        </div>
-        <button class="btn btn-p" onclick="adminCreateUser()">✅ Créer le compte</button>
-      </div>
+          <!-- Paramètres factures -->
+          <div class="card">
+            <div class="ct mb12">🧾 Paramètres de facturation</div>
+            <div class="fg mb8"><label class="fl">Préfixe factures</label>
+              <select class="fi" id="s-inv-prefix">
+                <option value="FAC">FAC (Facture)</option>
+                <option value="INV">INV (Invoice)</option>
+                <option value="FACT">FACT</option>
+              </select>
+            </div>
+            <div class="fg mb8"><label class="fl">Pied de page factures</label><textarea class="fi" id="s-inv-footer" rows="2" placeholder="Merci pour votre confiance. Paiement sous 15 jours."></textarea></div>
+            <button class="btn btn-g btn-sm" onclick="saveCompany()">💾 Sauvegarder</button>
+          </div>
 
-      <!-- USERS LIST -->
-      <div class="card">
-        <div class="ch">
-          <div class="ct">📋 Tous les comptes</div>
-          <button class="btn btn-g btn-sm" onclick="loadAdminUsers()">🔄 Actualiser</button>
-        </div>
-        <div class="tbl-wrap">
-          <table>
-            <thead><tr><th>Utilisateur</th><th>Email</th><th>Abonnement</th><th>Expiration</th><th>Statut</th><th>Actions</th></tr></thead>
-            <tbody id="adm-tbody"><tr><td colspan="6" style="text-align:center;color:var(--t3);padding:24px">Chargement...</td></tr></tbody>
-          </table>
+          <!-- WhatsApp Config -->
+          <div class="card" style="border-color:rgba(37,211,102,.2)">
+            <div class="ch mb12">
+              <div><div class="ct">💬 Configuration WhatsApp</div><div class="cs">Numéro utilisé pour les broadcasts et le bot IA</div></div>
+              <div class="live-dot" style="background:#25d366"></div>
+            </div>
+            <div class="fg mb8">
+              <label class="fl">Numéro WhatsApp Business *</label>
+              <input class="fi" id="s-wa-number" placeholder="+212612345678 (avec + et indicatif pays)">
+              <div class="fs12 t2 mt4">Format requis: +212XXXXXXXXX (Maroc) | +33XXXXXXXXX (France)</div>
+            </div>
+            <div style="background:rgba(37,211,102,.06);border:1px solid rgba(37,211,102,.2);border-radius:var(--r-md);padding:12px;margin-bottom:12px">
+              <div class="fw6 fs13 mb6">📋 Comment ça fonctionne</div>
+              <div class="fs12 t2" style="line-height:1.8">
+                <div>1. Entrez votre numéro WhatsApp Business</div>
+                <div>2. Les clients cliquent "Commander via WhatsApp" dans votre boutique</div>
+                <div>3. WhatsApp s'ouvre directement vers votre numéro</div>
+                <div>4. Le bot IA répond automatiquement en Darija/FR/AR</div>
+              </div>
+            </div>
+            <div id="s-wa-alert" class="alert mb8"></div>
+            <div class="flex gap8">
+              <button class="btn btn-success btn-sm" onclick="saveWhatsApp()">💾 Enregistrer le numéro</button>
+              <button class="btn btn-g btn-sm" onclick="testWhatsApp()">🧪 Tester</button>
+            </div>
+          </div>
+
+          <!-- Changer MDP -->
+          <div class="card">
+            <div class="ct mb12">🔑 Changer le mot de passe</div>
+            <div class="fg mb8"><label class="fl">Ancien mot de passe</label><input class="fi" type="password" id="pw-old" placeholder="••••••••"></div>
+            <div class="fg mb8"><label class="fl">Nouveau mot de passe</label><input class="fi" type="password" id="pw-new" placeholder="••••••••"></div>
+            <div id="pw-alert" class="alert mb8"></div>
+            <button class="btn btn-p btn-sm" onclick="changePassword()">🔑 Changer</button>
+          </div>
         </div>
       </div>
     </div>
@@ -3252,11 +3278,14 @@ let editInvId = null;
 // ── FACTURES ──────────────────────────────────
 async function viewInvoice(id) {
   const r = await API('GET', '/api/billing/invoices/' + id);
-  if (!r.ok) return;
+  if (!r.ok) return alert('Erreur chargement facture');
   const inv = r.data;
   currentPrintData = { type: 'invoice', data: inv };
-  document.getElementById('view-modal-title').textContent = inv.invoiceNo + ' — ' + inv.contactName;
-  document.getElementById('view-modal-content').innerHTML = buildInvoiceHTML(inv);
+  const titleEl   = document.getElementById('view-modal-title');
+  const contentEl = document.getElementById('view-modal-content');
+  if (!titleEl || !contentEl) return alert('Modal introuvable - rechargez la page');
+  titleEl.textContent   = (inv.invoiceNo||'') + ' — ' + (inv.contactName||'');
+  contentEl.innerHTML   = buildInvoiceHTML(inv);
   openModal('modal-view');
 }
 
@@ -3531,6 +3560,83 @@ function viewContact(id, name, phone, email, score, notes) {
       ${notes?`<div style="background:#f5f5f5;border-radius:8px;padding:12px"><div style="font-size:11px;color:#999;margin-bottom:4px">NOTES</div><div style="font-size:13px">${esc(notes)}</div></div>`:''}
     </div>`;
   openModal('modal-view');
+}
+
+
+/* ═══════════════════════════════════════════════
+   PARAMÈTRES ENTREPRISE + WHATSAPP
+═══════════════════════════════════════════════ */
+async function loadSettings() {
+  const r = await API('GET', '/api/settings/company');
+  if (!r.ok) return;
+  const d = r.data;
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+  set('s-company', d.company);
+  set('s-name',    d.name);
+  set('s-email',   d.email);
+  set('s-phone',   d.phone);
+  set('s-whatsapp', d.whatsapp);
+  set('s-city',    d.city);
+  set('s-address', d.address);
+  set('s-website', d.website);
+  set('s-description', d.description);
+  set('s-ice',     d.ice);
+  set('s-rc',      d.rc);
+  set('s-tva',     d.tva);
+  set('s-rib',     d.rib);
+  set('s-inv-footer', d.invoiceFooter);
+  set('s-wa-number', d.whatsapp);
+  const secEl = document.getElementById('s-sector');
+  if (secEl && d.sector) secEl.value = d.sector;
+  const prefEl = document.getElementById('s-inv-prefix');
+  if (prefEl && d.invoicePrefix) prefEl.value = d.invoicePrefix;
+}
+
+async function saveCompany() {
+  const get = (id) => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  const data = {
+    company:      get('s-company'),
+    name:         get('s-name'),
+    phone:        get('s-phone'),
+    whatsapp:     get('s-whatsapp') || get('s-phone'),
+    city:         get('s-city'),
+    address:      get('s-address'),
+    sector:       document.getElementById('s-sector')?.value || '',
+    website:      get('s-website'),
+    description:  get('s-description'),
+    ice:          get('s-ice'),
+    rc:           get('s-rc'),
+    tva:          get('s-tva'),
+    rib:          get('s-rib'),
+    invoicePrefix: document.getElementById('s-inv-prefix')?.value || 'FAC',
+    invoiceFooter: get('s-inv-footer'),
+  };
+  if (!data.company) return setAlert('s-company-alert', 'Nom entreprise requis', 'err');
+  const r = await API('PUT', '/api/settings/company', data);
+  if (r.ok) {
+    setAlert('s-company-alert', '✅ Informations sauvegardées!', 'ok');
+    // Update ME
+    if (ME) { ME.company = data.company; ME.phone = data.phone; }
+  } else {
+    setAlert('s-company-alert', 'Erreur sauvegarde', 'err');
+  }
+}
+
+async function saveWhatsApp() {
+  const num = document.getElementById('s-wa-number')?.value.trim();
+  if (!num) return setAlert('s-wa-alert', 'Entrez votre numéro WhatsApp', 'err');
+  if (!num.startsWith('+')) return setAlert('s-wa-alert', 'Format: +212XXXXXXXXX', 'err');
+  const r = await API('PUT', '/api/settings/company', { whatsapp: num, phone: num });
+  if (r.ok) {
+    setAlert('s-wa-alert', '✅ Numéro WhatsApp sauvegardé!', 'ok');
+    if (ME) ME.phone = num;
+  }
+}
+
+function testWhatsApp() {
+  const num = document.getElementById('s-wa-number')?.value.trim().replace(/\s+/g,'').replace('+','');
+  if (!num) return alert('Entrez votre numéro WhatsApp');
+  window.open('https://wa.me/' + num + '?text=Test NexaMarket Pro - Configuration WhatsApp', '_blank');
 }
 
 </script>
