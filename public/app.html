@@ -538,7 +538,9 @@ input[type="password"], input[type="email"], input[type="text"] {
     </div>
     <div class="fg">
       <label class="fl">Mot de passe</label>
-      <input class="fi" type="password" id="l-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+      <form onsubmit="event.preventDefault();doLogin()" style="margin:0;padding:0">
+        <input class="fi" type="password" id="l-pass" placeholder="••••••••">
+      </form>
     </div>
 
     <button class="btn btn-p btn-full" onclick="doLogin()">Se connecter →</button>
@@ -1667,7 +1669,12 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (TOKEN) {
     const r = await API('GET', '/api/auth/me');
     if (r.ok) { ME = r.data; enterApp(); }
-    else { TOKEN = ''; localStorage.removeItem('nx_token'); }
+    else {
+      // Token expiré ou invalide → reconnexion automatique
+      TOKEN = ''; ME = null;
+      localStorage.removeItem('nx_token');
+      showScreen('screen-login');
+    }
   }
 
   // Set today's date for expense
