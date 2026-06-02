@@ -2747,6 +2747,81 @@ function visDownload() {
 }
 
 
+
+// ── SUPPRESSION FOND NAVIGATEUR (sans API) ────────────
+async function removeBackground(base64) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width  = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imageData.data;
+      const w2 = canvas.width, h2 = canvas.height;
+
+      // Sample background color from corners (average of 4 corners)
+      function getPixel(x, y) {
+        const i = (y * w2 + x) * 4;
+        return [data[i], data[i+1], data[i+2], data[i+3]];
+      }
+      const corners = [
+        getPixel(0,0), getPixel(w2-1,0),
+        getPixel(0,h2-1), getPixel(w2-1,h2-1),
+        getPixel(Math.floor(w2/2),0), getPixel(0,Math.floor(h2/2))
+      ];
+      const bgR = Math.round(corners.reduce((s,c)=>s+c[0],0)/corners.length);
+      const bgG = Math.round(corners.reduce((s,c)=>s+c[1],0)/corners.length);
+      const bgB = Math.round(corners.reduce((s,c)=>s+c[2],0)/corners.length);
+
+      // Tolerance for color matching
+      const tolerance = 42;
+      function colorDist(r,g,b) {
+        return Math.sqrt((r-bgR)**2 + (g-bgG)**2 + (b-bgB)**2);
+      }
+
+      // Remove background pixels
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i], g = data[i+1], b = data[i+2];
+        const dist = colorDist(r, g, b);
+        if (dist < tolerance) {
+          // Smooth edge: partial transparency
+          data[i+3] = Math.min(data[i+3], Math.round((dist / tolerance) * 80));
+        }
+      }
+
+      // Feather edges - second pass for cleaner look
+      for (let y2 = 0; y2 < h2; y2++) {
+        for (let x = 0; x < w2; x++) {
+          const idx = (y2 * w2 + x) * 4;
+          if (data[idx+3] < 128) {
+            // Check neighbors and average
+            let neighborAlpha = 0, count = 0;
+            for (let dy = -1; dy <= 1; dy++) {
+              for (let dx = -1; dx <= 1; dx++) {
+                const nx = x+dx, ny = y2+dy;
+                if (nx>=0 && nx<w2 && ny>=0 && ny<h2) {
+                  neighborAlpha += data[(ny*w2+nx)*4+3];
+                  count++;
+                }
+              }
+            }
+            if (neighborAlpha/count > 180) data[idx+3] = Math.min(data[idx+3] * 1.5, 255);
+          }
+        }
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+      resolve(canvas.toDataURL('image/png'));
+    };
+    img.onerror = () => resolve(base64);
+    img.src = base64;
+  });
+}
+
 // ── CANVAS PREMIUM: Design pub magazine haut de gamme ───────
 function buildCanvasAd(base64, w, h) {
   return new Promise((resolve, reject) => {
