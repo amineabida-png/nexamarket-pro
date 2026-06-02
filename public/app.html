@@ -2739,6 +2739,226 @@ function visDownload() {
   a.click();
 }
 
+
+// ── CANVAS PREMIUM: Design pub magazine haut de gamme ───────
+function buildCanvasAd(base64, w, h) {
+  return new Promise((resolve, reject) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    const T = VIS_THEMES[visTheme] || VIS_THEMES.dark;
+    const W = w, H = h;
+    const isStory = H > W * 1.2;
+    const isWide  = W > H * 1.2;
+
+    // Background gradient premium
+    const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+    bgGrad.addColorStop(0, T.bg1);
+    bgGrad.addColorStop(0.6, T.bg2);
+    bgGrad.addColorStop(1, T.bg1);
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Subtle dot texture
+    ctx.save();
+    ctx.globalAlpha = 0.022;
+    for (let x = 0; x < W; x += 28) {
+      for (let y2 = 0; y2 < H; y2 += 28) {
+        ctx.beginPath();
+        ctx.arc(x, y2, 1, 0, Math.PI * 2);
+        ctx.fillStyle = '#fff';
+        ctx.fill();
+      }
+    }
+    ctx.restore();
+
+    // Glow top-right
+    ctx.save();
+    ctx.globalAlpha = 0.12;
+    const gr1 = ctx.createRadialGradient(W, 0, 0, W, 0, W * 0.65);
+    gr1.addColorStop(0, T.accent);
+    gr1.addColorStop(1, 'transparent');
+    ctx.fillStyle = gr1;
+    ctx.fillRect(0, 0, W, H);
+    ctx.restore();
+
+    // Glow bottom-left
+    ctx.save();
+    ctx.globalAlpha = 0.07;
+    const gr2 = ctx.createRadialGradient(0, H, 0, 0, H, W * 0.5);
+    gr2.addColorStop(0, T.accent);
+    gr2.addColorStop(1, 'transparent');
+    ctx.fillStyle = gr2;
+    ctx.fillRect(0, 0, W, H);
+    ctx.restore();
+
+    // Diagonal lines luxury
+    ctx.save();
+    ctx.globalAlpha = 0.04;
+    ctx.strokeStyle = T.accent;
+    ctx.lineWidth = W * 0.0015;
+    for (let i = -3; i < 5; i++) {
+      ctx.beginPath();
+      ctx.moveTo(W * (0.25 + i * 0.14), 0);
+      ctx.lineTo(W * (0.25 + i * 0.14) + H * 0.28, H);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // Left accent bar gradient
+    const barGrad = ctx.createLinearGradient(0, 0, 0, H);
+    barGrad.addColorStop(0, T.accent + 'ff');
+    barGrad.addColorStop(0.5, T.accent + 'dd');
+    barGrad.addColorStop(1, T.accent + '44');
+    ctx.fillStyle = barGrad;
+    ctx.fillRect(0, 0, Math.round(W * 0.013), H);
+
+    // Load product
+    const pImg = new Image();
+    pImg.onload = () => {
+      // Image zone
+      let imgZX, imgZY, imgZW, imgZH;
+      if (isStory) {
+        imgZX = W * 0.06; imgZY = H * 0.20; imgZW = W * 0.88; imgZH = H * 0.47;
+      } else if (isWide) {
+        imgZX = W * 0.48; imgZY = H * 0.06; imgZW = W * 0.48; imgZH = H * 0.88;
+      } else {
+        imgZX = W * 0.38; imgZY = H * 0.08; imgZW = W * 0.58; imgZH = H * 0.82;
+      }
+
+      const sc = Math.min(imgZW / pImg.width, imgZH / pImg.height) * 0.90;
+      const iw = pImg.width * sc, ih = pImg.height * sc;
+      const ix = imgZX + (imgZW - iw) / 2;
+      const iy = imgZY + (imgZH - ih) / 2;
+
+      // Spotlight behind product
+      const spR = Math.max(iw, ih) * 0.72;
+      const sp = ctx.createRadialGradient(ix+iw/2, iy+ih/2, 0, ix+iw/2, iy+ih/2, spR);
+      sp.addColorStop(0, 'rgba(255,255,255,0.09)');
+      sp.addColorStop(0.5, 'rgba(255,255,255,0.03)');
+      sp.addColorStop(1, 'transparent');
+      ctx.fillStyle = sp;
+      ctx.beginPath();
+      ctx.arc(ix+iw/2, iy+ih/2, spR, 0, Math.PI*2);
+      ctx.fill();
+
+      // Product shadow
+      ctx.save();
+      ctx.shadowColor = 'rgba(0,0,0,0.55)';
+      ctx.shadowBlur  = W * 0.09;
+      ctx.shadowOffsetX = W * 0.01;
+      ctx.shadowOffsetY = H * 0.02;
+      ctx.drawImage(pImg, ix, iy, iw, ih);
+      ctx.restore();
+      ctx.drawImage(pImg, ix, iy, iw, ih);
+
+      // ── TEXT ──
+      const name  = (document.getElementById('vis-name') ? document.getElementById('vis-name').value : 'Produit Premium').toUpperCase();
+      const promo = document.getElementById('vis-promo') ? document.getElementById('vis-promo').value : '';
+
+      let tX = isStory ? W*0.07 : W*0.05;
+      let tY = isStory ? H*0.72  : H*0.10;
+      let tW = isStory ? W*0.86   : W*0.34;
+
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+
+      // "COLLECTION" in accent
+      const lblSz = Math.round(Math.min(W,H) * 0.025);
+      ctx.font = '300 ' + lblSz + 'px Arial, sans-serif';
+      ctx.fillStyle = T.accent;
+      ctx.letterSpacing = '3px';
+      ctx.fillText('C O L L E C T I O N', tX, tY);
+
+      // Thin line
+      ctx.fillStyle = T.accent;
+      ctx.globalAlpha = 0.7;
+      ctx.fillRect(tX, tY + lblSz * 1.4, tW * 0.32, 1.5);
+      ctx.globalAlpha = 1;
+
+      // Product name bold
+      const nameSz = Math.round(Math.min(W,H) * (isStory ? 0.065 : 0.052));
+      ctx.font = '900 ' + nameSz + 'px Arial, sans-serif';
+      ctx.fillStyle = T.textC;
+
+      let lineY = tY + lblSz * 1.9;
+      const nWords = name.split(' ');
+      let nLine = '';
+      nWords.forEach((wd, i) => {
+        const test = nLine + (nLine ? ' ' : '') + wd;
+        if (ctx.measureText(test).width > tW && nLine) {
+          ctx.fillText(nLine, tX, lineY);
+          lineY += nameSz * 1.15;
+          nLine = wd;
+        } else nLine = test;
+        if (i === nWords.length-1) { ctx.fillText(nLine, tX, lineY); lineY += nameSz*1.3; }
+      });
+
+      // Promo box
+      if (promo) {
+        lineY += nameSz * 0.1;
+        const pSz = Math.round(Math.min(W,H) * (isStory ? 0.042 : 0.034));
+        ctx.font = '800 ' + pSz + 'px Arial, sans-serif';
+        const pWds = promo.toUpperCase().split(' ');
+        const pLns = [];
+        let pLn = '';
+        pWds.forEach((wd, i) => {
+          const t2 = pLn + (pLn ? ' ' : '') + wd;
+          if (ctx.measureText(t2).width > tW + W*0.03 && pLn) { pLns.push(pLn); pLn = wd; }
+          else pLn = t2;
+          if (i === pWds.length-1) pLns.push(pLn);
+        });
+
+        const pad = pSz * 0.55;
+        const bxH = pLns.length * pSz * 1.5 + pad * 1.2;
+        const bx  = tX - pad * 0.4;
+        const bww = tW + pad * 0.8;
+        const br  = pSz * 0.3;
+
+        // Box gradient
+        const bGrd = ctx.createLinearGradient(bx, lineY, bx + bww, lineY + bxH);
+        bGrd.addColorStop(0, T.accent);
+        bGrd.addColorStop(1, T.accent + 'cc');
+        ctx.fillStyle = bGrd;
+        ctx.beginPath();
+        ctx.moveTo(bx+br, lineY);
+        ctx.lineTo(bx+bww-br, lineY); ctx.quadraticCurveTo(bx+bww, lineY, bx+bww, lineY+br);
+        ctx.lineTo(bx+bww, lineY+bxH-br); ctx.quadraticCurveTo(bx+bww, lineY+bxH, bx+bww-br, lineY+bxH);
+        ctx.lineTo(bx+br, lineY+bxH); ctx.quadraticCurveTo(bx, lineY+bxH, bx, lineY+bxH-br);
+        ctx.lineTo(bx, lineY+br); ctx.quadraticCurveTo(bx, lineY, bx+br, lineY);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '800 ' + pSz + 'px Arial, sans-serif';
+        pLns.forEach((pl, i) => ctx.fillText(pl, tX, lineY + pad*0.35 + i * pSz * 1.5));
+        lineY += bxH + pSz * 0.6;
+      }
+
+      // Tagline
+      const tgSz = Math.round(Math.min(W,H) * 0.023);
+      ctx.font = '300 ' + tgSz + 'px Arial, sans-serif';
+      ctx.fillStyle = T.subC;
+      ctx.globalAlpha = 0.8;
+      ctx.fillText('Livraison partout au Maroc', tX, lineY + tgSz * 0.5);
+      ctx.globalAlpha = 1;
+
+      // Bottom line gradient
+      const btGrd = ctx.createLinearGradient(0, 0, W, 0);
+      btGrd.addColorStop(0, T.accent);
+      btGrd.addColorStop(0.6, T.accent + '88');
+      btGrd.addColorStop(1, 'transparent');
+      ctx.fillStyle = btGrd;
+      ctx.fillRect(0, H - Math.round(H*0.005), W, Math.round(H*0.005));
+
+      resolve(canvas.toDataURL('image/jpeg', 0.95));
+    };
+    pImg.onerror = () => reject(new Error('Impossible de charger la photo'));
+    pImg.src = base64;
+  });
+}
+
+
 async function visCaption() {
   const name = document.getElementById('vis-name').value || 'produit';
   const langEl = document.getElementById('vis-cap-lang');

@@ -1459,6 +1459,49 @@ app.post('/api/ai/caption-public', async (req, res) => {
   }
 });
 
+
+// ── Remove background via Remove.bg (50 free/month) ──
+app.post('/api/ai/remove-bg', auth, async (req, res) => {
+  const { imageBase64 } = req.body;
+  if (!imageBase64) return res.status(400).json({ error: 'Image requise' });
+  
+  const REMOVEBG_KEY = process.env.REMOVEBG_API_KEY || '';
+  if (!REMOVEBG_KEY) {
+    // Fallback: return original image (no removal)
+    return res.json({ result: imageBase64, removed: false, message: 'Ajoutez REMOVEBG_API_KEY sur Railway' });
+  }
+
+  try {
+    const base64Data = imageBase64.includes(',') ? imageBase64.split(',')[1] : imageBase64;
+    
+    const FormData = require('form-data');
+    const form = new FormData();
+    form.append('image_file_b64', base64Data);
+    form.append('size', 'auto');
+    form.append('format', 'png');
+
+    const r = await fetch('https://api.remove.bg/v1.0/removebg', {
+      method: 'POST',
+      headers: {
+        'X-Api-Key': REMOVEBG_KEY,
+        ...form.getHeaders()
+      },
+      body: form
+    });
+
+    if (!r.ok) {
+      const err = await r.text();
+      return res.json({ result: imageBase64, removed: false, message: 'Remove.bg: ' + err });
+    }
+
+    const buffer = await r.buffer();
+    const resultBase64 = 'data:image/png;base64,' + buffer.toString('base64');
+    res.json({ result: resultBase64, removed: true });
+  } catch(e) {
+    res.json({ result: imageBase64, removed: false, message: e.message });
+  }
+});
+
 app.get('/health', (req, res) => {
   const db = loadDB();
   res.json({
