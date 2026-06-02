@@ -1066,6 +1066,246 @@ input[type="password"], input[type="email"], input[type="text"] {
 
     <!-- ── VISUELS IA ── -->
     <div class="page hidden" id="page-visuals">
+      <div class="card card-glow">
+        <div class="ch">
+          <div><div class="ct">🎨 Créateur de Visuels Publicitaires</div><div class="cs">Uploadez votre photo → Pub professionnelle prête à télécharger</div></div>
+          <div class="flex aic gap6" style="background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);padding:6px 12px;border-radius:20px">
+            <div class="live-dot"></div><span class="fs12 c-g">100% Gratuit</span>
+          </div>
+        </div>
+
+        <div class="g2">
+          <!-- LEFT FORM -->
+          <div>
+            <!-- UPLOAD -->
+            <div class="fg">
+              <label class="fl">📸 Photo de votre produit *</label>
+              <div id="vis-drop-zone" style="border:2px dashed var(--border);border-radius:var(--r-md);padding:20px;text-align:center;cursor:pointer;background:var(--input);transition:all .2s"
+                onclick="document.getElementById('vis-file').click()"
+                ondragover="event.preventDefault();this.style.borderColor='var(--violet)'"
+                ondragleave="this.style.borderColor='var(--border)'"
+                ondrop="visDrop(event)">
+                <input type="file" id="vis-file" accept="image/*" style="display:none" onchange="visFileSelected(this)">
+                <div id="vis-drop-content">
+                  <div style="font-size:36px;margin-bottom:8px">📷</div>
+                  <div class="fw6 fs13">Cliquez ou glissez votre photo</div>
+                  <div class="fs12 t2 mt4">JPG · PNG · Max 10MB</div>
+                </div>
+                <div id="vis-thumb" style="display:none">
+                  <img id="vis-thumb-img" style="max-height:120px;max-width:100%;border-radius:8px;object-fit:contain">
+                  <div class="fs12 t2 mt6" id="vis-thumb-name"></div>
+                  <button class="btn btn-danger btn-sm mt6" onclick="event.stopPropagation();visRemove()">🗑 Supprimer</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- FIELDS -->
+            <div class="fg"><label class="fl">Nom du produit *</label><input class="fi" id="vis-name" placeholder="Ex: Sac Karl Lagerfeld Noir"></div>
+            <div class="fg"><label class="fl">Texte promo</label><input class="fi" id="vis-promo" placeholder="Ex: LIVRAISON GRATUITE · -20% · عرض خاص"></div>
+
+            <div class="fg">
+              <label class="fl">Thème couleur</label>
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:4px" id="vis-themes">
+                <div class="vis-theme sel" onclick="selTheme(this,'dark')" style="background:#111;border:2px solid var(--violet);border-radius:8px;padding:8px;text-align:center;cursor:pointer">
+                  <div style="font-size:16px">🖤</div><div class="fs11 mt4" style="color:#fff">Noir</div>
+                </div>
+                <div class="vis-theme" onclick="selTheme(this,'gold')" style="background:#1a1200;border:2px solid var(--border);border-radius:8px;padding:8px;text-align:center;cursor:pointer">
+                  <div style="font-size:16px">✨</div><div class="fs11 mt4" style="color:#c9a84c">Or</div>
+                </div>
+                <div class="vis-theme" onclick="selTheme(this,'white')" style="background:#f5f5f5;border:2px solid var(--border);border-radius:8px;padding:8px;text-align:center;cursor:pointer">
+                  <div style="font-size:16px">🤍</div><div class="fs11 mt4" style="color:#333">Blanc</div>
+                </div>
+                <div class="vis-theme" onclick="selTheme(this,'red')" style="background:#1a0000;border:2px solid var(--border);border-radius:8px;padding:8px;text-align:center;cursor:pointer">
+                  <div style="font-size:16px">❤️</div><div class="fs11 mt4" style="color:#c0392b">Rouge</div>
+                </div>
+                <div class="vis-theme" onclick="selTheme(this,'blue')" style="background:#00051a;border:2px solid var(--border);border-radius:8px;padding:8px;text-align:center;cursor:pointer">
+                  <div style="font-size:16px">💙</div><div class="fs11 mt4" style="color:#2979ff">Bleu</div>
+                </div>
+                <div class="vis-theme" onclick="selTheme(this,'pink')" style="background:#1a0010;border:2px solid var(--border);border-radius:8px;padding:8px;text-align:center;cursor:pointer">
+                  <div style="font-size:16px">💗</div><div class="fs11 mt4" style="color:#e91e8c">Rose</div>
+                </div>
+                <div class="vis-theme" onclick="selTheme(this,'green')" style="background:#001a08;border:2px solid var(--border);border-radius:8px;padding:8px;text-align:center;cursor:pointer">
+                  <div style="font-size:16px">💚</div><div class="fs11 mt4" style="color:#00c853">Vert</div>
+                </div>
+                <div class="vis-theme" onclick="selTheme(this,'purple')" style="background:#0d001a;border:2px solid var(--border);border-radius:8px;padding:8px;text-align:center;cursor:pointer">
+                  <div style="font-size:16px">💜</div><div class="fs11 mt4" style="color:#9c27b0">Violet</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="fg">
+              <label class="fl">Format</label>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px" id="vis-fmts">
+                <div class="vis-fmt sel" onclick="selFmt(this,'sq',1080,1080)" style="border:2px solid var(--violet);border-radius:8px;padding:8px;text-align:center;cursor:pointer;background:rgba(99,102,241,.1)">
+                  <div style="font-size:14px">◼</div><div class="fs11 fw6 mt4">Carré</div><div class="fs10 t2">FB · IG</div>
+                </div>
+                <div class="vis-fmt" onclick="selFmt(this,'story',1080,1920)" style="border:2px solid var(--border);border-radius:8px;padding:8px;text-align:center;cursor:pointer">
+                  <div style="font-size:14px">▬</div><div class="fs11 fw6 mt4">Story</div><div class="fs10 t2">IG · TikTok</div>
+                </div>
+                <div class="vis-fmt" onclick="selFmt(this,'wide',1200,627)" style="border:2px solid var(--border);border-radius:8px;padding:8px;text-align:center;cursor:pointer">
+                  <div style="font-size:14px">▬</div><div class="fs11 fw6 mt4">Large</div><div class="fs10 t2">LinkedIn</div>
+                </div>
+              </div>
+            </div>
+
+            <div id="vis-gen-alert" class="alert mt8"></div>
+            <button class="btn btn-p w100 mt8" style="justify-content:center;padding:13px;font-size:15px" onclick="visGenerate()">
+              🎨 Créer le visuel
+            </button>
+          </div>
+
+          <!-- RIGHT PREVIEW -->
+          <div>
+            <label class="fl mb8">Aperçu</label>
+            <canvas id="vis-canvas" style="width:100%;border-radius:var(--r-md);display:none;box-shadow:0 8px 32px rgba(0,0,0,.4)"></canvas>
+            <div id="vis-empty" style="background:var(--input);border:2px dashed var(--border);border-radius:var(--r-md);min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--t3)">
+              <div style="font-size:48px;margin-bottom:12px">🎨</div>
+              <div class="fs13">Uploadez une photo et cliquez Créer</div>
+            </div>
+            <div id="vis-actions" style="display:none;margin-top:12px" class="flex gap8">
+              <button class="btn btn-p w100" style="justify-content:center" onclick="visDownload()">⬇️ Télécharger</button>
+              <button class="btn btn-g" onclick="visGenerate()">🔄 Régénérer</button>
+            </div>
+
+            <!-- Caption -->
+            <div id="vis-caption-box" style="display:none;margin-top:12px">
+              <label class="fl mb6">📝 Légende IA (Groq)</label>
+              <div id="vis-caption-txt" style="background:var(--input);border:1px solid var(--border);border-radius:var(--r-md);padding:14px;font-size:13px;line-height:1.7;min-height:60px;white-space:pre-wrap"></div>
+              <div class="flex gap6 mt8">
+                <button class="btn btn-g btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('vis-caption-txt').textContent).then(()=>alert('Copié!'))">📋 Copier</button>
+                <select class="fi btn-sm" id="vis-cap-lang" style="width:110px">
+                  <option value="dar">Darija</option>
+                  <option value="fr">Français</option>
+                  <option value="ar">Arabe</option>
+                </select>
+                <button class="btn btn-g btn-sm" onclick="visCaption()">🔄 Nouvelle</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── YOUCAN ── -->
+    <div class="page hidden" id="page-youcan">
+
+      <!-- STATUS CARD -->
+      <div class="card" id="yc-status-card" style="border-color:rgba(99,102,241,.15)">
+        <div class="ch">
+          <div>
+            <div class="ct">🔗 Intégration YouCan</div>
+            <div class="cs" id="yc-status-text">Vérification du statut...</div>
+          </div>
+          <div id="yc-status-badge" class="tag tag-s">Chargement...</div>
+        </div>
+
+        <!-- NOT CONNECTED -->
+        <div id="yc-not-connected">
+          <div style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:var(--r-md);padding:18px;margin-bottom:16px">
+            <div class="fw7 c-a mb8">📋 Comment connecter YouCan en 3 étapes</div>
+            <div class="fs13" style="line-height:2;color:var(--t2)">
+              <div><strong style="color:var(--t1)">1.</strong> Allez sur votre admin YouCan → <strong style="color:var(--violet2)">Paramètres → API</strong></div>
+              <div><strong style="color:var(--t1)">2.</strong> Copiez votre <strong style="color:var(--violet2)">clé API</strong> (commence par yk_...)</div>
+              <div><strong style="color:var(--t1)">3.</strong> Collez-la ci-dessous et cliquez Sauvegarder</div>
+            </div>
+          </div>
+          <div class="form-g2 mb12">
+            <div class="fg"><label class="fl">Clé API YouCan *</label><input class="fi" id="yc-apikey" placeholder="yk_live_xxxx..."></div>
+            <div class="fg"><label class="fl">URL boutique *</label><input class="fi" id="yc-store" placeholder="ma-boutique.youcan.shop"></div>
+            <div class="fg"><label class="fl">Webhook Secret (optionnel)</label><input class="fi" id="yc-secret" placeholder="Pour sécuriser les webhooks"></div>
+          </div>
+          <div id="yc-config-alert" class="alert"></div>
+          <div class="flex gap8">
+            <button class="btn btn-p" onclick="saveYouCanConfig()">💾 Sauvegarder et connecter</button>
+            <button class="btn btn-g" onclick="loadYouCanStatus()">🔄 Tester la connexion</button>
+          </div>
+          <div class="sep"></div>
+          <div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--r-md);padding:14px">
+            <div class="fw7 mb8 fs13">📌 Configurer le Webhook YouCan (pour sync temps réel)</div>
+            <div class="fs12 t2 mb8">Dans YouCan Admin → Paramètres → Webhooks → Ajouter cette URL :</div>
+            <div style="background:var(--input);border-radius:var(--r-sm);padding:10px 14px;font-family:monospace;font-size:12px;color:var(--violet2);word-break:break-all" id="yc-webhook-url">
+              Chargement...
+            </div>
+            <div class="fs11 t2 mt8">Événements à activer : <strong>order.created · order.confirmed · order.cancelled · product.updated</strong></div>
+          </div>
+        </div>
+
+        <!-- CONNECTED -->
+        <div id="yc-connected" style="display:none">
+          <div style="background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);border-radius:var(--r-md);padding:14px;margin-bottom:16px;display:flex;align-items:center;gap:12px">
+            <span style="font-size:28px">✅</span>
+            <div>
+              <div class="fw7 c-g">YouCan connecté et actif</div>
+              <div class="fs12 t2 mt4">Boutique : <span id="yc-store-name" class="c-v fw6">—</span></div>
+            </div>
+          </div>
+
+          <!-- SYNC BUTTONS -->
+          <div class="g3 mb16">
+            <div class="card" style="text-align:center;cursor:pointer;transition:all var(--tr)" onclick="syncOrders()" onmouseover="this.style.borderColor='rgba(99,102,241,.3)'" onmouseout="this.style.borderColor='var(--border)'">
+              <div style="font-size:28px;margin-bottom:8px">📦</div>
+              <div class="fw7 mb4">Sync Commandes</div>
+              <div class="fs12 t2 mb10">Importer toutes les commandes YouCan</div>
+              <button class="btn btn-p btn-sm w100" style="justify-content:center">🔄 Synchroniser</button>
+            </div>
+            <div class="card" style="text-align:center;cursor:pointer;transition:all var(--tr)" onclick="syncProducts()" onmouseover="this.style.borderColor='rgba(99,102,241,.3)'" onmouseout="this.style.borderColor='var(--border)'">
+              <div style="font-size:28px;margin-bottom:8px">🛒</div>
+              <div class="fw7 mb4">Sync Produits</div>
+              <div class="fs12 t2 mb10">Importer catalogue + stocks YouCan</div>
+              <button class="btn btn-p btn-sm w100" style="justify-content:center">🔄 Synchroniser</button>
+            </div>
+            <div class="card" style="text-align:center;cursor:pointer;transition:all var(--tr)" onclick="syncAll()" onmouseover="this.style.borderColor='rgba(34,197,94,.3)'" onmouseout="this.style.borderColor='var(--border)'">
+              <div style="font-size:28px;margin-bottom:8px">⚡</div>
+              <div class="fw7 mb4">Tout synchroniser</div>
+              <div class="fs12 t2 mb10">Commandes + Produits + Clients</div>
+              <button class="btn btn-success btn-sm w100" style="justify-content:center">⚡ Sync tout</button>
+            </div>
+          </div>
+
+          <div id="yc-sync-result" class="alert" style="margin-bottom:12px"></div>
+
+          <!-- YOUCAN ORDERS PREVIEW -->
+          <div class="ch mt8"><div class="ct fs13">📦 Dernières commandes YouCan</div><button class="btn btn-g btn-sm" onclick="loadYCOrders()">🔄 Actualiser</button></div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>N° Commande</th><th>Client</th><th>Total</th><th>Paiement</th><th>Statut</th><th>Date</th></tr></thead>
+              <tbody id="yc-orders-tbody"><tr><td colspan="6" style="text-align:center;color:var(--t3);padding:18px">Cliquez "Sync Commandes" pour charger</td></tr></tbody>
+            </table>
+          </div>
+
+          <div class="sep"></div>
+          <div class="fw7 mb8 fs13">⚙️ Reconfigurer</div>
+          <button class="btn btn-danger btn-sm" onclick="disconnectYouCan()">🔌 Déconnecter YouCan</button>
+        </div>
+      </div>
+
+      <!-- HOW IT WORKS -->
+      <div class="card">
+        <div class="ct mb16">🔄 Comment fonctionne la synchronisation</div>
+        <div class="g3">
+          <div style="text-align:center;padding:16px;background:var(--card2);border-radius:var(--r-md)">
+            <div style="font-size:32px;margin-bottom:10px">🛍</div>
+            <div class="fw7 mb6">Client commande sur YouCan</div>
+            <div class="fs12 t2">Un client passe commande sur votre boutique YouCan</div>
+          </div>
+          <div style="text-align:center;padding:16px;background:var(--card2);border-radius:var(--r-md)">
+            <div style="font-size:32px;margin-bottom:10px">⚡</div>
+            <div class="fw7 mb6">NexaMarket reçoit en temps réel</div>
+            <div class="fs12 t2">Via Webhook : commande + client ajoutés automatiquement</div>
+          </div>
+          <div style="text-align:center;padding:16px;background:var(--card2);border-radius:var(--r-md)">
+            <div style="font-size:32px;margin-bottom:10px">🤖</div>
+            <div class="fw7 mb6">Actions automatiques</div>
+            <div class="fs12 t2">Stock déduit · Contact CRM créé · Alerte notification</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- ── VISUELS IA ── -->
+    <div class="page hidden" id="page-visuals">
 
       <!-- FORMATS -->
       <div class="card card-glow">
@@ -2235,529 +2475,274 @@ function disconnectYouCan() {
 // Load YouCan status when page opens
 const _origShowPage = showPage;
 
-/* ═══════════════════════════════════════════════
-   VISUELS IA — Pollinations.ai (100% gratuit)
-═══════════════════════════════════════════════ */
-
-let visCurrPlat  = 'facebook';
-let visCurrSize  = '1080x1080';
-let visGenerated = {};
-let visCurrImg   = '';
-
-const PLAT_NAMES = {
-  facebook:        'Facebook Feed',
-  facebook_story:  'Facebook Story',
-  instagram:       'Instagram Feed',
-  instagram_reel:  'Instagram Reel',
-  tiktok:          'TikTok',
-  linkedin:        'LinkedIn'
-};
-
-const PLAT_SIZES = {
-  facebook:        { w: 1080, h: 1080 },
-  facebook_story:  { w: 1080, h: 1920 },
-  instagram:       { w: 1080, h: 1080 },
-  instagram_reel:  { w: 1080, h: 1920 },
-  tiktok:          { w: 1080, h: 1920 },
-  linkedin:        { w: 1200, h: 627  }
-};
-
-function initVisuals() {
-  // Set default selection
-  const first = document.querySelector('.vis-plat.sel');
-  if (!first) selPlat(document.querySelector('.vis-plat'), 'facebook', '1080x1080');
-}
-
-function selPlat(el, plat, size) {
-  document.querySelectorAll('.vis-plat').forEach(p => p.classList.remove('sel'));
-  el.classList.add('sel');
-  visCurrPlat = plat;
-  visCurrSize = size;
-}
-
-function buildPrompt() {
-  const product = document.getElementById('vis-product').value || 'produit marocain';
-  const style   = document.getElementById('vis-style').value;
-  const colors  = document.getElementById('vis-colors').value;
-  const text    = document.getElementById('vis-text').value;
-
-  // Build a very specific prompt
-  let prompt = `professional commercial product photography of ${product}`;
-  prompt += `, ${style}`;
-  if (colors) prompt += `, color palette: ${colors}`;
-  if (text)   prompt += `, with promotional text overlay: "${text}"`;
-  prompt += ', ultra sharp, 4k resolution, studio lighting, photorealistic';
-  prompt += ', no text errors, clean professional look, magazine quality';
-
-  const additions = {
-    facebook:        ', square 1:1 format, facebook advertisement',
-    facebook_story:  ', vertical 9:16 portrait, instagram story style',
-    instagram:       ', square instagram feed post, lifestyle photography',
-    instagram_reel:  ', vertical 9:16 reel thumbnail, eye-catching',
-    tiktok:          ', vertical tiktok ad, trendy young audience',
-    linkedin:        ', wide 1.91:1 linkedin professional post'
-  };
-  prompt += additions[visCurrPlat] || '';
-
-  return encodeURIComponent(prompt);
-}
-
-async function generateVisual() {
-  const product = document.getElementById('vis-product').value.trim();
-  if (!product && !uploadedPhotoBase64) {
-    setAlert('vis-alert', 'Entrez le produit ou uploadez une photo', 'err');
-    return;
-  }
-  document.getElementById('vis-alert').textContent = '';
-
-  const loading     = document.getElementById('vis-loading');
-  const img         = document.getElementById('vis-img');
-  const placeholder = document.getElementById('vis-placeholder');
-  placeholder.style.display = 'none';
-  img.style.display         = 'none';
-  loading.style.display     = 'flex';
-
-  const { w, h } = PLAT_SIZES[visCurrPlat];
-
-  if (uploadedPhotoBase64) {
-    // ── MODE PHOTO RÉELLE → Canvas professionnel ──
-    document.getElementById('vis-progress').textContent = 'Création du visuel professionnel...';
-    try {
-      const dataUrl = await buildCanvasAd(uploadedPhotoBase64, w, h);
-      loading.style.display = 'none';
-      img.src = dataUrl; img.style.display = 'block';
-      visCurrImg = dataUrl;
-      visGenerated[visCurrPlat] = dataUrl;
-      document.getElementById('vis-info').style.display = 'block';
-      document.getElementById('vis-plat-name').textContent = PLAT_NAMES[visCurrPlat];
-      document.getElementById('vis-size-info').textContent = w + '×' + h + 'px';
-      const card = document.getElementById('fmt-' + visCurrPlat);
-      if (card) {
-        const prev = card.querySelector('.format-preview');
-        if (prev) prev.innerHTML = '<img src="' + dataUrl + '" style="width:100%;height:100%;object-fit:cover;border-radius:8px">';
-        const dl = document.getElementById('dl-' + visCurrPlat);
-        if (dl) dl.style.display = 'flex';
-      }
-    } catch(e) {
-      loading.style.display = 'none';
-      setAlert('vis-alert', 'Erreur: ' + e.message, 'err');
-    }
-  } else {
-    // ── MODE SANS PHOTO → Pollinations ──
-    document.getElementById('vis-progress').textContent = 'Génération IA en cours...';
-    const prompt = buildPrompt();
-    const seed   = Math.floor(Math.random() * 999999);
-    const imgUrl = 'https://image.pollinations.ai/prompt/' + prompt + '?width=' + w + '&height=' + h + '&seed=' + seed + '&nologo=true&enhance=true';
-    const newImg = new Image();
-    newImg.crossOrigin = 'anonymous';
-    newImg.onload = async () => {
-      loading.style.display = 'none';
-      img.src = imgUrl; img.style.display = 'block';
-      visCurrImg = imgUrl; visGenerated[visCurrPlat] = imgUrl;
-      document.getElementById('vis-info').style.display = 'block';
-      document.getElementById('vis-plat-name').textContent = PLAT_NAMES[visCurrPlat];
-      document.getElementById('vis-size-info').textContent = w + '×' + h + 'px';
-      updateFormatCard(visCurrPlat, imgUrl);
-      await generateCaptionAI();
-    };
-    newImg.onerror = () => {
-      loading.style.display = 'none';
-      placeholder.style.display = 'block';
-      setAlert('vis-alert', 'Erreur connexion internet', 'err');
-    };
-    newImg.src = imgUrl;
-    return;
-  }
-  await generateCaptionAI();
-}
-
-// ── CANVAS PRO: Pub magazine professionnelle ─────────────────
-function buildCanvasAd(base64, w, h) {
-  return new Promise((resolve, reject) => {
-    const canvas = document.createElement('canvas');
-    canvas.width = w; canvas.height = h;
-    const ctx = canvas.getContext('2d');
-
-    const colorStr  = (document.getElementById('vis-colors').value || '').toLowerCase();
-    const promoText = document.getElementById('vis-text').value || '';
-    const prodName  = document.getElementById('vis-product').value || 'Produit Premium';
-    const platform  = visCurrPlat;
-
-    // Color themes
-    let bg1='#0a0a0a', bg2='#1a1a1a', accent='#c9a84c', textCol='#ffffff', subCol='rgba(255,255,255,0.7)';
-    if (colorStr.includes('blanc') || colorStr.includes('white')) {
-      bg1='#fafafa'; bg2='#f0ede8'; accent='#1a1a1a'; textCol='#111'; subCol='rgba(0,0,0,0.6)';
-    } else if (colorStr.includes('or') && !colorStr.includes('noir')) {
-      bg1='#1a1200'; bg2='#2d2000'; accent='#c9a84c'; textCol='#fff'; subCol='rgba(201,168,76,0.8)';
-    } else if (colorStr.includes('bordeaux') || colorStr.includes('rouge')) {
-      bg1='#1a0000'; bg2='#2d0808'; accent='#c0392b'; textCol='#fff'; subCol='rgba(255,150,150,0.7)';
-    } else if (colorStr.includes('rose') || colorStr.includes('pink')) {
-      bg1='#1a0010'; bg2='#2d0020'; accent='#e91e8c'; textCol='#fff'; subCol='rgba(255,150,200,0.7)';
-    } else if (colorStr.includes('bleu') || colorStr.includes('blue')) {
-      bg1='#00051a'; bg2='#000d2d'; accent='#2979ff'; textCol='#fff'; subCol='rgba(100,150,255,0.7)';
-    } else if (colorStr.includes('vert') || colorStr.includes('green')) {
-      bg1='#001a08'; bg2='#002d10'; accent='#00c853'; textCol='#fff'; subCol='rgba(100,255,150,0.7)';
-    }
-
-    // ── BACKGROUND ──
-    const bgGrad = ctx.createLinearGradient(0, 0, w * 0.3, h);
-    bgGrad.addColorStop(0, bg1);
-    bgGrad.addColorStop(1, bg2);
-    ctx.fillStyle = bgGrad;
-    ctx.fillRect(0, 0, w, h);
-
-    // Diagonal light effect
-    ctx.save();
-    const lightGrad = ctx.createLinearGradient(w * 0.3, 0, w, h * 0.6);
-    lightGrad.addColorStop(0, 'rgba(255,255,255,0.06)');
-    lightGrad.addColorStop(1, 'rgba(255,255,255,0)');
-    ctx.fillStyle = lightGrad;
-    ctx.beginPath();
-    ctx.moveTo(w * 0.25, 0);
-    ctx.lineTo(w, 0);
-    ctx.lineTo(w, h * 0.7);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
-
-    // Accent side bar (left)
-    ctx.fillStyle = accent;
-    ctx.fillRect(0, 0, w * 0.012, h);
-
-    // Load product image
-    const pImg = new Image();
-    pImg.onload = () => {
-      // ── PRODUCT IMAGE ──
-      const isVertical = h > w;
-      const imgAreaW = isVertical ? w * 0.85 : w * 0.52;
-      const imgAreaH = isVertical ? h * 0.52 : h * 0.72;
-      const imgX     = isVertical ? (w - imgAreaW) / 2 : w * 0.42;
-      const imgY     = isVertical ? h * 0.18 : (h - imgAreaH) / 2;
-
-      const scale = Math.min(imgAreaW / pImg.width, imgAreaH / pImg.height);
-      const pw = pImg.width  * scale;
-      const ph = pImg.height * scale;
-      const px = imgX + (imgAreaW - pw) / 2;
-      const py = imgY + (imgAreaH - ph) / 2;
-
-      // Glow behind product
-      ctx.save();
-      const glow = ctx.createRadialGradient(px+pw/2, py+ph/2, 0, px+pw/2, py+ph/2, Math.max(pw,ph)*0.7);
-      glow.addColorStop(0, accent.replace(')', ',0.15)').replace('rgb','rgba').replace('#','rgba(').replace('rgba(','rgba(') + '0.12)');
-      glow.addColorStop(0, 'rgba(255,255,255,0.08)');
-      glow.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = glow;
-      ctx.fillRect(px - pw*0.3, py - ph*0.3, pw*1.6, ph*1.6);
-      ctx.restore();
-
-      // Product shadow
-      ctx.save();
-      ctx.shadowColor = 'rgba(0,0,0,0.5)';
-      ctx.shadowBlur  = w * 0.06;
-      ctx.shadowOffsetX = w * 0.015;
-      ctx.shadowOffsetY = h * 0.025;
-      ctx.drawImage(pImg, px, py, pw, ph);
-      ctx.restore();
-
-      // ── TEXT CONTENT ──
-      const textX = isVertical ? w * 0.08 : w * 0.05;
-      const textY = isVertical ? h * 0.75  : h * 0.12;
-      const textW = isVertical ? w * 0.84   : w * 0.38;
-
-      // Accent line before text
-      ctx.fillStyle = accent;
-      ctx.fillRect(textX, textY - (isVertical ? h*0.015 : h*0.01), w*0.04, isVertical ? h*0.004 : h*0.003);
-
-      // Brand / product name
-      const nameSize = Math.round(Math.min(w,h) * (isVertical ? 0.048 : 0.038));
-      ctx.font = '300 ' + nameSize + 'px Arial, sans-serif';
-      ctx.fillStyle = subCol;
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'top';
-      ctx.fillText('COLLECTION', textX, textY);
-
-      // Big product title
-      const titleSize = Math.round(Math.min(w,h) * (isVertical ? 0.072 : 0.058));
-      ctx.font = '800 ' + titleSize + 'px Arial, sans-serif';
-      ctx.fillStyle = textCol;
-
-      // Word wrap product name
-      const words = prodName.toUpperCase().split(' ');
-      let line = '', lineY = textY + nameSize * 1.4;
-      const maxLineW = textW;
-      words.forEach((word, i) => {
-        const test = line + (line ? ' ' : '') + word;
-        if (ctx.measureText(test).width > maxLineW && line) {
-          ctx.fillText(line, textX, lineY);
-          lineY += titleSize * 1.15;
-          line = word;
-        } else { line = test; }
-        if (i === words.length - 1) { ctx.fillText(line, textX, lineY); lineY += titleSize * 1.2; }
-      });
-
-      // Promo text
-      if (promoText) {
-        lineY += titleSize * 0.3;
-        // Promo box
-        const promoSize = Math.round(Math.min(w,h) * (isVertical ? 0.052 : 0.042));
-        const promoLines = [];
-        let pLine = '';
-        const pWords = promoText.toUpperCase().split(' ');
-        ctx.font = '700 ' + promoSize + 'px Arial, sans-serif';
-        pWords.forEach((word, i) => {
-          const test = pLine + (pLine ? ' ' : '') + word;
-          if (ctx.measureText(test).width > textW && pLine) {
-            promoLines.push(pLine); pLine = word;
-          } else { pLine = test; }
-          if (i === pWords.length-1) promoLines.push(pLine);
-        });
-
-        const promoBoxH = promoLines.length * promoSize * 1.4 + promoSize * 0.8;
-        // Background box
-        ctx.fillStyle = accent;
-        ctx.beginPath();
-        if (ctx.roundRect) ctx.roundRect(textX - w*0.02, lineY - promoSize*0.4, textW + w*0.04, promoBoxH, w*0.015);
-        else ctx.rect(textX - w*0.02, lineY - promoSize*0.4, textW + w*0.04, promoBoxH);
-        ctx.fill();
-
-        ctx.fillStyle = bg1 === '#fafafa' ? '#fff' : '#000';
-        ctx.fillStyle = '#ffffff';
-        promoLines.forEach((pl, i) => {
-          ctx.fillText(pl, textX, lineY + i * promoSize * 1.4);
-        });
-        lineY += promoBoxH + promoSize * 0.5;
-      }
-
-      // Tagline
-      const tagSize = Math.round(Math.min(w,h) * 0.028);
-      ctx.font = '400 ' + tagSize + 'px Arial, sans-serif';
-      ctx.fillStyle = subCol;
-      ctx.fillText('🇲🇦 Livraison partout au Maroc', textX, lineY + tagSize * 0.5);
-
-      // Bottom accent line
-      ctx.fillStyle = accent;
-      ctx.fillRect(0, h - h*0.008, w, h*0.008);
-
-      // Corner decoration
-      ctx.fillStyle = accent;
-      ctx.globalAlpha = 0.15;
-      ctx.beginPath();
-      ctx.arc(w, 0, w * 0.22, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.globalAlpha = 0.08;
-      ctx.beginPath();
-      ctx.arc(w, 0, w * 0.35, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.globalAlpha = 1;
-
-      resolve(canvas.toDataURL('image/jpeg', 0.95));
-    };
-    pImg.onerror = () => reject(new Error('Impossible de charger la photo'));
-    pImg.src = base64;
-  });
-}
-
-
-async function generateCaptionAI() {
-  const product  = document.getElementById('vis-product').value;
-  const lang     = document.getElementById('vis-lang').value;
-  const platform = PLAT_NAMES[visCurrPlat];
-
-  const langStr  = lang === 'dar' ? 'darija marocain' : lang === 'ar' ? 'arabe classique' : 'français';
-  const prompt   = `Crée une légende pub accrocheuse en ${langStr} pour ${platform} pour ce produit: "${product}". 
-Maximum 3 phrases. Inclure emojis et hashtags adaptés Maroc. Ton engageant et commercial.`;
-
-  const r = await API('POST', '/api/ai/chat', { message: prompt });
-  const captionWrap = document.getElementById('vis-caption-wrap');
-  const captionEl   = document.getElementById('vis-caption');
-
-  captionWrap.style.display = 'block';
-  captionEl.textContent     = r.ok ? r.data.reply : "Légende non disponible";
-}
-
-async function regenCaption() {
-  document.getElementById('vis-caption').textContent = '⏳ Génération...';
-  await generateCaptionAI();
-}
-
-function copyCaption() {
-  const text = document.getElementById('vis-caption').textContent;
-  navigator.clipboard.writeText(text).then(() => alert('✅ Légende copiée!')).catch(() => {});
-}
-
-function downloadVisual() {
-  if (!visCurrImg) return;
-  const a = document.createElement('a');
-  a.href = visCurrImg;
-  a.download = `nexamarket-${visCurrPlat}-${Date.now()}.jpg`;
-  a.target   = '_blank';
-  a.click();
-}
-
-function downloadFormat(plat) {
-  const url = visGenerated[plat];
-  if (!url) return;
-  const a = document.createElement('a');
-  a.href = url; a.download = `nexamarket-${plat}.jpg`; a.target = '_blank';
-  a.click();
-}
-
-function updateFormatCard(plat, imgUrl) {
-  const card = document.getElementById('fmt-' + plat);
-  if (!card) return;
-  const preview = card.querySelector('.format-preview');
-  preview.innerHTML = `<img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:var(--r-sm)" alt="${plat}">`;
-  const dlBtn = document.getElementById('dl-' + plat);
-  if (dlBtn) dlBtn.style.display = 'flex';
-}
-
-async function generateAllFormats() {
-  const product = document.getElementById('vis-product').value.trim();
-  if (!product) {
-    setAlert('vis-alert', "Entrez le produit avant de continuer", 'err');
-    return;
-  }
-
-  const btn = document.getElementById('btn-all-formats');
-  btn.textContent = '⏳ Génération en cours...';
-  btn.disabled    = true;
-
-  const platforms = Object.keys(PLAT_SIZES);
-  const style     = document.getElementById('vis-style').value;
-  const colors    = document.getElementById('vis-colors').value;
-  const text      = document.getElementById('vis-text').value;
-
-  for (const plat of platforms) {
-    const { w, h } = PLAT_SIZES[plat];
-    let p = `${style}, ${product}`;
-    if (colors) p += `, ${colors}`;
-    if (text)   p += `, text "${text}"`;
-
-    const adds = {
-      facebook:'square facebook ad', facebook_story:'vertical story',
-      instagram:'square instagram', instagram_reel:'vertical reel',
-      tiktok:'vertical tiktok', linkedin:'wide linkedin professional'
-    };
-    p += `, ${adds[plat]}, high quality commercial photo`;
-
-    const seed   = Math.floor(Math.random() * 999999);
-    const imgUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(p)}?width=${w}&height=${h}&seed=${seed}&nologo=true&enhance=true`;
-
-    // Update card with loading state
-    const card = document.getElementById('fmt-' + plat);
-    if (card) {
-      card.querySelector('.format-preview').innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:80px;color:var(--t3);font-size:12px">⏳ Génération...</div>`;
-    }
-
-    // Load async
-    const imgEl = new Image();
-    imgEl.crossOrigin = 'anonymous';
-    imgEl.onload = () => {
-      visGenerated[plat] = imgUrl;
-      updateFormatCard(plat, imgUrl);
-    };
-    imgEl.src = imgUrl;
-
-    // Small delay between requests
-    await new Promise(r => setTimeout(r, 800));
-  }
-
-  btn.textContent = '⚡ Régénérer tous les formats';
-  btn.disabled    = false;
-}
 
 /* ═══════════════════════════════════════════════
-   PHOTO UPLOAD & ANALYSE IA
+   VISUELS IA — Canvas 100% fonctionnel
 ═══════════════════════════════════════════════ */
+let visPhoto = null;
+let visTheme = 'dark';
+let visFmtW  = 1080;
+let visFmtH  = 1080;
 
-let uploadedPhotoBase64 = null;
-let uploadedPhotoDesc   = null;
+// Themes
+const VIS_THEMES = {
+  dark:   { bg1:'#0a0a0a', bg2:'#1a1a1a', accent:'#c9a84c', textC:'#ffffff', subC:'rgba(255,255,255,0.6)' },
+  gold:   { bg1:'#1a1200', bg2:'#2d2000', accent:'#c9a84c', textC:'#ffffff', subC:'rgba(201,168,76,0.8)' },
+  white:  { bg1:'#ffffff', bg2:'#f0ede8', accent:'#1a1a1a', textC:'#111111', subC:'rgba(0,0,0,0.5)' },
+  red:    { bg1:'#1a0000', bg2:'#2d0808', accent:'#c0392b', textC:'#ffffff', subC:'rgba(255,120,120,0.7)' },
+  blue:   { bg1:'#00051a', bg2:'#000d2d', accent:'#2979ff', textC:'#ffffff', subC:'rgba(100,160,255,0.7)' },
+  pink:   { bg1:'#1a0010', bg2:'#2d0020', accent:'#e91e8c', textC:'#ffffff', subC:'rgba(255,100,180,0.7)' },
+  green:  { bg1:'#001a08', bg2:'#002d10', accent:'#00c853', textC:'#ffffff', subC:'rgba(100,255,150,0.7)' },
+  purple: { bg1:'#0d001a', bg2:'#1a0030', accent:'#9c27b0', textC:'#ffffff', subC:'rgba(180,100,255,0.7)' },
+};
 
-function handlePhotoDrop(e) {
+function initVisuals() {}
+
+function visDrop(e) {
   e.preventDefault();
-  e.stopPropagation();
-  document.getElementById('photo-upload-zone').style.borderColor = 'var(--border)';
-  const file = e.dataTransfer.files[0];
-  if (file && file.type.startsWith('image/')) processPhotoFile(file);
+  const f = e.dataTransfer.files[0];
+  if (f && f.type.startsWith('image/')) loadVisPhoto(f);
 }
-
-function handlePhotoUpload(input) {
-  const file = input.files[0];
-  if (file) processPhotoFile(file);
+function visFileSelected(inp) {
+  if (inp.files[0]) loadVisPhoto(inp.files[0]);
 }
-
-function processPhotoFile(file) {
-  if (file.size > 10 * 1024 * 1024) {
-    setAlert('vis-alert', 'Photo trop grande — maximum 10MB', 'err');
-    return;
-  }
-
+function loadVisPhoto(file) {
+  if (file.size > 10*1024*1024) { setAlert('vis-gen-alert','Max 10MB','err'); return; }
   const reader = new FileReader();
-  reader.onload = async function(e) {
-    const base64 = e.target.result;
-    uploadedPhotoBase64 = base64;
-
-    // Show preview
-    document.getElementById('photo-placeholder').style.display = 'none';
-    document.getElementById('photo-preview-wrap').style.display = 'block';
-    document.getElementById('photo-preview-img').src = base64;
-    document.getElementById('photo-preview-name').textContent = 
-      file.name + ' (' + Math.round(file.size/1024) + ' KB)';
-
-    // Analyze with AI
-    await analyzePhotoWithAI(base64);
+  reader.onload = e => {
+    visPhoto = e.target.result;
+    document.getElementById('vis-drop-content').style.display = 'none';
+    document.getElementById('vis-thumb').style.display = 'block';
+    document.getElementById('vis-thumb-img').src = visPhoto;
+    document.getElementById('vis-thumb-name').textContent = file.name + ' (' + Math.round(file.size/1024) + 'KB)';
   };
   reader.readAsDataURL(file);
 }
-
-function removePhoto() {
-  uploadedPhotoBase64 = null;
-  uploadedPhotoDesc   = null;
-  document.getElementById('photo-placeholder').style.display = 'block';
-  document.getElementById('photo-preview-wrap').style.display = 'none';
-  document.getElementById('photo-analyzing').style.display = 'none';
-  document.getElementById('photo-analyzed').style.display = 'none';
-  document.getElementById('photo-file-inp').value = '';
+function visRemove() {
+  visPhoto = null;
+  document.getElementById('vis-drop-content').style.display = 'block';
+  document.getElementById('vis-thumb').style.display = 'none';
+  document.getElementById('vis-file').value = '';
+  document.getElementById('vis-canvas').style.display = 'none';
+  document.getElementById('vis-empty').style.display = 'flex';
+  document.getElementById('vis-actions').style.display = 'none';
+  document.getElementById('vis-caption-box').style.display = 'none';
+}
+function selTheme(el, theme) {
+  document.querySelectorAll('.vis-theme').forEach(t => {
+    t.style.borderColor = 'var(--border)';
+    t.classList.remove('sel');
+  });
+  el.style.borderColor = 'var(--violet)';
+  el.classList.add('sel');
+  visTheme = theme;
+}
+function selFmt(el, name, w, h) {
+  document.querySelectorAll('.vis-fmt').forEach(t => {
+    t.style.borderColor = 'var(--border)';
+    t.style.background  = 'transparent';
+  });
+  el.style.borderColor = 'var(--violet)';
+  el.style.background  = 'rgba(99,102,241,.1)';
+  visFmtW = w; visFmtH = h;
 }
 
-async function analyzePhotoWithAI(base64) {
-  document.getElementById('photo-analyzing').style.display = 'block';
-  document.getElementById('photo-analyzed').style.display = 'none';
-  document.getElementById('photo-analyze-txt').textContent = 'Analyse IA de votre photo...';
+async function visGenerate() {
+  if (!visPhoto) { setAlert('vis-gen-alert','Uploadez d'abord une photo produit','err'); return; }
+  const name  = document.getElementById('vis-name').value.trim() || 'Produit Premium';
+  const promo = document.getElementById('vis-promo').value.trim();
+  document.getElementById('vis-gen-alert').textContent = '';
 
-  try {
-    const r = await fetch('/api/ai/analyze-image', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + TOKEN
-      },
-      body: JSON.stringify({ imageBase64: base64 })
+  const canvas = document.getElementById('vis-canvas');
+  canvas.width  = visFmtW;
+  canvas.height = visFmtH;
+  canvas.style.display = 'block';
+  document.getElementById('vis-empty').style.display = 'none';
+
+  const ctx = canvas.getContext('2d');
+  const T   = VIS_THEMES[visTheme] || VIS_THEMES.dark;
+  const W   = visFmtW, H = visFmtH;
+  const isStory = H > W;
+
+  // Background
+  const bgGrad = ctx.createLinearGradient(0, 0, isStory ? 0 : W, isStory ? H : 0);
+  bgGrad.addColorStop(0, T.bg1);
+  bgGrad.addColorStop(1, T.bg2);
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Diagonal shine
+  ctx.save();
+  const shine = ctx.createLinearGradient(0, 0, W, H);
+  shine.addColorStop(0, 'rgba(255,255,255,0.04)');
+  shine.addColorStop(0.5, 'rgba(255,255,255,0.01)');
+  shine.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = shine;
+  ctx.fillRect(0, 0, W, H);
+  ctx.restore();
+
+  // Accent vertical bar (left)
+  ctx.fillStyle = T.accent;
+  ctx.fillRect(0, 0, Math.round(W * 0.013), H);
+
+  // Circle decoration (top right)
+  ctx.save();
+  ctx.globalAlpha = 0.08;
+  ctx.fillStyle = T.accent;
+  ctx.beginPath();
+  ctx.arc(W, 0, W * 0.38, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.globalAlpha = 0.04;
+  ctx.beginPath();
+  ctx.arc(W, 0, W * 0.55, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  // Load product image
+  await new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      // Image zone
+      const imgPad  = W * 0.08;
+      const imgX    = isStory ? imgPad : W * 0.45;
+      const imgY    = isStory ? H * 0.22 : H * 0.12;
+      const imgMaxW = isStory ? W - imgPad*2 : W * 0.50;
+      const imgMaxH = isStory ? H * 0.50     : H * (promo ? 0.60 : 0.72);
+
+      const scale = Math.min(imgMaxW / img.width, imgMaxH / img.height);
+      const iw = img.width * scale, ih = img.height * scale;
+      const ix = imgX + (imgMaxW - iw) / 2;
+      const iy = imgY + (imgMaxH - ih) / 2;
+
+      // Shadow
+      ctx.save();
+      ctx.shadowColor   = 'rgba(0,0,0,0.45)';
+      ctx.shadowBlur    = W * 0.07;
+      ctx.shadowOffsetX = W * 0.015;
+      ctx.shadowOffsetY = H * 0.02;
+      ctx.drawImage(img, ix, iy, iw, ih);
+      ctx.restore();
+
+      resolve();
+    };
+    img.onerror = resolve;
+    img.src = visPhoto;
+  });
+
+  // Text area
+  const tX = isStory ? W * 0.07 : W * 0.055;
+  const tY = isStory ? H * 0.76  : H * 0.10;
+  const tW = isStory ? W * 0.86   : W * 0.36;
+
+  // Accent line
+  ctx.fillStyle = T.accent;
+  ctx.fillRect(tX, tY - H*0.012, W*0.05, H*0.003);
+
+  // "COLLECTION" subtitle
+  const subSz = Math.round(Math.min(W,H) * 0.032);
+  ctx.font = '300 ' + subSz + 'px Arial';
+  ctx.fillStyle = T.subC;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillText('COLLECTION', tX, tY);
+
+  // Product name (big, bold)
+  const nameSz = Math.round(Math.min(W,H) * (isStory ? 0.062 : 0.052));
+  ctx.font = '800 ' + nameSz + 'px Arial';
+  ctx.fillStyle = T.textC;
+
+  let lineY = tY + subSz * 1.5;
+  const words = name.toUpperCase().split(' ');
+  let line = '';
+  words.forEach((w2, i) => {
+    const test = line + (line ? ' ' : '') + w2;
+    if (ctx.measureText(test).width > tW && line) {
+      ctx.fillText(line, tX, lineY);
+      lineY += nameSz * 1.18;
+      line = w2;
+    } else line = test;
+    if (i === words.length-1) { ctx.fillText(line, tX, lineY); lineY += nameSz * 1.3; }
+  });
+
+  // Promo text box
+  if (promo) {
+    lineY += nameSz * 0.2;
+    const promoSz = Math.round(Math.min(W,H) * (isStory ? 0.048 : 0.038));
+    ctx.font = '700 ' + promoSz + 'px Arial';
+
+    // Measure lines
+    const pWords = promo.toUpperCase().split(' ');
+    const pLines = [];
+    let pLine = '';
+    pWords.forEach((w2, i) => {
+      const t2 = pLine + (pLine?' ':'' ) + w2;
+      if (ctx.measureText(t2).width > tW && pLine) { pLines.push(pLine); pLine=w2; }
+      else pLine = t2;
+      if (i===pWords.length-1) pLines.push(pLine);
     });
-    const data = await r.json();
 
-    if (r.ok && data.description) {
-      uploadedPhotoDesc = data.description;
-      const prodInp = document.getElementById('vis-product');
-      if (!prodInp.value.trim()) {
-        prodInp.value = data.productName || data.description.slice(0, 80);
-      }
-      // Auto-fill colors if suggested
-      if (data.suggestedColors) {
-        const colorsInp = document.getElementById('vis-colors');
-        if (!colorsInp.value.trim()) colorsInp.value = data.suggestedColors;
-      }
-      document.getElementById('photo-analyzing').style.display = 'none';
-      document.getElementById('photo-analyzed').style.display = 'block';
-    } else {
-      document.getElementById('photo-analyze-txt').textContent = 'Entrez la description manuellement';
-    }
-  } catch(err) {
-    console.error('Analyze error:', err);
-    document.getElementById('photo-analyze-txt').textContent = 'Entrez la description manuellement';
+    const boxH = pLines.length * promoSz * 1.45 + promoSz * 0.7;
+    // Accent box
+    ctx.fillStyle = T.accent;
+    ctx.beginPath();
+    const bx = tX - W*0.018, by = lineY - promoSz*0.35;
+    const bw2 = tW + W*0.036;
+    const r2 = W * 0.018;
+    ctx.moveTo(bx+r2, by);
+    ctx.lineTo(bx+bw2-r2, by);
+    ctx.quadraticCurveTo(bx+bw2, by, bx+bw2, by+r2);
+    ctx.lineTo(bx+bw2, by+boxH-r2);
+    ctx.quadraticCurveTo(bx+bw2, by+boxH, bx+bw2-r2, by+boxH);
+    ctx.lineTo(bx+r2, by+boxH);
+    ctx.quadraticCurveTo(bx, by+boxH, bx, by+boxH-r2);
+    ctx.lineTo(bx, by+r2);
+    ctx.quadraticCurveTo(bx, by, bx+r2, by);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = '#ffffff';
+    pLines.forEach((pl, i) => ctx.fillText(pl, tX, lineY + i * promoSz * 1.45));
+    lineY += boxH + promoSz * 0.6;
   }
+
+  // Bottom tagline
+  const tagSz = Math.round(Math.min(W,H) * 0.026);
+  ctx.font = '400 ' + tagSz + 'px Arial';
+  ctx.fillStyle = T.subC;
+  ctx.fillText('🇲🇦 Livraison partout au Maroc', tX, lineY + tagSz * 0.3);
+
+  // Bottom accent line
+  ctx.fillStyle = T.accent;
+  ctx.fillRect(0, H - Math.round(H*0.007), W, Math.round(H*0.007));
+
+  // Show actions
+  document.getElementById('vis-actions').style.display = 'flex';
+
+  // Generate caption
+  await visCaption();
+}
+
+function visDownload() {
+  const canvas = document.getElementById('vis-canvas');
+  const a = document.createElement('a');
+  a.download = 'nexamarket-pub-' + visTheme + '-' + visFmtW + 'x' + visFmtH + '.jpg';
+  a.href = canvas.toDataURL('image/jpeg', 0.95);
+  a.click();
+}
+
+async function visCaption() {
+  const name  = document.getElementById('vis-name').value || 'produit';
+  const lang  = document.getElementById('vis-cap-lang')?.value || 'dar';
+  const langStr = lang==='dar' ? 'darija marocain' : lang==='ar' ? 'arabe' : 'français';
+  const box   = document.getElementById('vis-caption-box');
+  const txt   = document.getElementById('vis-caption-txt');
+  box.style.display = 'block';
+  txt.textContent = '⏳ Génération légende IA...';
+  const r = await API('POST', '/api/ai/chat', {
+    message: 'Crée une légende pub courte et accrocheuse en ' + langStr + ' pour: "' + name + '". 2-3 phrases max avec emojis et hashtags Maroc.'
+  });
+  txt.textContent = r.ok ? r.data.reply : 'Erreur IA — vérifiez Groq';
 }
 
 </script>
 </body>
-</html>
