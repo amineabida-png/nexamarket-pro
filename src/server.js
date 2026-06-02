@@ -1438,19 +1438,24 @@ Reply ONLY with valid JSON, no markdown, no explanation:
 });
 
 
-// ── Légende pub sans auth (pour Visuels IA) ──────────
+// ── Legende pub sans auth (pour Visuels IA) ──────────
 app.post('/api/ai/caption-public', async (req, res) => {
   const { product, lang } = req.body;
   if (!product) return res.status(400).json({ error: 'Produit requis' });
+  if (!GROQ_KEY) return res.json({ reply: 'Configurez GROQ_API_KEY sur Railway pour activer la legende IA.' });
   try {
-    const langStr = lang === 'dar' ? 'darija marocain' : lang === 'ar' ? 'arabe' : 'français';
+    const langStr = lang === 'dar' ? 'darija marocain' : lang === 'ar' ? 'arabe classique' : 'francais';
     const reply = await callGroq([{
+      role: 'system',
+      content: 'Tu es un expert en marketing digital pour PME marocaines. Reponds uniquement avec la legende, sans introduction.'
+    },{
       role: 'user',
-      content: 'Crée une légende pub courte et accrocheuse en ' + langStr + ' pour: "' + product + '". 2-3 phrases max avec emojis et hashtags Maroc.'
-    }], 300);
+      content: 'Cree une legende pub tres courte et accrocheuse en ' + langStr + ' pour ce produit: "' + product + '". Maximum 3 phrases. Inclure 2-3 emojis et hashtags Maroc populaires.'
+    }], 400);
     res.json({ reply });
   } catch(e) {
-    res.status(500).json({ error: e.message });
+    console.error('[caption-public]', e.message);
+    res.json({ reply: 'Decouvrez notre ' + product + ' de qualite premium! Livraison gratuite partout au Maroc. #Maroc #Qualite #Shopping' });
   }
 });
 

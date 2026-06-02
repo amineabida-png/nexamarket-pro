@@ -1783,8 +1783,10 @@ function showPage(id, navEl) {
   if (navEl) navEl.classList.add('on');
 
   const m = PAGE_META[id] || {};
-  document.getElementById('hdr-title').textContent = m.t || id;
-  document.getElementById('hdr-s').textContent     = m.s || '';
+  const hdrT = document.getElementById('hdr-title');
+  const hdrS = document.getElementById('hdr-s');
+  if (hdrT) hdrT.textContent = m.t || id;
+  if (hdrS) hdrS.textContent = m.s || '';
 
   // Load data for page
   if (id === 'dashboard')  loadDashboard();
@@ -2548,8 +2550,15 @@ function selFmt(el, name, w, h) {
 }
 
 async function visGenerate() {
-  if (!visPhoto) { setAlert("vis-gen-alert","Uploadez une photo produit","err"); return; }
-  const name  = document.getElementById('vis-name').value.trim() || 'Produit Premium';
+  if (!visPhoto) { setAlert("vis-gen-alert","Uploadez une photo produit d'abord","err"); return; }
+  const nameEl = document.getElementById('vis-name');
+  const rawName = nameEl ? nameEl.value.trim() : '';
+  if (!rawName) {
+    setAlert("vis-gen-alert","Entrez le nom du produit", "err");
+    if (nameEl) nameEl.focus();
+    return;
+  }
+  const name = rawName;
   const promo = document.getElementById('vis-promo').value.trim();
   document.getElementById('vis-gen-alert').textContent = '';
 
@@ -2732,21 +2741,32 @@ function visDownload() {
 
 async function visCaption() {
   const name = document.getElementById('vis-name').value || 'produit';
-  const lang = document.getElementById('vis-cap-lang') ? document.getElementById('vis-cap-lang').value : 'dar';
+  const langEl = document.getElementById('vis-cap-lang');
+  const lang = langEl ? langEl.value : 'dar';
   const box  = document.getElementById('vis-caption-box');
   const txt  = document.getElementById('vis-caption-txt');
+  if (!box || !txt) return;
   box.style.display = 'block';
-  txt.textContent = 'Generation legende IA...';
+  txt.textContent = 'Generation en cours...';
   try {
+    // Try public endpoint first
     const r = await fetch('/api/ai/caption-public', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ product: name, lang: lang })
     });
-    const data = await r.json();
-    txt.textContent = r.ok ? data.reply : 'Verifiez votre connexion Groq';
+    if (r.ok) {
+      const data = await r.json();
+      txt.textContent = data.reply || 'Aucune legende generee';
+    } else {
+      // Fallback: use authenticated endpoint
+      const r2 = await API('POST', '/api/ai/chat', {
+        message: 'Cree une legende pub en ' + (lang==='dar'?'darija':'francais') + ' pour: "' + name + '". 2 phrases max avec hashtags Maroc.'
+      });
+      txt.textContent = r2.ok ? r2.data.reply : 'Ajoutez votre texte de legende ici';
+    }
   } catch(e) {
-    txt.textContent = 'Erreur reseau';
+    txt.textContent = 'Ajoutez votre texte de legende ici';
   }
 }
 
